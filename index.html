@@ -3,7 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="フィラメント代・電気代・プリンター償却費・失敗率・販売手数料から、3Dプリント作品の原価と販売価格を計算できる無料ツールです。">
+  <meta name="description" content="フィラメント代、電気代、3Dプリンターの償却費、失敗率、梱包費、送料、販売手数料から、作品1個あたりの原価と目標利益率に応じた販売価格を計算できる無料ツールです。">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="3Dプリンター原価・販売価格計算ツール">
+  <meta property="og:description" content="材料費・電気代・機材費・失敗率・販売手数料を考慮して、3Dプリント作品の原価と販売価格を計算。">
+  <meta property="og:url" content="https://3d-print-cost-calculator-7ce.pages.dev/">
+  <link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/">
   <title>3Dプリンター原価・販売価格計算ツール</title>
   <style>
     :root { color-scheme: light; --ink:#172033; --muted:#5b6577; --line:#dce2eb; --surface:#fff; --bg:#f4f7fb; --accent:#225bd6; --accent2:#eaf0ff; --good:#147548; }
@@ -43,7 +49,15 @@
     .btn-primary { background:var(--accent); color:white; }
     .btn-secondary { background:#eef2f8; color:var(--ink); }
     .note { color:var(--muted); font-size:.84rem; margin:12px 0 0; }
-    footer { color:var(--muted); font-size:.82rem; padding:0 16px 28px; }
+    .guide { margin-top:18px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; }
+    .guide h2 { font-size:1.2rem; margin:0 0 12px; }
+    .guide h3 { font-size:1rem; margin:18px 0 6px; }
+    .guide p,.guide li { color:#354156; }
+    .guide ul { padding-left:1.25rem; }
+    .formula { background:#f5f8fd; border:1px solid #e4eaf3; border-radius:9px; padding:12px; overflow-wrap:anywhere; }
+    .faq-item { border-top:1px solid var(--line); padding:12px 0; }
+    .faq-item h3 { margin:0 0 5px; }
+    footer { color:var(--muted); font-size:.82rem; padding:18px 16px 28px; }
     @media(max-width:760px) { .layout { grid-template-columns:1fr; } .results { grid-column:auto; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     @media(max-width:420px) { .fields { grid-template-columns:1fr; } .panel { padding:15px; } .metrics { gap:8px; } .metric { padding:11px; } }
   </style>
@@ -150,8 +164,59 @@
       <p class="note" id="warning"></p>
     </section>
   </div>
+  <section class="guide" aria-labelledby="guide-title">
+    <h2 id="guide-title">3Dプリンター作品の原価・販売価格の計算方法</h2>
+    <p>3Dプリンターで作った作品を販売する場合、フィラメント代だけで価格を決めると、電気代、プリンターの消耗、印刷失敗、梱包・送料、販売手数料を回収できないことがあります。このツールでは、入力した条件から作品1個あたりの概算原価と販売価格を計算します。</p>
+
+    <h3>1. フィラメント代</h3>
+    <p class="formula">フィラメント代 ＝ フィラメント購入価格 ÷ スプール総重量 × 作品1個の使用量</p>
+    <p>例えば、1,000gで2,500円のフィラメントを80g使う場合、材料費は200円です。サポート材やパージ分も見込む場合は、作品の使用量に加えて入力してください。</p>
+
+    <h3>2. 電気代</h3>
+    <p class="formula">電気代 ＝ 印刷時間 × 消費電力 ÷ 1,000 × 電気料金単価</p>
+    <p>消費電力はW、印刷時間は時間、電気料金単価は円/kWhで入力します。実際の消費電力は機種や設定、加熱状態によって変わるため、必要に応じて実測値に置き換えてください。</p>
+
+    <h3>3. プリンターの償却費</h3>
+    <p class="formula">償却費 ＝ プリンター購入価格 ÷ 想定使用可能時間 × 印刷時間</p>
+    <p>これは購入費を使用時間で按分する簡易計算です。修理費、ノズルなどの交換部品、保守費用は別途考慮してください。</p>
+
+    <h3>4. 印刷失敗率</h3>
+    <p class="formula">失敗率反映後の製造原価 ＝ 失敗率反映前の製造原価 ÷ (1 − 失敗率)</p>
+    <p>例えば失敗率が5%なら、成功品1個を得るための期待製造コストとして製造原価を0.95で割ります。この計算は、失敗した印刷にも製造コストが発生し、梱包・送料は成功品にだけ発生する想定です。</p>
+
+    <h3>5. 目標利益率から販売価格を計算</h3>
+    <p class="formula">販売価格 ＝ (失敗率反映後の製造原価 ＋ 梱包費 ＋ 送料) ÷ (1 − 販売手数料率 − 目標利益率)</p>
+    <p>目標利益率は、販売価格に対する利益の割合です。販売手数料率と目標利益率の合計が100%未満である必要があります。固定出品料、税金、人件費、値引き、返品・再発送費などは、初期版の計算に含まれていません。</p>
+
+    <h2>使い方</h2>
+    <ul>
+      <li>フィラメント購入価格、スプール重量、作品1個の使用量を入力します。</li>
+      <li>印刷時間、消費電力、電気料金単価を入力します。</li>
+      <li>プリンター購入価格と想定使用可能時間、印刷失敗率を設定します。</li>
+      <li>梱包費、出品者負担の送料、販売手数料率、目標利益率を入力します。</li>
+      <li>計算結果の販売価格・原価・利益額を確認し、必要に応じて条件を調整します。</li>
+    </ul>
+
+    <h2>よくある質問</h2>
+    <div class="faq-item">
+      <h3>この計算ツールは無料ですか？</h3>
+      <p>はい。現在の基本機能は無料で、入力値はブラウザ内で計算します。入力内容をサーバーへ送信・保存する機能はありません。</p>
+    </div>
+    <div class="faq-item">
+      <h3>計算した販売価格で必ず利益が出ますか？</h3>
+      <p>いいえ。計算結果は入力条件に基づく概算です。人件費、税金、固定手数料、保守費、返品や値引きなど、含まれていない費用も確認してください。</p>
+    </div>
+    <div class="faq-item">
+      <h3>販売手数料率はどの値を入力すればよいですか？</h3>
+      <p>利用する販売サイトや決済サービスの最新の料金表を確認し、売上に対してかかる割合を入力してください。固定手数料がある場合は、このツールだけでは完全には反映できません。</p>
+    </div>
+    <div class="faq-item">
+      <h3>失敗率はどのように設定すればよいですか？</h3>
+      <p>過去の印刷回数と失敗回数を記録し、失敗回数 ÷ 全印刷回数で見積もる方法があります。作品や材料、印刷設定によって変わるため、実績に応じて調整してください。</p>
+    </div>
+  </section>
 </main>
-<footer class="wrap">本ツールは概算用です。実際の材料ロス、保守費、税金、販売サービスの料金体系などを確認し、販売前にご自身の条件で検証してください。</footer>
+<footer class="wrap">本ツールは概算用です。実際の材料ロス、保守費、人件費、税金、販売サービスの料金体系などを確認し、販売前にご自身の条件で検証してください。</footer>
 <script>
 (() => {
   const ids = ["filamentPrice","spoolWeight","usedGrams","printHours","powerWatts","electricityRate","printerPrice","printerLifeHours","failureRate","otherCost","packagingCost","shippingCost","feeRate","targetMargin"];
@@ -163,9 +228,12 @@
   function calculate() {
     const spool = num("spoolWeight");
     const life = num("printerLifeHours");
-    const failure = Math.min(99, num("failureRate")) / 100;
-    const fee = Math.min(99, num("feeRate")) / 100;
-    const target = Math.min(95, num("targetMargin")) / 100;
+    const failureInput = num("failureRate");
+    const feeInput = num("feeRate");
+    const targetInput = num("targetMargin");
+    const failure = Math.min(99, failureInput) / 100;
+    const fee = Math.min(99, feeInput) / 100;
+    const target = Math.min(95, targetInput) / 100;
     const filament = spool > 0 ? num("filamentPrice") / spool * num("usedGrams") : NaN;
     const electricity = num("printHours") * num("powerWatts") / 1000 * num("electricityRate");
     const depreciation = life > 0 ? num("printerPrice") / life * num("printHours") : NaN;
@@ -196,6 +264,9 @@
     let warning = "";
     if (spool <= 0) warning = "スプール総重量は1g以上を入力してください。";
     else if (life <= 0) warning = "想定使用可能時間は1時間以上を入力してください。";
+    else if (failureInput >= 100) warning = "印刷失敗率は100%未満を入力してください。計算では99%として扱っています。";
+    else if (feeInput >= 100) warning = "販売手数料率は100%未満を入力してください。計算では99%として扱っています。";
+    else if (targetInput >= 100) warning = "目標利益率が高すぎます。95%以下を入力してください。";
     else if (denominator <= 0) warning = "販売手数料率と目標利益率の合計が100%以上のため、販売価格を計算できません。";
     else warning = "原価は概算です。失敗率は製造原価に対して反映しています。";
     put("warning", warning);

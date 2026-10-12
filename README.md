@@ -1,2 +1,14 @@
-# 3d-print-cost-calculator
-3D printer cost and selling price calculator
+# 3Dプリンター原価・販売価格計算ツール
+
+ブラウザ内で動作する日本語の無料計算ツールです。入力値をサーバーへ送信・保存する機能はありません。
+
+## ファイル
+- `index.html`: 計算ツール本体、使い方、計算式、FAQ
+- `robots.txt`: クローラー向けの案内
+- `sitemap.xml`: トップページのサイトマップ
+
+## 公開
+Cloudflare PagesでGitHubリポジトリのルートを公開します。ビルド処理は不要です。
+
+## 注意
+計算は概算です。人件費、税金、固定出品料、保守費、返品・値引き、材料ロスなどは利用者自身で確認してください。
