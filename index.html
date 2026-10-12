@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="フィラメント代・電気代・プリンター償却費・失敗率・販売手数料から、3Dプリント作品の原価と販売価格を計算できる無料ツールです。">
+  <title>3Dプリンター原価・販売価格計算ツール</title>
+  <style>
+    :root { color-scheme: light; --ink:#172033; --muted:#5b6577; --line:#dce2eb; --surface:#fff; --bg:#f4f7fb; --accent:#225bd6; --accent2:#eaf0ff; --good:#147548; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
+    header { background:#13264b; color:white; padding:28px 18px 24px; }
+    .wrap { max-width:1080px; margin:auto; }
+    header h1 { margin:0 0 8px; font-size:clamp(1.45rem,4vw,2.1rem); }
+    header p { margin:0; color:#e0e8fb; max-width:760px; }
+    main { padding:22px 16px 40px; }
+    .intro { margin:0 0 18px; color:var(--muted); }
+    .layout { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+    .panel { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:0 3px 12px #1b31530a; }
+    .panel h2 { font-size:1.08rem; margin:0 0 14px; }
+    .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 12px; }
+    label { display:block; font-size:.9rem; font-weight:650; }
+    .hint { display:block; color:var(--muted); font-size:.78rem; font-weight:400; margin-top:2px; }
+    .control { display:flex; margin-top:6px; }
+    input { width:100%; min-width:0; border:1px solid #c9d2e0; border-radius:8px; padding:10px 11px; font:inherit; color:var(--ink); background:white; }
+    input:focus { outline:3px solid #225bd626; border-color:var(--accent); }
+    .unit { display:flex; align-items:center; padding:0 10px; background:#f0f3f8; border:1px solid #c9d2e0; border-left:0; border-radius:0 8px 8px 0; color:var(--muted); white-space:nowrap; font-size:.85rem; }
+    .control:has(.unit) input { border-radius:8px 0 0 8px; }
+    .results { grid-column:1 / -1; background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; }
+    .results h2 { margin:0 0 14px; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .metric { background:#f5f8fd; border:1px solid #e4eaf3; padding:14px; border-radius:11px; }
+    .metric .name { color:var(--muted); font-size:.83rem; }
+    .metric .value { font-size:clamp(1.15rem,2.5vw,1.7rem); font-weight:750; margin-top:5px; overflow-wrap:anywhere; }
+    .metric.primary { background:var(--accent2); border-color:#cbd9ff; }
+    .metric.primary .value { color:var(--accent); }
+    .details { width:100%; border-collapse:collapse; margin-top:18px; }
+    .details th,.details td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); }
+    .details th { color:var(--muted); font-weight:600; }
+    .details td:last-child,.details th:last-child { text-align:right; font-variant-numeric:tabular-nums; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; }
+    button { border:0; border-radius:9px; padding:10px 14px; font:inherit; font-weight:650; cursor:pointer; }
+    .btn-primary { background:var(--accent); color:white; }
+    .btn-secondary { background:#eef2f8; color:var(--ink); }
+    .note { color:var(--muted); font-size:.84rem; margin:12px 0 0; }
+    footer { color:var(--muted); font-size:.82rem; padding:0 16px 28px; }
+    @media(max-width:760px) { .layout { grid-template-columns:1fr; } .results { grid-column:auto; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media(max-width:420px) { .fields { grid-template-columns:1fr; } .panel { padding:15px; } .metrics { gap:8px; } .metric { padding:11px; } }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>3Dプリンター原価・販売価格計算ツール</h1>
+    <p>材料費・電気代・機材の償却費・失敗率・販売手数料をまとめて計算。作品1個あたりの原価と、目標利益率に応じた販売価格を確認できます。</p>
+  </div>
+</header>
+<main class="wrap">
+  <p class="intro">入力値はこのブラウザ内で計算されます。入力データをサーバーへ送信・保存する機能はありません。</p>
+  <div class="layout">
+    <section class="panel">
+      <h2>1. フィラメント・印刷条件</h2>
+      <div class="fields">
+        <label>フィラメント購入価格
+          <span class="control"><input id="filamentPrice" type="number" min="0" step="1" value="2500"><span class="unit">円</span></span>
+        </label>
+        <label>スプール総重量
+          <span class="control"><input id="spoolWeight" type="number" min="1" step="1" value="1000"><span class="unit">g</span></span>
+        </label>
+        <label>作品1個の使用量
+          <span class="control"><input id="usedGrams" type="number" min="0" step="0.1" value="80"><span class="unit">g</span></span>
+        </label>
+        <label>印刷時間
+          <span class="control"><input id="printHours" type="number" min="0" step="0.1" value="5"><span class="unit">時間</span></span>
+        </label>
+        <label>プリンター消費電力
+          <span class="control"><input id="powerWatts" type="number" min="0" step="1" value="150"><span class="unit">W</span></span>
+        </label>
+        <label>電気料金単価
+          <span class="control"><input id="electricityRate" type="number" min="0" step="0.1" value="31"><span class="unit">円/kWh</span></span>
+        </label>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>2. 機材・失敗率</h2>
+      <div class="fields">
+        <label>プリンター購入価格
+          <span class="control"><input id="printerPrice" type="number" min="0" step="1" value="60000"><span class="unit">円</span></span>
+        </label>
+        <label>想定使用可能時間
+          <span class="control"><input id="printerLifeHours" type="number" min="1" step="1" value="3000"><span class="unit">時間</span></span>
+          <span class="hint">償却費を計算するための目安</span>
+        </label>
+        <label>印刷失敗率
+          <span class="control"><input id="failureRate" type="number" min="0" max="99" step="1" value="5"><span class="unit">%</span></span>
+        </label>
+        <label>その他消耗品費
+          <span class="control"><input id="otherCost" type="number" min="0" step="1" value="20"><span class="unit">円/個</span></span>
+        </label>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>3. 販売条件</h2>
+      <div class="fields">
+        <label>梱包費
+          <span class="control"><input id="packagingCost" type="number" min="0" step="1" value="80"><span class="unit">円/個</span></span>
+        </label>
+        <label>送料（出品者負担分）
+          <span class="control"><input id="shippingCost" type="number" min="0" step="1" value="230"><span class="unit">円/個</span></span>
+        </label>
+        <label>販売手数料率
+          <span class="control"><input id="feeRate" type="number" min="0" max="99" step="0.1" value="10"><span class="unit">%</span></span>
+        </label>
+        <label>目標利益率
+          <span class="control"><input id="targetMargin" type="number" min="0" max="95" step="1" value="30"><span class="unit">%</span></span>
+          <span class="hint">販売価格に対する利益の割合</span>
+        </label>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>計算方法</h2>
+      <p class="note">失敗率は「成功品1個を得るための期待コスト」として、失敗率を考慮した原価に反映します。販売価格は、販売手数料と目標利益率を差し引いて逆算します。</p>
+      <p class="note">人件費・税金・プラットフォームごとの固定費は初期版では含みません。必要に応じて後から追加できます。</p>
+      <div class="actions">
+        <button class="btn-secondary" id="resetBtn" type="button">初期値に戻す</button>
+        <button class="btn-primary" id="copyBtn" type="button">計算結果をコピー</button>
+      </div>
+      <p class="note" id="copyStatus" role="status" aria-live="polite"></p>
+    </section>
+    <section class="results" aria-live="polite">
+      <h2>計算結果（作品1個あたり）</h2>
+      <div class="metrics">
+        <div class="metric primary"><div class="name">目標利益率での販売価格</div><div class="value" id="suggestedPrice">—</div></div>
+        <div class="metric"><div class="name">失敗率込みの原価</div><div class="value" id="totalCost">—</div></div>
+        <div class="metric"><div class="name">販売時の利益額</div><div class="value" id="profit">—</div></div>
+        <div class="metric"><div class="name">販売利益率</div><div class="value" id="margin">—</div></div>
+      </div>
+      <table class="details">
+        <tbody>
+          <tr><th scope="row">フィラメント代</th><td id="filamentCost">—</td></tr>
+          <tr><th scope="row">電気代</th><td id="electricityCost">—</td></tr>
+          <tr><th scope="row">プリンター償却費</th><td id="depreciationCost">—</td></tr>
+          <tr><th scope="row">その他消耗品費</th><td id="otherCostResult">—</td></tr>
+          <tr><th scope="row">失敗率反映前の製造原価</th><td id="baseCost">—</td></tr>
+          <tr><th scope="row">梱包費・送料を含む原価</th><td id="costWithShipping">—</td></tr>
+          <tr><th scope="row">販売手数料（提案価格で計算）</th><td id="feeCost">—</td></tr>
+          <tr><th scope="row">損益分岐となる販売価格</th><td id="breakEvenPrice">—</td></tr>
+        </tbody>
+      </table>
+      <p class="note" id="warning"></p>
+    </section>
+  </div>
+</main>
+<footer class="wrap">本ツールは概算用です。実際の材料ロス、保守費、税金、販売サービスの料金体系などを確認し、販売前にご自身の条件で検証してください。</footer>
+<script>
+(() => {
+  const ids = ["filamentPrice","spoolWeight","usedGrams","printHours","powerWatts","electricityRate","printerPrice","printerLifeHours","failureRate","otherCost","packagingCost","shippingCost","feeRate","targetMargin"];
+  const defaults = Object.fromEntries(ids.map(id => [id, document.getElementById(id).value]));
+  const num = id => Math.max(0, Number(document.getElementById(id).value) || 0);
+  const yen = value => Number.isFinite(value) ? Math.round(value).toLocaleString("ja-JP", {style:"currency",currency:"JPY",maximumFractionDigits:0}) : "計算不可";
+  const pct = value => Number.isFinite(value) ? `${value.toFixed(1)}%` : "計算不可";
+  const put = (id, value) => document.getElementById(id).textContent = value;
+  function calculate() {
+    const spool = num("spoolWeight");
+    const life = num("printerLifeHours");
+    const failure = Math.min(99, num("failureRate")) / 100;
+    const fee = Math.min(99, num("feeRate")) / 100;
+    const target = Math.min(95, num("targetMargin")) / 100;
+    const filament = spool > 0 ? num("filamentPrice") / spool * num("usedGrams") : NaN;
+    const electricity = num("printHours") * num("powerWatts") / 1000 * num("electricityRate");
+    const depreciation = life > 0 ? num("printerPrice") / life * num("printHours") : NaN;
+    const other = num("otherCost");
+    const base = filament + electricity + depreciation + other;
+    const production = base / (1 - failure);
+    const packaging = num("packagingCost");
+    const shipping = num("shippingCost");
+    const landed = production + packaging + shipping;
+    const breakEven = fee < 1 ? landed / (1 - fee) : NaN;
+    const denominator = 1 - fee - target;
+    const suggested = denominator > 0 ? landed / denominator : NaN;
+    const profit = suggested * (1 - fee) - landed;
+    const margin = suggested > 0 ? profit / suggested * 100 : NaN;
+
+    put("filamentCost", yen(filament));
+    put("electricityCost", yen(electricity));
+    put("depreciationCost", yen(depreciation));
+    put("otherCostResult", yen(other));
+    put("baseCost", yen(base));
+    put("costWithShipping", yen(landed));
+    put("feeCost", yen(suggested * fee));
+    put("breakEvenPrice", yen(breakEven));
+    put("suggestedPrice", yen(suggested));
+    put("totalCost", yen(landed));
+    put("profit", yen(profit));
+    put("margin", pct(margin));
+    let warning = "";
+    if (spool <= 0) warning = "スプール総重量は1g以上を入力してください。";
+    else if (life <= 0) warning = "想定使用可能時間は1時間以上を入力してください。";
+    else if (denominator <= 0) warning = "販売手数料率と目標利益率の合計が100%以上のため、販売価格を計算できません。";
+    else warning = "原価は概算です。失敗率は製造原価に対して反映しています。";
+    put("warning", warning);
+  }
+  ids.forEach(id => document.getElementById(id).addEventListener("input", calculate));
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    ids.forEach(id => document.getElementById(id).value = defaults[id]);
+    calculate();
+    put("copyStatus", "初期値に戻しました。");
+  });
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    const lines = [
+      "3Dプリンター原価・販売価格計算結果",
+      `目標利益率での販売価格: ${document.getElementById("suggestedPrice").textContent}`,
+      `失敗率込みの原価: ${document.getElementById("totalCost").textContent}`,
+      `販売時の利益額: ${document.getElementById("profit").textContent}`,
+      `販売利益率: ${document.getElementById("margin").textContent}`,
+      `フィラメント代: ${document.getElementById("filamentCost").textContent}`,
+      `電気代: ${document.getElementById("electricityCost").textContent}`,
+      `プリンター償却費: ${document.getElementById("depreciationCost").textContent}`,
+      `損益分岐となる販売価格: ${document.getElementById("breakEvenPrice").textContent}`
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(lines);
+      put("copyStatus", "計算結果をコピーしました。");
+    } catch {
+      put("copyStatus", "自動コピーできませんでした。ブラウザのコピー許可を確認してください。");
+    }
+  });
+  calculate();
+})();
+</script>
+</body>
+</html>
