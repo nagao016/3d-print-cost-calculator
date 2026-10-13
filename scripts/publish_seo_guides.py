@@ -121,24 +121,38 @@ def render_article(article):
 <link rel="canonical" href="__URL__">
 <title>__TITLE__</title>
 <style>
-:root{color-scheme:light;--ink:#172033;--muted:#5b6577;--line:#dce2eb;--accent:#225bd6;--bg:#f4f7fb}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.8}
-header{background:#13264b;color:white;padding:20px 18px}.wrap{max-width:860px;margin:auto}
-header a{color:white}main{padding:26px 16px 42px}article{background:white;border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,34px)}
-h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-size:1.35rem;margin-top:32px;padding-bottom:7px;border-bottom:1px solid var(--line)}h3{font-size:1.05rem}a{color:var(--accent)}.eyebrow{color:var(--muted);font-size:.9rem}.cta{display:inline-block;background:var(--accent);color:white;text-decoration:none;padding:11px 16px;border-radius:9px;font-weight:700}footer{padding:20px 16px 32px;color:var(--muted);font-size:.85rem}li{margin:.35rem 0}.faq{border-top:1px solid var(--line);padding:8px 0}
+:root{color-scheme:light;--ink:#172033;--muted:#65718a;--line:#e0e7f2;--accent:#315ee7;--accent-dark:#183b9e;--tint:#edf2ff;--bg:#f5f7fc;--white:#fff;--shadow:0 14px 38px rgba(23,42,88,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#e8efff 0,transparent 38%),var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.85}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:var(--accent-dark)}.wrap{max-width:920px;margin:auto}
+header{background:linear-gradient(115deg,#101e43,#203f88 68%,#315ee7);color:white;padding:17px 20px;box-shadow:0 6px 22px #152d6020}
+header .wrap{display:flex;align-items:center;gap:16px;justify-content:space-between}header a{color:white;text-decoration:none;font-weight:650}header a:hover{color:#dbe5ff}
+.brand{font-weight:800;letter-spacing:.01em}.back-link{font-size:.92rem;opacity:.95}
+main{padding:36px 16px 54px}article{background:var(--white);border:1px solid #e5eaf4;border-radius:22px;padding:clamp(22px,5vw,52px);box-shadow:var(--shadow);overflow:hidden}
+.breadcrumb{font-size:.82rem;color:var(--muted);margin:0 0 22px}.breadcrumb a{color:var(--muted);text-decoration:none}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--accent-dark);background:var(--tint);border:1px solid #dce5ff;border-radius:999px;padding:5px 12px;font-size:.8rem;font-weight:750;letter-spacing:.04em;margin:0 0 14px}
+h1{font-size:clamp(1.8rem,4.6vw,2.8rem);line-height:1.35;letter-spacing:-.035em;margin:0 0 20px;max-width:780px}
+.lead{font-size:1.08rem;line-height:1.95;color:#3d4962;background:linear-gradient(135deg,#f2f6ff,#fbfcff);border-left:4px solid var(--accent);padding:20px 22px;border-radius:0 14px 14px 0;margin:0 0 30px}
+.toc{background:#f8faff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:28px 0 36px}.toc h2{font-size:1rem;margin:0 0 10px;border:0;padding:0}.toc ol{padding-left:1.35rem;margin:0}.toc li{margin:5px 0}.toc a{text-decoration:none;font-weight:600}
+section{margin-top:36px}h2{font-size:clamp(1.25rem,3vw,1.55rem);line-height:1.5;margin:0 0 15px;padding:0 0 12px;border-bottom:1px solid var(--line);position:relative}h2:after{content:"";display:block;position:absolute;left:0;bottom:-1px;width:54px;height:3px;border-radius:3px;background:var(--accent)}
+p{margin:0 0 14px}section p:last-child{margin-bottom:0}h3{font-size:1.04rem;line-height:1.55;margin:0 0 8px}.faq{background:#fbfcff;border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin:12px 0}.faq h3:before{content:"Q";display:inline-grid;place-items:center;width:25px;height:25px;background:var(--tint);color:var(--accent-dark);border-radius:7px;margin-right:9px;font-size:.8rem}
+.cta-panel{margin-top:42px;padding:26px;background:linear-gradient(135deg,#14264f,#244db7);border-radius:18px;color:white}.cta-panel h2{border:0;padding:0;color:white}.cta-panel h2:after{display:none}.cta-panel p{color:#e3eaff}.cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:white;color:#173b9e;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:800;box-shadow:0 5px 16px #08183c22}.cta:hover{background:#edf2ff;color:#173b9e}
+.related-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0;list-style:none}.related-grid li{margin:0}.related-grid a{display:block;height:100%;background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px;text-decoration:none;font-weight:700;box-shadow:0 4px 14px #1b315308}.related-grid a:after{content:" ↗";color:var(--accent)}.date-note{font-size:.82rem;color:var(--muted);margin-top:30px;padding-top:18px;border-top:1px solid var(--line)}
+footer{padding:24px 16px 38px;color:var(--muted);font-size:.84rem;text-align:center}
+@media(max-width:620px){header .wrap{align-items:flex-start;flex-direction:column;gap:5px}main{padding:20px 12px 32px}article{border-radius:16px;padding:22px 18px}.lead{font-size:1rem;padding:16px}.toc{padding:18px}.related-grid{grid-template-columns:1fr}.cta{width:100%}}
 </style>
 </head>
 <body>
 <header><div class="wrap"><a href="/">← 原価・販売価格計算ツールへ戻る</a></div></header>
 <main class="wrap"><article>
-<p class="eyebrow">3Dプリンター原価計算ガイド</p>
+<p class="breadcrumb"><a href="/">ホーム</a>　›　<a href="/#seo-guides">原価計算ガイド</a>　›　この記事</p>
+<p class="eyebrow">3D PRINT COST GUIDE</p>
 <h1>__TITLE__</h1>
-<p>__INTRO__</p>
+<p class="lead">__INTRO__</p>
+__TOC__
 __SECTIONS__
 __FAQ__
-<section><h2>計算ツールで試算する</h2><p>入力条件に基づく原価や販売価格を確認したい場合は、無料の計算ツールをご利用ください。結果は概算であり、入力条件や含まれていない費用によって変わります。</p><p><a class="cta" href="/">原価・販売価格計算ツールを使う</a></p></section>
-<section><h2>関連記事</h2><ul>__RELATED__</ul></section>
-<p class="eyebrow">下書き生成日：__DATE__。公開後も内容を確認・更新してください。</p>
+<section class="cta-panel"><h2>実際の条件で原価を計算する</h2><p>材料費・電気代・機材費などを入力して、作品1個あたりの費用を試算できます。</p><p><a class="cta" href="/">無料の原価計算ツールを使う →</a></p></section>
+<section><h2>関連記事</h2><ul class="related-grid">__RELATED__</ul></section>
+<p class="date-note">記事の更新日：__DATE__　｜　計算結果は入力条件に基づく概算です。</p>
 </article></main>
 <footer class="wrap">本ページは一般的な計算方法の説明です。実際の費用・料金・販売条件を確認し、ご自身の条件で検証してください。</footer>
 </body></html>
@@ -151,8 +165,9 @@ def build_html(article):
         "__TITLE__": escape(article["title"], quote=True),
         "__URL__": escape(SITE + "/" + article["path"].replace("index.html", ""), quote=True),
         "__INTRO__": escape(article["intro"]),
-        "__SECTIONS__": "".join("<section><h2>" + escape(h) + "</h2>" + "".join("<p>" + escape(p) + "</p>" for p in ps) + "</section>" for h, ps in article["sections"]),
-        "__FAQ__": "<section><h2>よくある質問</h2>" + "".join("<div class=\"faq\"><h3>" + escape(q) + "</h3><p>" + escape(a) + "</p></div>" for q, a in article["faq"]) + "</section>",
+        "__SECTIONS__": "".join('<section id="section-' + str(i) + '"><h2>' + escape(h) + "</h2>" + "".join("<p>" + escape(p) + "</p>" for p in ps) + "</section>" for i, (h, ps) in enumerate(article["sections"], 1)),
+        "__TOC__": '<nav class="toc" aria-label="この記事の目次"><h2>この記事でわかること</h2><ol>' + "".join('<li><a href="#section-' + str(i) + '">' + escape(h) + '</a></li>' for i, (h, ps) in enumerate(article["sections"], 1)) + '<li><a href="#faq">よくある質問</a></li></ol></nav>', 
+        "__FAQ__": '<section id="faq"><h2>よくある質問</h2>' + "".join("<div class=\"faq\"><h3>" + escape(q) + "</h3><p>" + escape(a) + "</p></div>" for q, a in article["faq"]) + "</section>",
         "__RELATED__": "".join("<li><a href=\"/guide/" + other["slug"] + "/\">" + escape(other["title"]) + "</a></li>" for other in ARTICLES if other["slug"] != article["slug"]),
         "__DATE__": datetime.now(timezone.utc).strftime("%Y年%m月%d日")
     }
@@ -164,17 +179,45 @@ def update_homepage():
     if not INDEX.exists():
         raise FileNotFoundError("index.html not found at repository root; refusing to modify unknown site structure.")
     source = INDEX.read_text(encoding="utf-8")
+    design_marker = "AUTO-GUIDES-DESIGN-CSS"
+    if design_marker not in source:
+        design_css = """<style id="AUTO-GUIDES-DESIGN-CSS">
+.auto-guides{margin:34px 0 8px;padding:clamp(22px,4vw,38px);border:1px solid #dce5f5;border-radius:22px;background:linear-gradient(135deg,#f4f7ff 0%,#fff 72%);box-shadow:0 12px 34px rgba(28,54,110,.07)}
+.auto-guides__eyebrow{font-size:.75rem;letter-spacing:.16em;font-weight:800;color:#315ee7;margin-bottom:10px}
+.auto-guides__heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:22px}
+.auto-guides__heading h2{margin:0 0 8px;font-size:clamp(1.25rem,3vw,1.7rem);line-height:1.4;color:#172033}
+.auto-guides__heading p{margin:0;color:#65718a;line-height:1.7}
+.auto-guides__count{white-space:nowrap;font-size:.7rem;font-weight:800;letter-spacing:.08em;color:#52668e;border:1px solid #dce5f5;border-radius:999px;padding:7px 10px;background:#fff}
+.auto-guides__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.auto-guide-card{display:flex;flex-direction:column;min-height:220px;padding:20px 18px;border:1px solid #e0e7f2;border-radius:16px;background:#fff;color:#172033;text-decoration:none;box-shadow:0 4px 14px rgba(23,42,88,.04);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.auto-guide-card:hover{transform:translateY(-3px);border-color:#b9caff;box-shadow:0 12px 24px rgba(35,75,170,.1);color:#172033}
+.auto-guide-card__num{font-size:.7rem;letter-spacing:.1em;color:#315ee7;font-weight:850;margin-bottom:14px}
+.auto-guide-card__title{font-size:1.04rem;line-height:1.5;font-weight:800;margin-bottom:10px}
+.auto-guide-card__desc{font-size:.87rem;line-height:1.7;color:#65718a}
+.auto-guide-card__link{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:17px;font-size:.84rem;color:#315ee7;font-weight:800}
+.auto-guide-card__link b{font-size:1.05rem}
+@media(max-width:760px){.auto-guides__grid{grid-template-columns:1fr}.auto-guide-card{min-height:0}.auto-guides__heading{align-items:flex-start;flex-direction:column}.auto-guides__count{display:none}}
+</style>
+"""
+        head_end = source.lower().find("</head>")
+        if head_end < 0:
+            raise ValueError("Could not find </head>; refusing to inject guide styling.")
+        source = source[:head_end] + design_css + source[head_end:]
     start = "<!-- AUTO-SEO-GUIDES-START -->"
     end = "<!-- AUTO-SEO-GUIDES-END -->"
     section = """<!-- AUTO-SEO-GUIDES-START -->
-<section class="guide" id="seo-guides" aria-labelledby="seo-guides-title">
-  <h2 id="seo-guides-title">3Dプリンター原価計算ガイド</h2>
-  <p>原価や販売価格の考え方を詳しく知りたい方は、こちらの記事もご覧ください。</p>
-  <ul>
-    <li><a href="/guide/cost-calculation/">3Dプリンターの原価計算ガイド</a></li>
-    <li><a href="/guide/filament-cost/">フィラメント材料費の計算方法</a></li>
-    <li><a href="/guide/selling-price/">3Dプリント作品の販売価格の決め方</a></li>
-  </ul>
+<section class="auto-guides" id="seo-guides" aria-labelledby="seo-guides-title">
+  <div class="auto-guides__eyebrow">LEARN &amp; CALCULATE</div>
+  <div class="auto-guides__heading">
+    <div><h2 id="seo-guides-title">3Dプリンター原価計算ガイド</h2>
+    <p>原価の考え方から販売価格の決め方まで、知りたいテーマから学べます。</p></div>
+    <span class="auto-guides__count">GUIDE 01—03</span>
+  </div>
+  <div class="auto-guides__grid">
+    <a class="auto-guide-card" href="/guide/cost-calculation/"><span class="auto-guide-card__num">01 / COST</span><span class="auto-guide-card__title">3Dプリンターの原価計算ガイド</span><span class="auto-guide-card__desc">材料費・電気代・機材費など、原価の内訳と計算前の確認ポイント。</span><span class="auto-guide-card__link">計算方法を読む <b>↗</b></span></a>
+    <a class="auto-guide-card" href="/guide/filament-cost/"><span class="auto-guide-card__num">02 / MATERIAL</span><span class="auto-guide-card__title">フィラメント材料費の計算方法</span><span class="auto-guide-card__desc">購入価格と使用量から、造形1個あたりの材料費を見積もる方法。</span><span class="auto-guide-card__link">計算方法を読む <b>↗</b></span></a>
+    <a class="auto-guide-card" href="/guide/selling-price/"><span class="auto-guide-card__num">03 / PRICE</span><span class="auto-guide-card__title">3Dプリント作品の販売価格</span><span class="auto-guide-card__desc">原価・販売手数料・送料・利益率を整理して価格を考える。</span><span class="auto-guide-card__link">価格の考え方を読む <b>↗</b></span></a>
+  </div>
 </section>
 <!-- AUTO-SEO-GUIDES-END -->
 """
