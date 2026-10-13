@@ -12,72 +12,110 @@
   <link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/">
   <title>3Dプリンター原価・販売価格計算ツール</title>
   <style>
-    :root { color-scheme: light; --ink:#172033; --muted:#5b6577; --line:#dce2eb; --surface:#fff; --bg:#f4f7fb; --accent:#225bd6; --accent2:#eaf0ff; --good:#147548; }
+    :root {
+      color-scheme: light;
+      --ink:#15213b; --muted:#63718b; --line:#dfe6f2; --surface:#fff;
+      --bg:#f4f7fd; --accent:#315ee7; --accent-dark:#2148bf;
+      --accent-soft:#edf2ff; --navy:#101d3d; --good:#147548;
+      --shadow:0 14px 36px rgba(26,48,100,.075);
+    }
     * { box-sizing:border-box; }
-    body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
-    header { background:#13264b; color:white; padding:28px 18px 24px; }
-    .wrap { max-width:1080px; margin:auto; }
-    header h1 { margin:0 0 8px; font-size:clamp(1.45rem,4vw,2.1rem); }
-    header p { margin:0; color:#e0e8fb; max-width:760px; }
-    main { padding:22px 16px 40px; }
-    .intro { margin:0 0 18px; color:var(--muted); }
-    .layout { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
-    .panel { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:0 3px 12px #1b31530a; }
-    .panel h2 { font-size:1.08rem; margin:0 0 14px; }
-    .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 12px; }
-    label { display:block; font-size:.9rem; font-weight:650; }
-    .hint { display:block; color:var(--muted); font-size:.78rem; font-weight:400; margin-top:2px; }
-    .control { display:flex; margin-top:6px; }
-    input { width:100%; min-width:0; border:1px solid #c9d2e0; border-radius:8px; padding:10px 11px; font:inherit; color:var(--ink); background:white; }
-    input:focus { outline:3px solid #225bd626; border-color:var(--accent); }
-    .unit { display:flex; align-items:center; padding:0 10px; background:#f0f3f8; border:1px solid #c9d2e0; border-left:0; border-radius:0 8px 8px 0; color:var(--muted); white-space:nowrap; font-size:.85rem; }
-    .control:has(.unit) input { border-radius:8px 0 0 8px; }
-    .results { grid-column:1 / -1; background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; }
-    .results h2 { margin:0 0 14px; }
-    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
-    .metric { background:#f5f8fd; border:1px solid #e4eaf3; padding:14px; border-radius:11px; }
-    .metric .name { color:var(--muted); font-size:.83rem; }
-    .metric .value { font-size:clamp(1.15rem,2.5vw,1.7rem); font-weight:750; margin-top:5px; overflow-wrap:anywhere; }
-    .metric.primary { background:var(--accent2); border-color:#cbd9ff; }
-    .metric.primary .value { color:var(--accent); }
-    .details { width:100%; border-collapse:collapse; margin-top:18px; }
-    .details th,.details td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); }
-    .details th { color:var(--muted); font-weight:600; }
-    .details td:last-child,.details th:last-child { text-align:right; font-variant-numeric:tabular-nums; }
-    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; }
-    button { border:0; border-radius:9px; padding:10px 14px; font:inherit; font-weight:650; cursor:pointer; }
-    .btn-primary { background:var(--accent); color:white; }
-    .btn-secondary { background:#eef2f8; color:var(--ink); }
-    .note { color:var(--muted); font-size:.84rem; margin:12px 0 0; }
-    .guide { margin-top:18px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; }
-    .guide h2 { font-size:1.2rem; margin:0 0 12px; }
-    .guide h3 { font-size:1rem; margin:18px 0 6px; }
-    .guide p,.guide li { color:#354156; }
-    .guide ul { padding-left:1.25rem; }
-    .formula { background:#f5f8fd; border:1px solid #e4eaf3; border-radius:9px; padding:12px; overflow-wrap:anywhere; }
-    .faq-item { border-top:1px solid var(--line); padding:12px 0; }
-    .faq-item h3 { margin:0 0 5px; }
-    footer { color:var(--muted); font-size:.82rem; padding:18px 16px 28px; }
-    @media(max-width:760px) { .layout { grid-template-columns:1fr; } .results { grid-column:auto; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-    @media(max-width:420px) { .fields { grid-template-columns:1fr; } .panel { padding:15px; } .metrics { gap:8px; } .metric { padding:11px; } }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+      color:var(--ink); background:
+      radial-gradient(ellipse at 8% 0%,rgba(208,222,255,.62),transparent 33%),
+      radial-gradient(ellipse at 95% 16%,rgba(226,234,255,.6),transparent 25%),var(--bg);
+      line-height:1.65;
+    }
+    .wrap { max-width:1120px; margin:auto; }
+    header {
+      position:relative; overflow:hidden; color:white;
+      padding:48px 22px 42px;
+      background:linear-gradient(118deg,#101d3d 0%,#1a3470 55%,#315ee7 100%);
+      isolation:isolate;
+    }
+    header:before,header:after { content:"";position:absolute;z-index:-1;border:1px solid rgba(255,255,255,.13);border-radius:50%;pointer-events:none; }
+    header:before { width:430px;height:430px;right:-95px;top:-255px;box-shadow:0 0 0 38px rgba(255,255,255,.035),0 0 0 80px rgba(255,255,255,.025); }
+    header:after { width:260px;height:260px;right:18%;bottom:-235px;background:rgba(255,255,255,.035); }
+    header .wrap { position:relative; }
+    header h1 { max-width:820px;margin:12px 0 12px;font-size:clamp(1.8rem,4.2vw,2.75rem);line-height:1.25;letter-spacing:-.04em;font-weight:850; }
+    header h1:before { content:"FREE ONLINE TOOL";display:block;font-size:.72rem;letter-spacing:.18em;font-weight:800;color:#cbd8ff;margin-bottom:14px; }
+    header p { margin:0;color:#e0e8ff;max-width:760px;font-size:1.02rem;line-height:1.85; }
+    main { padding:26px 18px 48px; }
+    .intro { display:flex;align-items:center;gap:10px;margin:0 0 22px;color:#4c5b76;font-size:.88rem;background:rgba(255,255,255,.78);border:1px solid #e1e8f5;border-radius:12px;padding:12px 15px; }
+    .intro:before { content:"✓";display:grid;place-items:center;flex:0 0 24px;height:24px;border-radius:50%;background:#e8f7ef;color:#147548;font-weight:900; }
+    .layout { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch; }
+    .panel { background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);position:relative; }
+    .panel h2 { font-size:1.08rem;line-height:1.45;margin:0 0 18px;display:flex;align-items:center;gap:10px; }
+    .panel h2:before { content:"";display:block;width:5px;height:23px;border-radius:6px;background:var(--accent); }
+    .fields { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 14px; }
+    label { display:block;font-size:.88rem;font-weight:700;color:#293650; }
+    .hint { display:block;color:var(--muted);font-size:.76rem;font-weight:400;margin-top:5px;line-height:1.55; }
+    .control { display:flex;margin-top:7px; }
+    input { width:100%;min-width:0;border:1px solid #cbd5e5;border-radius:10px;padding:11px 12px;font:inherit;color:var(--ink);background:#fcfdff;transition:border-color .15s,box-shadow .15s; }
+    input:hover { border-color:#aab9d5; }
+    input:focus { outline:0;border-color:var(--accent);box-shadow:0 0 0 4px rgba(49,94,231,.13);background:white; }
+    .unit { display:flex;align-items:center;padding:0 11px;background:#f0f3f9;border:1px solid #cbd5e5;border-left:0;border-radius:0 10px 10px 0;color:#5f6b82;white-space:nowrap;font-size:.82rem; }
+    .control:has(.unit) input { border-radius:10px 0 0 10px; }
+    .results { grid-column:1 / -1;background:linear-gradient(135deg,#fff 0%,#f9fbff 100%);border:1px solid #d7e1f4;border-radius:20px;padding:25px;box-shadow:var(--shadow); }
+    .results h2 { margin:0 0 18px;font-size:1.25rem;display:flex;align-items:center;gap:10px; }
+    .results h2:before { content:"";width:6px;height:26px;border-radius:5px;background:var(--accent); }
+    .metrics { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px; }
+    .metric { background:#f5f7fc;border:1px solid #e4eaf4;padding:17px 15px;border-radius:14px;min-width:0; }
+    .metric .name { color:#596781;font-size:.8rem;line-height:1.5;font-weight:650; }
+    .metric .value { font-size:clamp(1.15rem,2.5vw,1.75rem);font-weight:850;letter-spacing:-.03em;margin-top:8px;overflow-wrap:anywhere;line-height:1.3; }
+    .metric.primary { background:linear-gradient(135deg,#edf2ff,#e4ebff);border-color:#c9d7ff;position:relative;overflow:hidden; }
+    .metric.primary:after { content:"";position:absolute;width:100px;height:100px;right:-40px;bottom:-58px;border:1px solid #315ee72b;border-radius:50%;box-shadow:0 0 0 13px #315ee70a,0 0 0 27px #315ee708; }
+    .metric.primary .name { color:#3451a2; }
+    .metric.primary .value { color:var(--accent-dark); }
+    .details { width:100%;border-collapse:collapse;margin-top:22px;background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden; }
+    .details th,.details td { text-align:left;padding:12px 14px;border-bottom:1px solid #e9edf5;font-size:.9rem; }
+    .details tr:last-child th,.details tr:last-child td { border-bottom:0; }
+    .details th { color:#596781;font-weight:600;background:#fafbfe; }
+    .details td:last-child,.details th:last-child { text-align:right;font-variant-numeric:tabular-nums; }
+    .actions { display:flex;flex-wrap:wrap;gap:10px;margin-top:18px; }
+    button { border:0;border-radius:10px;padding:11px 15px;font:inherit;font-size:.9rem;font-weight:750;cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s; }
+    button:hover { transform:translateY(-1px); }
+    .btn-primary { background:linear-gradient(135deg,#315ee7,#2448bb);color:white;box-shadow:0 6px 14px rgba(49,94,231,.2); }
+    .btn-primary:hover { box-shadow:0 9px 18px rgba(49,94,231,.27); }
+    .btn-secondary { background:#edf1f8;color:#2e3c56; }
+    .btn-secondary:hover { background:#e1e8f4; }
+    .note { color:var(--muted);font-size:.82rem;line-height:1.75;margin:12px 0 0; }
+    .guide { margin-top:24px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:clamp(22px,4vw,34px);box-shadow:var(--shadow); }
+    .guide h2 { font-size:clamp(1.2rem,3vw,1.55rem);line-height:1.45;margin:0 0 14px;padding-bottom:13px;border-bottom:1px solid var(--line);position:relative; }
+    .guide h2:after { content:"";position:absolute;left:0;bottom:-1px;width:52px;height:3px;background:var(--accent);border-radius:3px; }
+    .guide h3 { font-size:1.02rem;line-height:1.55;margin:25px 0 8px; }
+    .guide p,.guide li { color:#394760; }
+    .guide ul { padding-left:1.3rem; }
+    .guide li { margin:6px 0; }
+    .formula { background:linear-gradient(135deg,#f2f6ff,#f9fbff);border:1px solid #dce6fb;border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;overflow-wrap:anywhere;font-weight:650;color:#233a72!important; }
+    .faq-item { border-top:1px solid var(--line);padding:17px 0; }
+    .faq-item h3 { margin:0 0 6px;display:flex;gap:10px;align-items:flex-start; }
+    .faq-item h3:before { content:"Q";flex:0 0 26px;height:26px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-dark);border-radius:7px;font-size:.8rem; }
+    footer { color:var(--muted);font-size:.82rem;line-height:1.7;padding:24px 18px 36px;text-align:center; }
+    @media(max-width:760px) {
+      header { padding:36px 20px 32px; }
+      .layout { grid-template-columns:1fr; }
+      .results { grid-column:auto; }
+      .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .panel { padding:20px; }
+    }
+    @media(max-width:480px) {
+      header { padding:30px 17px 28px; }
+      main { padding:18px 12px 32px; }
+      .fields { grid-template-columns:1fr; }
+      .panel { padding:17px; }
+      .results { padding:17px; }
+      .metrics { gap:9px; }
+      .metric { padding:13px 11px; }
+      .metric .name { font-size:.75rem; }
+      .details th,.details td { padding:10px 8px;font-size:.82rem; }
+      .guide { padding:21px 17px; }
+      .actions button { flex:1 1 auto; }
+    }
+    @media(prefers-reduced-motion:reduce) { html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important} }
   </style>
-<style id="AUTO-GUIDES-DESIGN-CSS">
-.auto-guides{margin:34px 0 8px;padding:clamp(22px,4vw,38px);border:1px solid #dce5f5;border-radius:22px;background:linear-gradient(135deg,#f4f7ff 0%,#fff 72%);box-shadow:0 12px 34px rgba(28,54,110,.07)}
-.auto-guides__eyebrow{font-size:.75rem;letter-spacing:.16em;font-weight:800;color:#315ee7;margin-bottom:10px}
-.auto-guides__heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:22px}
-.auto-guides__heading h2{margin:0 0 8px;font-size:clamp(1.25rem,3vw,1.7rem);line-height:1.4;color:#172033}
-.auto-guides__heading p{margin:0;color:#65718a;line-height:1.7}
-.auto-guides__count{white-space:nowrap;font-size:.7rem;font-weight:800;letter-spacing:.08em;color:#52668e;border:1px solid #dce5f5;border-radius:999px;padding:7px 10px;background:#fff}
-.auto-guides__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.auto-guide-card{display:flex;flex-direction:column;min-height:220px;padding:20px 18px;border:1px solid #e0e7f2;border-radius:16px;background:#fff;color:#172033;text-decoration:none;box-shadow:0 4px 14px rgba(23,42,88,.04);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
-.auto-guide-card:hover{transform:translateY(-3px);border-color:#b9caff;box-shadow:0 12px 24px rgba(35,75,170,.1);color:#172033}
-.auto-guide-card__num{font-size:.7rem;letter-spacing:.1em;color:#315ee7;font-weight:850;margin-bottom:14px}
-.auto-guide-card__title{font-size:1.04rem;line-height:1.5;font-weight:800;margin-bottom:10px}
-.auto-guide-card__desc{font-size:.87rem;line-height:1.7;color:#65718a}
-.auto-guide-card__link{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:17px;font-size:.84rem;color:#315ee7;font-weight:800}
-.auto-guide-card__link b{font-size:1.05rem}
-@media(max-width:760px){.auto-guides__grid{grid-template-columns:1fr}.auto-guide-card{min-height:0}.auto-guides__heading{align-items:flex-start;flex-direction:column}.auto-guides__count{display:none}}
-</style>
 </head>
 <body>
 <header>
@@ -87,7 +125,7 @@
   </div>
 </header>
 <main class="wrap">
-  <p class="intro">入力値はこのブラウザ内で計算されます。入力データをサーバーへ送信・保存する機能はありません。</p>
+  <p class="intro">安心してお試しください。入力値はこのブラウザ内で計算され、サーバーへ送信・保存されません。</p>
   <div class="layout">
     <section class="panel">
       <h2>1. フィラメント・印刷条件</h2>
@@ -236,21 +274,6 @@
       <p>過去の印刷回数と失敗回数を記録し、失敗回数 ÷ 全印刷回数で見積もる方法があります。作品や材料、印刷設定によって変わるため、実績に応じて調整してください。</p>
     </div>
   </section>
-<!-- AUTO-SEO-GUIDES-START -->
-<section class="auto-guides" id="seo-guides" aria-labelledby="seo-guides-title">
-  <div class="auto-guides__eyebrow">LEARN &amp; CALCULATE</div>
-  <div class="auto-guides__heading">
-    <div><h2 id="seo-guides-title">3Dプリンター原価計算ガイド</h2>
-    <p>原価の考え方から販売価格の決め方まで、知りたいテーマから学べます。</p></div>
-    <span class="auto-guides__count">GUIDE 01—03</span>
-  </div>
-  <div class="auto-guides__grid">
-    <a class="auto-guide-card" href="/guide/cost-calculation/"><span class="auto-guide-card__num">01 / COST</span><span class="auto-guide-card__title">3Dプリンターの原価計算ガイド</span><span class="auto-guide-card__desc">材料費・電気代・機材費など、原価の内訳と計算前の確認ポイント。</span><span class="auto-guide-card__link">計算方法を読む <b>↗</b></span></a>
-    <a class="auto-guide-card" href="/guide/filament-cost/"><span class="auto-guide-card__num">02 / MATERIAL</span><span class="auto-guide-card__title">フィラメント材料費の計算方法</span><span class="auto-guide-card__desc">購入価格と使用量から、造形1個あたりの材料費を見積もる方法。</span><span class="auto-guide-card__link">計算方法を読む <b>↗</b></span></a>
-    <a class="auto-guide-card" href="/guide/selling-price/"><span class="auto-guide-card__num">03 / PRICE</span><span class="auto-guide-card__title">3Dプリント作品の販売価格</span><span class="auto-guide-card__desc">原価・販売手数料・送料・利益率を整理して価格を考える。</span><span class="auto-guide-card__link">価格の考え方を読む <b>↗</b></span></a>
-  </div>
-</section>
-<!-- AUTO-SEO-GUIDES-END -->
 </main>
 <footer class="wrap">本ツールは概算用です。実際の材料ロス、保守費、人件費、税金、販売サービスの料金体系などを確認し、販売前にご自身の条件で検証してください。</footer>
 <script>
