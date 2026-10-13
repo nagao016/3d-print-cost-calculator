@@ -9,6 +9,12 @@
 <meta property="og:title" content="3Dプリンターの原価計算ガイド｜費用の内訳と計算方法">
 <meta property="og:description" content="3Dプリンター作品の原価を見積もるために、材料費・電気代・機材費・失敗率・梱包費などの考え方を解説します。">
 <meta property="og:url" content="https://3d-print-cost-calculator-7ce.pages.dev/guide/cost-calculation/">
+<meta property="og:image" content="https://3d-print-cost-calculator-7ce.pages.dev/assets/article-cost.png">
+<meta property="og:image:alt" content="電卓と3Dプリント作品を並べた原価計算のイメージ">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="3Dプリンターの原価計算ガイド｜費用の内訳と計算方法">
+<meta name="twitter:description" content="3Dプリンター作品の原価を見積もるために、材料費・電気代・機材費・失敗率・梱包費などの考え方を解説します。">
+<meta name="twitter:image" content="https://3d-print-cost-calculator-7ce.pages.dev/assets/article-cost.png">
 <link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/guide/cost-calculation/">
 <title>3Dプリンターの原価計算ガイド｜費用の内訳と計算方法</title>
 <style>
@@ -16,7 +22,7 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.8}
 header{background:#13264b;color:white;padding:20px 18px}.wrap{max-width:860px;margin:auto}
 header a{color:white}main{padding:26px 16px 42px}article{background:white;border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,34px)}
-h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-size:1.35rem;margin-top:32px;padding-bottom:7px;border-bottom:1px solid var(--line)}h3{font-size:1.05rem}a{color:var(--accent)}.eyebrow{color:var(--muted);font-size:.9rem}.cta{display:inline-block;background:var(--accent);color:white;text-decoration:none;padding:11px 16px;border-radius:9px;font-weight:700}footer{padding:20px 16px 32px;color:var(--muted);font-size:.85rem}li{margin:.35rem 0}.faq{border-top:1px solid var(--line);padding:8px 0}
+h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-size:1.35rem;margin-top:32px;padding-bottom:7px;border-bottom:1px solid var(--line)}h3{font-size:1.05rem}a{color:var(--accent)}.eyebrow{color:var(--muted);font-size:.9rem}.article-visual{margin:24px 0 30px}.article-visual img{display:block;width:100%;max-height:440px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}.article-visual figcaption{font-size:.88rem;color:var(--muted);margin-top:8px}.cta{display:inline-block;background:var(--accent);color:white;text-decoration:none;padding:11px 16px;border-radius:9px;font-weight:700}footer{padding:20px 16px 32px;color:var(--muted);font-size:.85rem}li{margin:.35rem 0}.faq{border-top:1px solid var(--line);padding:8px 0}
 </style>
 </head>
 <body>
@@ -25,6 +31,7 @@ h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-
 <p class="eyebrow">3Dプリンター原価計算ガイド</p>
 <h1>3Dプリンターの原価計算ガイド｜費用の内訳と計算方法</h1>
 <p>3Dプリント作品の原価を把握するには、フィラメント代だけでなく、電気代、機材の使用、印刷失敗、梱包や送料などを整理することが重要です。</p>
+<figure class="article-visual"><img src="/assets/article-cost.png" alt="電卓と3Dプリント作品を並べた原価計算のイメージ" width="1200" height="800" fetchpriority="high"><figcaption>材料費だけでなく、電気代や機材費なども整理して原価を見積もります。</figcaption></figure>
 <section><h2>原価に含める費用</h2><p>材料費は、フィラメントなどの使用量と購入単価をもとに見積もります。サポート材、パージ分、試し刷りなども必要に応じて考慮します。</p><p>電気代は、印刷時間、消費電力、電気料金単価を使って概算します。実際の消費電力は機種や加熱状態によって変わります。</p><p>機材費は、プリンター購入費を想定使用時間で按分する方法があります。ノズル交換や保守・修理費は別途記録すると実態に近づきます。</p><p>販売する場合は、失敗分、消耗品、後処理、梱包、送料、販売手数料なども必要に応じて確認します。</p></section><section><h2>計算前に確認すること</h2><p>入力値の単位をそろえ、材料重量や印刷時間が実際の造形条件に合っているか確認します。</p><p>税金、人件費、固定出品料、返品・再発送などが計算に含まれていない場合は別途考慮してください。</p><p>失敗率を別途反映している場合、材料ロスなどを二重に加算していないか確認します。</p></section><section><h2>計算ツールで試算する</h2><p>入力条件を変更して原価や販売価格の変化を比較すると、費用の影響を把握しやすくなります。計算結果は入力条件に基づく概算として扱ってください。</p></section>
 <section><h2>よくある質問</h2><div class="faq"><h3>原価にはフィラメント代だけを含めればよいですか？</h3><p>フィラメント代は重要ですが、電気代、機材費、失敗分、消耗品、梱包・送料、販売手数料なども目的に応じて確認してください。</p></div><div class="faq"><h3>計算結果は実際の利益と一致しますか？</h3><p>必ずしも一致しません。入力値の誤差や、計算に含めていない費用、値引き・返品などで結果は変わります。</p></div></section>
 <section><h2>計算ツールで試算する</h2><p>入力条件に基づく原価や販売価格を確認したい場合は、無料の計算ツールをご利用ください。結果は概算であり、入力条件や含まれていない費用によって変わります。</p><p><a class="cta" href="/">原価・販売価格計算ツールを使う</a></p></section>
