@@ -1,0 +1,46 @@
+name: Auto Publish SEO Guide Pages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 19 * * *" # 04:00 JST daily
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-publish-seo-guides
+  cancel-in-progress: false
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate guide pages and update homepage/sitemap
+        run: python scripts/publish_seo_guides.py
+      - name: Commit generated pages
+        run: |
+          if git diff --quiet -- index.html sitemap.xml guide SEO-PUBLISH-REPORT.md; then
+            echo "No published content changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sitemap.xml guide SEO-PUBLISH-REPORT.md
+          git commit -m "content: publish SEO guide pages"
+          git push
+      - name: Upload generated pages for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-seo-guide-pages
+          path: |
+            guide/**/*.html
+            SEO-PUBLISH-REPORT.md
+          if-no-files-found: ignore
+          retention-days: 30
