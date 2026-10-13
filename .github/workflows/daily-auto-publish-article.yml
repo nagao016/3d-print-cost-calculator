@@ -1,0 +1,46 @@
+name: Daily Auto Publish Article
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 19 * * *" # 04:15 JST daily; after the existing guide workflow
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-auto-publish-article
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate one queued article with image and update links
+        run: python scripts/auto_publish_article.py
+      - name: Commit and push published article
+        run: |
+          if git diff --quiet -- index.html sitemap.xml guide content-queue AUTO-PUBLISH-REPORT.md; then
+            echo "No new article changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sitemap.xml guide content-queue/articles.json content-queue/published.json AUTO-PUBLISH-REPORT.md
+          git commit -m "content: auto-publish scheduled SEO article"
+          git push
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-publish-article-report
+          path: AUTO-PUBLISH-REPORT.md
+          if-no-files-found: ignore
+          retention-days: 30
