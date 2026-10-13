@@ -12,24 +12,38 @@
 <link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/guide/selling-price/">
 <title>3Dプリント作品の販売価格の決め方｜原価と利益率</title>
 <style>
-:root{color-scheme:light;--ink:#172033;--muted:#5b6577;--line:#dce2eb;--accent:#225bd6;--bg:#f4f7fb}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.8}
-header{background:#13264b;color:white;padding:20px 18px}.wrap{max-width:860px;margin:auto}
-header a{color:white}main{padding:26px 16px 42px}article{background:white;border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,34px)}
-h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-size:1.35rem;margin-top:32px;padding-bottom:7px;border-bottom:1px solid var(--line)}h3{font-size:1.05rem}a{color:var(--accent)}.eyebrow{color:var(--muted);font-size:.9rem}.cta{display:inline-block;background:var(--accent);color:white;text-decoration:none;padding:11px 16px;border-radius:9px;font-weight:700}footer{padding:20px 16px 32px;color:var(--muted);font-size:.85rem}li{margin:.35rem 0}.faq{border-top:1px solid var(--line);padding:8px 0}
+:root{color-scheme:light;--ink:#172033;--muted:#65718a;--line:#e0e7f2;--accent:#315ee7;--accent-dark:#183b9e;--tint:#edf2ff;--bg:#f5f7fc;--white:#fff;--shadow:0 14px 38px rgba(23,42,88,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#e8efff 0,transparent 38%),var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.85}
+a{color:var(--accent);text-underline-offset:3px}a:hover{color:var(--accent-dark)}.wrap{max-width:920px;margin:auto}
+header{background:linear-gradient(115deg,#101e43,#203f88 68%,#315ee7);color:white;padding:17px 20px;box-shadow:0 6px 22px #152d6020}
+header .wrap{display:flex;align-items:center;gap:16px;justify-content:space-between}header a{color:white;text-decoration:none;font-weight:650}header a:hover{color:#dbe5ff}
+.brand{font-weight:800;letter-spacing:.01em}.back-link{font-size:.92rem;opacity:.95}
+main{padding:36px 16px 54px}article{background:var(--white);border:1px solid #e5eaf4;border-radius:22px;padding:clamp(22px,5vw,52px);box-shadow:var(--shadow);overflow:hidden}
+.breadcrumb{font-size:.82rem;color:var(--muted);margin:0 0 22px}.breadcrumb a{color:var(--muted);text-decoration:none}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--accent-dark);background:var(--tint);border:1px solid #dce5ff;border-radius:999px;padding:5px 12px;font-size:.8rem;font-weight:750;letter-spacing:.04em;margin:0 0 14px}
+h1{font-size:clamp(1.8rem,4.6vw,2.8rem);line-height:1.35;letter-spacing:-.035em;margin:0 0 20px;max-width:780px}
+.lead{font-size:1.08rem;line-height:1.95;color:#3d4962;background:linear-gradient(135deg,#f2f6ff,#fbfcff);border-left:4px solid var(--accent);padding:20px 22px;border-radius:0 14px 14px 0;margin:0 0 30px}
+.toc{background:#f8faff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:28px 0 36px}.toc h2{font-size:1rem;margin:0 0 10px;border:0;padding:0}.toc ol{padding-left:1.35rem;margin:0}.toc li{margin:5px 0}.toc a{text-decoration:none;font-weight:600}
+section{margin-top:36px}h2{font-size:clamp(1.25rem,3vw,1.55rem);line-height:1.5;margin:0 0 15px;padding:0 0 12px;border-bottom:1px solid var(--line);position:relative}h2:after{content:"";display:block;position:absolute;left:0;bottom:-1px;width:54px;height:3px;border-radius:3px;background:var(--accent)}
+p{margin:0 0 14px}section p:last-child{margin-bottom:0}h3{font-size:1.04rem;line-height:1.55;margin:0 0 8px}.faq{background:#fbfcff;border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin:12px 0}.faq h3:before{content:"Q";display:inline-grid;place-items:center;width:25px;height:25px;background:var(--tint);color:var(--accent-dark);border-radius:7px;margin-right:9px;font-size:.8rem}
+.cta-panel{margin-top:42px;padding:26px;background:linear-gradient(135deg,#14264f,#244db7);border-radius:18px;color:white}.cta-panel h2{border:0;padding:0;color:white}.cta-panel h2:after{display:none}.cta-panel p{color:#e3eaff}.cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:white;color:#173b9e;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:800;box-shadow:0 5px 16px #08183c22}.cta:hover{background:#edf2ff;color:#173b9e}
+.related-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0;list-style:none}.related-grid li{margin:0}.related-grid a{display:block;height:100%;background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px;text-decoration:none;font-weight:700;box-shadow:0 4px 14px #1b315308}.related-grid a:after{content:" ↗";color:var(--accent)}.date-note{font-size:.82rem;color:var(--muted);margin-top:30px;padding-top:18px;border-top:1px solid var(--line)}
+footer{padding:24px 16px 38px;color:var(--muted);font-size:.84rem;text-align:center}
+@media(max-width:620px){header .wrap{align-items:flex-start;flex-direction:column;gap:5px}main{padding:20px 12px 32px}article{border-radius:16px;padding:22px 18px}.lead{font-size:1rem;padding:16px}.toc{padding:18px}.related-grid{grid-template-columns:1fr}.cta{width:100%}}
 </style>
 </head>
 <body>
 <header><div class="wrap"><a href="/">← 原価・販売価格計算ツールへ戻る</a></div></header>
 <main class="wrap"><article>
-<p class="eyebrow">3Dプリンター原価計算ガイド</p>
+<p class="breadcrumb"><a href="/">ホーム</a>　›　<a href="/#seo-guides">原価計算ガイド</a>　›　この記事</p>
+<p class="eyebrow">3D PRINT COST GUIDE</p>
 <h1>3Dプリント作品の販売価格の決め方｜原価と利益率</h1>
-<p>3Dプリント作品の販売価格を考えるときは、材料費だけでなく、製造にかかる費用、販売サービスの手数料、梱包・送料などを確認する必要があります。</p>
-<section><h2>原価と販売価格の違い</h2><p>原価は作品を作り販売するためにかかる費用の見積もりです。販売価格は需要、品質、納期、競合、提供価値なども考慮して決めます。</p><p>材料費、電気代、機材費、消耗品、失敗分、後処理、梱包・送料など、何を原価に含めるかを決めておくと比較しやすくなります。</p></section><section><h2>販売手数料と送料を忘れない</h2><p>販売サービスや決済手段によって手数料体系は異なります。割合でかかる費用と固定費を区別し、最新の公式料金を確認してください。</p><p>送料を購入者が負担する場合と出品者が負担する場合では収支が変わります。梱包材や発送資材も必要に応じて計上します。</p></section><section><h2>利益額と利益率を区別する</h2><p>利益額は売上から対象費用を差し引いた金額です。利益率は、どの金額を分母とするかを明確にして計算します。売上に対する利益率と原価に対する上乗せ率は異なります。</p><p>販売手数料が販売価格に対する割合で発生する場合、目標利益率を満たす価格を逆算するには、手数料率と利益率の定義を確認する必要があります。</p></section><section><h2>価格を定期的に見直す</h2><p>材料価格、印刷時間、失敗率、販売手数料、送料が変わったら見積もりを更新します。実際の販売結果も価格設定を見直す材料にします。</p><p>販売するモデルやデザインについて、ライセンスや知的財産権上の条件を確認することも重要です。</p></section>
-<section><h2>よくある質問</h2><div class="faq"><h3>原価に利益率を足せば販売価格になりますか？</h3><p>利益率を原価に対する上乗せ率とする場合と、売上に対する利益率を目標にする場合では計算が異なります。</p></div><div class="faq"><h3>販売手数料はどのように設定しますか？</h3><p>利用する販売サービスや決済サービスの公式料金を確認し、割合の手数料と固定費を分けて見積もります。</p></div></section>
-<section><h2>計算ツールで試算する</h2><p>入力条件に基づく原価や販売価格を確認したい場合は、無料の計算ツールをご利用ください。結果は概算であり、入力条件や含まれていない費用によって変わります。</p><p><a class="cta" href="/">原価・販売価格計算ツールを使う</a></p></section>
-<section><h2>関連記事</h2><ul><li><a href="/guide/cost-calculation/">3Dプリンターの原価計算ガイド｜費用の内訳と計算方法</a></li><li><a href="/guide/filament-cost/">3Dプリンターのフィラメント材料費の計算方法</a></li></ul></section>
-<p class="eyebrow">下書き生成日：2026年10月13日。公開後も内容を確認・更新してください。</p>
+<p class="lead">3Dプリント作品の販売価格を考えるときは、材料費だけでなく、製造にかかる費用、販売サービスの手数料、梱包・送料などを確認する必要があります。</p>
+<nav class="toc" aria-label="この記事の目次"><h2>この記事でわかること</h2><ol><li><a href="#section-1">原価と販売価格の違い</a></li><li><a href="#section-2">販売手数料と送料を忘れない</a></li><li><a href="#section-3">利益額と利益率を区別する</a></li><li><a href="#section-4">価格を定期的に見直す</a></li><li><a href="#faq">よくある質問</a></li></ol></nav>
+<section id="section-1"><h2>原価と販売価格の違い</h2><p>原価は作品を作り販売するためにかかる費用の見積もりです。販売価格は需要、品質、納期、競合、提供価値なども考慮して決めます。</p><p>材料費、電気代、機材費、消耗品、失敗分、後処理、梱包・送料など、何を原価に含めるかを決めておくと比較しやすくなります。</p></section><section id="section-2"><h2>販売手数料と送料を忘れない</h2><p>販売サービスや決済手段によって手数料体系は異なります。割合でかかる費用と固定費を区別し、最新の公式料金を確認してください。</p><p>送料を購入者が負担する場合と出品者が負担する場合では収支が変わります。梱包材や発送資材も必要に応じて計上します。</p></section><section id="section-3"><h2>利益額と利益率を区別する</h2><p>利益額は売上から対象費用を差し引いた金額です。利益率は、どの金額を分母とするかを明確にして計算します。売上に対する利益率と原価に対する上乗せ率は異なります。</p><p>販売手数料が販売価格に対する割合で発生する場合、目標利益率を満たす価格を逆算するには、手数料率と利益率の定義を確認する必要があります。</p></section><section id="section-4"><h2>価格を定期的に見直す</h2><p>材料価格、印刷時間、失敗率、販売手数料、送料が変わったら見積もりを更新します。実際の販売結果も価格設定を見直す材料にします。</p><p>販売するモデルやデザインについて、ライセンスや知的財産権上の条件を確認することも重要です。</p></section>
+<section id="faq"><h2>よくある質問</h2><div class="faq"><h3>原価に利益率を足せば販売価格になりますか？</h3><p>利益率を原価に対する上乗せ率とする場合と、売上に対する利益率を目標にする場合では計算が異なります。</p></div><div class="faq"><h3>販売手数料はどのように設定しますか？</h3><p>利用する販売サービスや決済サービスの公式料金を確認し、割合の手数料と固定費を分けて見積もります。</p></div></section>
+<section class="cta-panel"><h2>実際の条件で原価を計算する</h2><p>材料費・電気代・機材費などを入力して、作品1個あたりの費用を試算できます。</p><p><a class="cta" href="/">無料の原価計算ツールを使う →</a></p></section>
+<section><h2>関連記事</h2><ul class="related-grid"><li><a href="/guide/cost-calculation/">3Dプリンターの原価計算ガイド｜費用の内訳と計算方法</a></li><li><a href="/guide/filament-cost/">3Dプリンターのフィラメント材料費の計算方法</a></li></ul></section>
+<p class="date-note">記事の更新日：2026年10月13日　｜　計算結果は入力条件に基づく概算です。</p>
 </article></main>
 <footer class="wrap">本ページは一般的な計算方法の説明です。実際の費用・料金・販売条件を確認し、ご自身の条件で検証してください。</footer>
 </body></html>

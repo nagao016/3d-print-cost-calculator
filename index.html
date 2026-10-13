@@ -61,6 +61,23 @@
     @media(max-width:760px) { .layout { grid-template-columns:1fr; } .results { grid-column:auto; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     @media(max-width:420px) { .fields { grid-template-columns:1fr; } .panel { padding:15px; } .metrics { gap:8px; } .metric { padding:11px; } }
   </style>
+<style id="AUTO-GUIDES-DESIGN-CSS">
+.auto-guides{margin:34px 0 8px;padding:clamp(22px,4vw,38px);border:1px solid #dce5f5;border-radius:22px;background:linear-gradient(135deg,#f4f7ff 0%,#fff 72%);box-shadow:0 12px 34px rgba(28,54,110,.07)}
+.auto-guides__eyebrow{font-size:.75rem;letter-spacing:.16em;font-weight:800;color:#315ee7;margin-bottom:10px}
+.auto-guides__heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:22px}
+.auto-guides__heading h2{margin:0 0 8px;font-size:clamp(1.25rem,3vw,1.7rem);line-height:1.4;color:#172033}
+.auto-guides__heading p{margin:0;color:#65718a;line-height:1.7}
+.auto-guides__count{white-space:nowrap;font-size:.7rem;font-weight:800;letter-spacing:.08em;color:#52668e;border:1px solid #dce5f5;border-radius:999px;padding:7px 10px;background:#fff}
+.auto-guides__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.auto-guide-card{display:flex;flex-direction:column;min-height:220px;padding:20px 18px;border:1px solid #e0e7f2;border-radius:16px;background:#fff;color:#172033;text-decoration:none;box-shadow:0 4px 14px rgba(23,42,88,.04);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.auto-guide-card:hover{transform:translateY(-3px);border-color:#b9caff;box-shadow:0 12px 24px rgba(35,75,170,.1);color:#172033}
+.auto-guide-card__num{font-size:.7rem;letter-spacing:.1em;color:#315ee7;font-weight:850;margin-bottom:14px}
+.auto-guide-card__title{font-size:1.04rem;line-height:1.5;font-weight:800;margin-bottom:10px}
+.auto-guide-card__desc{font-size:.87rem;line-height:1.7;color:#65718a}
+.auto-guide-card__link{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:17px;font-size:.84rem;color:#315ee7;font-weight:800}
+.auto-guide-card__link b{font-size:1.05rem}
+@media(max-width:760px){.auto-guides__grid{grid-template-columns:1fr}.auto-guide-card{min-height:0}.auto-guides__heading{align-items:flex-start;flex-direction:column}.auto-guides__count{display:none}}
+</style>
 </head>
 <body>
 <header>
@@ -220,14 +237,18 @@
     </div>
   </section>
 <!-- AUTO-SEO-GUIDES-START -->
-<section class="guide" id="seo-guides" aria-labelledby="seo-guides-title">
-  <h2 id="seo-guides-title">3Dプリンター原価計算ガイド</h2>
-  <p>原価や販売価格の考え方を詳しく知りたい方は、こちらの記事もご覧ください。</p>
-  <ul>
-    <li><a href="/guide/cost-calculation/">3Dプリンターの原価計算ガイド</a></li>
-    <li><a href="/guide/filament-cost/">フィラメント材料費の計算方法</a></li>
-    <li><a href="/guide/selling-price/">3Dプリント作品の販売価格の決め方</a></li>
-  </ul>
+<section class="auto-guides" id="seo-guides" aria-labelledby="seo-guides-title">
+  <div class="auto-guides__eyebrow">LEARN &amp; CALCULATE</div>
+  <div class="auto-guides__heading">
+    <div><h2 id="seo-guides-title">3Dプリンター原価計算ガイド</h2>
+    <p>原価の考え方から販売価格の決め方まで、知りたいテーマから学べます。</p></div>
+    <span class="auto-guides__count">GUIDE 01—03</span>
+  </div>
+  <div class="auto-guides__grid">
+    <a class="auto-guide-card" href="/guide/cost-calculation/"><span class="auto-guide-card__num">01 / COST</span><span class="auto-guide-card__title">3Dプリンターの原価計算ガイド</span><span class="auto-guide-card__desc">材料費・電気代・機材費など、原価の内訳と計算前の確認ポイント。</span><span class="auto-guide-card__link">計算方法を読む <b>↗</b></span></a>
+    <a class="auto-guide-card" href="/guide/filament-cost/"><span class="auto-guide-card__num">02 / MATERIAL</span><span class="auto-guide-card__title">フィラメント材料費の計算方法</span><span class="auto-guide-card__desc">購入価格と使用量から、造形1個あたりの材料費を見積もる方法。</span><span class="auto-guide-card__link">計算方法を読む <b>↗</b></span></a>
+    <a class="auto-guide-card" href="/guide/selling-price/"><span class="auto-guide-card__num">03 / PRICE</span><span class="auto-guide-card__title">3Dプリント作品の販売価格</span><span class="auto-guide-card__desc">原価・販売手数料・送料・利益率を整理して価格を考える。</span><span class="auto-guide-card__link">価格の考え方を読む <b>↗</b></span></a>
+  </div>
 </section>
 <!-- AUTO-SEO-GUIDES-END -->
 </main>
