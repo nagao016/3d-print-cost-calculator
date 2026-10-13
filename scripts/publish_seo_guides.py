@@ -13,6 +13,9 @@ ARTICLES = [
     {
         "path": "guide/cost-calculation/index.html",
         "slug": "cost-calculation",
+        "image": "/assets/article-cost.png",
+        "image_alt": "電卓と3Dプリント作品を並べた原価計算のイメージ",
+        "image_caption": "材料費だけでなく、電気代や機材費なども整理して原価を見積もります。",
         "title": "3Dプリンターの原価計算ガイド｜費用の内訳と計算方法",
         "description": "3Dプリンター作品の原価を見積もるために、材料費・電気代・機材費・失敗率・梱包費などの考え方を解説します。",
         "intro": "3Dプリント作品の原価を把握するには、フィラメント代だけでなく、電気代、機材の使用、印刷失敗、梱包や送料などを整理することが重要です。",
@@ -40,6 +43,9 @@ ARTICLES = [
     {
         "path": "guide/filament-cost/index.html",
         "slug": "filament-cost",
+        "image": "/assets/article-filament.png",
+        "image_alt": "フィラメントのスプールと3Dプリントの造形サンプル",
+        "image_caption": "購入価格・スプール重量・作品に使う量をそろえて材料費を計算します。",
         "title": "3Dプリンターのフィラメント材料費の計算方法",
         "description": "フィラメントの購入価格・スプール重量・造形で使う量から材料費を見積もる方法を解説します。",
         "intro": "3Dプリント作品の材料費は、フィラメントの購入価格と作品に使う量から概算できます。実際の見積もりでは、スライサーの推定値、サポート材、パージ、失敗分なども確認しましょう。",
@@ -68,6 +74,9 @@ ARTICLES = [
     {
         "path": "guide/selling-price/index.html",
         "slug": "selling-price",
+        "image": "/assets/article-selling-price.png",
+        "image_alt": "さまざまな色と形の3Dプリント作品",
+        "image_caption": "販売価格は原価だけでなく、手数料・送料・利益率なども考慮して決めます。",
         "title": "3Dプリント作品の販売価格の決め方｜原価と利益率",
         "description": "3Dプリント作品の販売価格を考えるために、原価・販売手数料・梱包送料・利益率などの確認ポイントを整理します。",
         "intro": "3Dプリント作品の販売価格を考えるときは、材料費だけでなく、製造にかかる費用、販売サービスの手数料、梱包・送料などを確認する必要があります。",
@@ -118,6 +127,12 @@ def render_article(article):
 <meta property="og:title" content="__TITLE__">
 <meta property="og:description" content="__DESCRIPTION__">
 <meta property="og:url" content="__URL__">
+<meta property="og:image" content="__OG_IMAGE__">
+<meta property="og:image:alt" content="__IMAGE_ALT__">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="__TITLE__">
+<meta name="twitter:description" content="__DESCRIPTION__">
+<meta name="twitter:image" content="__OG_IMAGE__">
 <link rel="canonical" href="__URL__">
 <title>__TITLE__</title>
 <style>
@@ -125,7 +140,7 @@ def render_article(article):
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.8}
 header{background:#13264b;color:white;padding:20px 18px}.wrap{max-width:860px;margin:auto}
 header a{color:white}main{padding:26px 16px 42px}article{background:white;border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,34px)}
-h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-size:1.35rem;margin-top:32px;padding-bottom:7px;border-bottom:1px solid var(--line)}h3{font-size:1.05rem}a{color:var(--accent)}.eyebrow{color:var(--muted);font-size:.9rem}.cta{display:inline-block;background:var(--accent);color:white;text-decoration:none;padding:11px 16px;border-radius:9px;font-weight:700}footer{padding:20px 16px 32px;color:var(--muted);font-size:.85rem}li{margin:.35rem 0}.faq{border-top:1px solid var(--line);padding:8px 0}
+h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-size:1.35rem;margin-top:32px;padding-bottom:7px;border-bottom:1px solid var(--line)}h3{font-size:1.05rem}a{color:var(--accent)}.eyebrow{color:var(--muted);font-size:.9rem}.article-visual{margin:24px 0 30px}.article-visual img{display:block;width:100%;max-height:440px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}.article-visual figcaption{font-size:.88rem;color:var(--muted);margin-top:8px}.cta{display:inline-block;background:var(--accent);color:white;text-decoration:none;padding:11px 16px;border-radius:9px;font-weight:700}footer{padding:20px 16px 32px;color:var(--muted);font-size:.85rem}li{margin:.35rem 0}.faq{border-top:1px solid var(--line);padding:8px 0}
 </style>
 </head>
 <body>
@@ -134,6 +149,7 @@ h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4;margin:8px 0 14px}h2{font-
 <p class="eyebrow">3Dプリンター原価計算ガイド</p>
 <h1>__TITLE__</h1>
 <p>__INTRO__</p>
+<figure class="article-visual"><img src="__IMAGE__" alt="__IMAGE_ALT__" width="1200" height="800" fetchpriority="high"><figcaption>__IMAGE_CAPTION__</figcaption></figure>
 __SECTIONS__
 __FAQ__
 <section><h2>計算ツールで試算する</h2><p>入力条件に基づく原価や販売価格を確認したい場合は、無料の計算ツールをご利用ください。結果は概算であり、入力条件や含まれていない費用によって変わります。</p><p><a class="cta" href="/">原価・販売価格計算ツールを使う</a></p></section>
@@ -150,6 +166,10 @@ def build_html(article):
         "__DESCRIPTION__": escape(article["description"], quote=True),
         "__TITLE__": escape(article["title"], quote=True),
         "__URL__": escape(SITE + "/" + article["path"].replace("index.html", ""), quote=True),
+        "__OG_IMAGE__": escape(SITE + article["image"], quote=True),
+        "__IMAGE__": escape(article["image"], quote=True),
+        "__IMAGE_ALT__": escape(article["image_alt"], quote=True),
+        "__IMAGE_CAPTION__": escape(article["image_caption"]),
         "__INTRO__": escape(article["intro"]),
         "__SECTIONS__": "".join("<section><h2>" + escape(h) + "</h2>" + "".join("<p>" + escape(p) + "</p>" for p in ps) + "</section>" for h, ps in article["sections"]),
         "__FAQ__": "<section><h2>よくある質問</h2>" + "".join("<div class=\"faq\"><h3>" + escape(q) + "</h3><p>" + escape(a) + "</p></div>" for q, a in article["faq"]) + "</section>",
@@ -208,6 +228,10 @@ def main():
         assert html.count("<h1>") == 1
         assert 'rel="canonical"' in html
         assert 'name="description"' in html
+        assert 'property="og:image"' in html
+        assert 'name="twitter:card" content="summary_large_image"' in html
+        assert 'class="article-visual"' in html
+        assert article["image"] in html
         assert "</html>" in html.lower()
         path.write_text(html, encoding="utf-8")
         generated.append(str(path.relative_to(ROOT)))
@@ -222,6 +246,8 @@ def main():
     ] + ["- `" + p + "`" for p in generated] + [
         "", "## Checks", "",
         "- Each page has a title, meta description, canonical URL, one H1, and a link to the calculator.",
+        "- Each article includes a relevant local image, descriptive alt text, and a caption.",
+        "- Open Graph and Twitter large-image metadata are included for social sharing previews.",
         "- Homepage guide links are inserted without duplicating the section on repeated runs.",
         "- Sitemap contains the three guide URLs.",
         "", "## Limitations", "",
