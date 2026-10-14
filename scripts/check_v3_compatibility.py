@@ -3,7 +3,8 @@ import re
 
 root = Path(__file__).resolve().parents[1]
 production = (root / "index.html").read_text(encoding="utf-8")
-v3 = (root / "uiux-prototype" / "src" / "main.jsx").read_text(encoding="utf-8")
+production_app = (root / "uiux-prototype" / "src" / "main.jsx").read_text(encoding="utf-8")
+v3 = (root / "uiux-prototype" / "src" / "main-preview.jsx").read_text(encoding="utf-8")
 css = (root / "uiux-prototype" / "src" / "styles.css").read_text(encoding="utf-8")
 preview = (root / "preview-v3.html").read_text(encoding="utf-8")
 hub = (root / "guide" / "index.html").read_text(encoding="utf-8")
@@ -14,7 +15,7 @@ expected_ids = [
     "failureRate", "otherCost", "packagingCost", "shippingCost",
     "feeRate", "targetMargin",
 ]
-prod_ids_match = re.search(r"const ids\s*=\s*\[([^\]]+)\]", production)
+prod_ids_match = re.search(r"const ids\s*=\s*\[([^\]]+)\]", production_app)
 assert prod_ids_match, "Could not locate production calculator input IDs"
 prod_ids = re.findall(r'"([^"]+)"', prod_ids_match.group(1))
 fields_match = re.search(r"const fields\s*=\s*\[([\s\S]*?)\n\];", v3)
@@ -34,7 +35,7 @@ equations = [
     ("break-even price", r"landed\s*/\s*\(1\s*-\s*fee\)", r"landed\s*/\s*\(1\s*-\s*fee\)"),
     ("profit", r"suggested\s*\*\s*\(1\s*-\s*fee\)\s*-\s*landed", r"suggested\s*\*\s*\(1\s*-\s*fee\)\s*-\s*landed"),
 ]
-prod_calc = production[production.find("function calculate()"):]
+prod_calc = production_app[production_app.find("function calculate()"): ]
 v3_calc = v3[v3.find("function calculate(v)"):]
 for label, prod_pattern, v3_pattern in equations:
     assert re.search(prod_pattern, prod_calc), f"Production formula missing or changed: {label}"
