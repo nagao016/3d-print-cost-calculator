@@ -14,20 +14,22 @@ function safeEqual(a, b) {
 
 async function verifySignature(rawBody, signatureHeader, secret) {
   if (!signatureHeader) return false;
-  const parts = Object.fromEntries(signatureHeader.split(",").map(part => {
+  const fields = signatureHeader.split(",").map(part => {
     const [key, value] = part.split("=", 2);
     return [key, value];
-  }));
-  if (!parts.t || !parts.v1) return false;
-  const timestamp = Number(parts.t);
-  if (!Number.isFinite(timestamp) || Math.abs(Date.now() / 1000 - timestamp) > 300) return false;
-  const signedPayload = `${parts.t}.${rawBody}`;
+  });
+  const timestamp = fields.find(([key]) => key === "t")?.[1];
+  const signatures = fields.filter(([key]) => key === "v1").map(([, value]) => value);
+  if (!timestamp || signatures.length === 0) return false;
+  const timestampNumber = Number(timestamp);
+  if (!Number.isFinite(timestampNumber) || Math.abs(Date.now() / 1000 - timestampNumber) > 300) return false;
+  const signedPayload = `${timestamp}.${rawBody}`;
   const key = await crypto.subtle.importKey(
     "raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
   );
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
   const expected = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
-  return safeEqual(expected, parts.v1);
+  return signatures.some(signature => safeEqual(expected, signature));
 }
 
 export async function onRequestPost({ request, env }) {
