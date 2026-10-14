@@ -79,3 +79,20 @@
 .order-inputs input{width:100%;min-width:0;box-sizing:border-box;border:1px solid #d3d3ca;background:#fff;padding:10px;font:12px var(--mono)}
 .order-profit-content .pro-result-list{margin-top:14px}
 @media(max-width:700px){.inline-pro-tools,.order-profit-inline{padding:13px;margin-top:17px}.inline-pro-heading>div>strong{font-size:12px}.inline-pro-locked{align-items:flex-start;flex-direction:column}.order-inputs{grid-template-columns:1fr 1fr;gap:9px}.order-inputs input{padding:9px 7px}.inline-pro-tools .pro-form-row{gap:6px}.inline-pro-tools .pro-form-row button{font-size:9px;padding:8px}}
+
+
+/* Compact live cost panel and align embedded comparison fields */
+.inline-pro-tools{padding-left:0;padding-right:0}
+.inline-pro-tools .inline-pro-heading,.inline-pro-tools .inline-pro-feature{margin-left:0;margin-right:0}
+.inline-pro-tools .filament-table th:first-child,.inline-pro-tools .filament-table td:first-child{padding-left:0}
+.apply-filament-btn{border:1px solid #d5a18f;background:#fff4ef;color:#9c3c24;padding:7px 9px;font-size:9px;font-weight:700;cursor:pointer;white-space:nowrap}
+.apply-filament-btn:hover{background:#fbe2d8}
+.model-panel{align-self:start;gap:0}
+.model-base-cost{display:grid;gap:8px;padding:23px 0 21px;border-bottom:1px solid #c7c8bd}
+.model-base-cost span{font:8px var(--mono);letter-spacing:.06em;color:#77786f}
+.model-base-cost strong{font:clamp(24px,2.5vw,34px) var(--mono);letter-spacing:-.08em;color:#252722}
+.model-base-cost small{font-size:9px;color:#85867d;line-height:1.7}
+.model-panel .mini-breakdown{margin-top:0}
+.model-panel .model-footer{margin-top:20px;padding-top:0}
+@media(max-width:1050px){.model-base-cost{padding:8px 0 15px}.model-panel .mini-breakdown{margin-top:0}.model-panel .model-footer{margin-top:0}}
+@media(max-width:700px){.inline-pro-tools{padding-left:0;padding-right:0}.model-panel{gap:12px}.model-base-cost{padding:10px 0 14px}.model-panel .model-footer{margin-top:5px}}
