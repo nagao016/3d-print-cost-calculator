@@ -188,7 +188,7 @@ def update_homepage():
     end = "<!-- AUTO-SEO-GUIDES-END -->"
     section = """<!-- AUTO-SEO-GUIDES-START -->
 <section class="guide" id="seo-guides" aria-labelledby="seo-guides-title">
-  <div class="section-heading"><div><span class="section-kicker">LEARN MORE</span><h2 id="seo-guides-title">3Dプリンターの価格設定に役立つ記事</h2><p>原価や販売価格の考え方を、テーマごとにわかりやすく解説します。</p></div><a class="all-articles" href="#seo-guides">記事一覧を見る →</a></div>
+  <div class="section-heading"><div><span class="section-kicker">LEARN MORE</span><h2 id="seo-guides-title">3Dプリンターの価格設定に役立つ記事</h2><p>原価や販売価格の考え方を、テーマごとにわかりやすく解説します。</p></div><a class="all-articles" href="/guide/">記事一覧を見る →</a></div>
   <div class="article-cards">
     <a class="article-card" href="/guide/cost-calculation/"><img src="/assets/article-cost.png" alt="電卓と3Dプリント作品" width="177" height="122" loading="lazy"><div class="article-card-body"><span class="article-tag tag-blue">基礎知識</span><h3>3Dプリンターの原価計算ガイド</h3><p>原価の内訳や計算方法、価格設定の基本をわかりやすく解説します。</p><span class="read-more">この記事を読む →</span></div></a>
     <a class="article-card" href="/guide/filament-cost/"><img src="/assets/article-filament.png" alt="フィラメントと造形サンプル" width="175" height="122" loading="lazy"><div class="article-card-body"><span class="article-tag tag-green">材料費</span><h3>フィラメント材料費の計算方法</h3><p>購入価格と使用量から、材料費を正確に計算する方法を解説します。</p><span class="read-more">この記事を読む →</span></div></a>
@@ -210,7 +210,7 @@ def update_sitemap():
     old_urls = []
     if SITEMAP.exists():
         old_urls = re.findall(r"<loc>\s*(.*?)\s*</loc>", SITEMAP.read_text(encoding="utf-8"), flags=re.S)
-    urls = [SITE + "/"] + [SITE + "/" + a["path"].replace("index.html", "") for a in ARTICLES]
+    urls = [SITE + "/", SITE + "/guide/"] + [SITE + "/" + a["path"].replace("index.html", "") for a in ARTICLES]
     urls += [u.strip() for u in old_urls if u.strip() and u.strip() not in urls]
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     for url in urls:
