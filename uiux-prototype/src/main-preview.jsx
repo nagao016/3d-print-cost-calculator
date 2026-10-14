@@ -262,7 +262,7 @@ function App() {
         </section>
 
         <section className="pro-tools-section" id="pro-tools">
-          <div className="results-heading"><div><span className="micro-label">PRO WORKSPACE</span><h2>条件を保存し、注文単位で考える。</h2><p>計算条件の保存、注文全体の利益計算、複数商品の一括見積もり・CSV出力、フィラメント比較。</p></div><span className="pro-pill">PRO / ¥500 MONTH</span></div>
+          <div className="results-heading"><div><span className="micro-label">PRO WORKSPACE</span><h2>見積もりから利益管理まで、ひとつのワークスペースで。</h2><p>複数商品の一括見積もりを中心に、材料比較・条件保存・注文利益の確認まで。日々の見積もり業務をまとめて効率化します。</p></div><span className="pro-pill">PRO / ¥500 MONTH</span></div>
           {!proActive ? <div className="pro-lock-panel pro-wide"><span className="micro-label">PRO WORKSPACE / UNLOCK</span><h3>見積もり業務を、もっと速く・正確に。</h3><p>複数商品の一括見積もりとCSV出力、フィラメント比較、計算条件の保存、注文全体の利益計算、手数料や送料を含む価格シミュレーションを利用できます。計算データはブラウザ内で処理し、保存条件もこのブラウザに保存します。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : <div className="pro-tools-grid">
             <article className="pro-tool-card pro-tool-wide batch-estimate-card">
               <span className="micro-label">01 / BATCH ESTIMATES</span><h3>複数商品の一括見積もり・CSV出力</h3><p>商品ごとの使用量・印刷時間・注文数を入力すると、原価・推奨販売価格・注文利益をまとめて計算します。最大20商品まで対応。</p>
