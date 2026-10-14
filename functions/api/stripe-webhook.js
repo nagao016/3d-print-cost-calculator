@@ -19,6 +19,8 @@ async function verifySignature(rawBody, signatureHeader, secret) {
     return [key, value];
   }));
   if (!parts.t || !parts.v1) return false;
+  const timestamp = Number(parts.t);
+  if (!Number.isFinite(timestamp) || Math.abs(Date.now() / 1000 - timestamp) > 300) return false;
   const signedPayload = `${parts.t}.${rawBody}`;
   const key = await crypto.subtle.importKey(
     "raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
@@ -49,13 +51,21 @@ export async function onRequestPost({ request, env }) {
       event.type === "customer.subscription.deleted") {
     const active = ["active", "trialing"].includes(object.status);
     if (active) {
+      const existing = await env.PRO_ACCESS.get(`license:${token}`, "json") || {};
       await env.PRO_ACCESS.put(`license:${token}`, JSON.stringify({
+        ...existing,
         status: "active",
+        customerId: object.customer || existing.customerId || null,
+        subscriptionId: object.id || existing.subscriptionId || null,
         currentPeriodEnd: object.current_period_end || null
       }));
     } else {
+      const existing = await env.PRO_ACCESS.get(`license:${token}`, "json") || {};
       await env.PRO_ACCESS.put(`license:${token}`, JSON.stringify({
+        ...existing,
         status: "inactive",
+        customerId: object.customer || existing.customerId || null,
+        subscriptionId: object.id || existing.subscriptionId || null,
         currentPeriodEnd: object.current_period_end || null
       }));
     }
