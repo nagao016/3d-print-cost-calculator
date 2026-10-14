@@ -269,7 +269,7 @@ function App() {
         </section>
 
         <section className="results-section" id="results">
-          <div className="results-heading"><div><span className="micro-label">OUTPUT / 01</span><h2>価格を、分解して考える。</h2><p>目標利益率から逆算した価格と、コスト構造を確認できます。</p></div><button className="copy-action" onClick={copy}>結果をコピー <span>↗</span></button></div>
+          <div className="results-heading"><div><span className="micro-label">OUTPUT / 01</span><h2>価格を、分解して考える。</h2><p>目標利益率から逆算した価格と、コスト構造を確認できます。</p></div>{proActive ? <button className="copy-action" onClick={copy}>結果をコピー <span>↗</span></button> : <span className="pro-inline-tag">価格シミュレーションはPro専用</span>}</div>
           <div className="results-grid">
             <div className="cost-map">
               <div className="subhead"><span>コスト構成</span><small>PER ITEM / ESTIMATE</small></div>
@@ -280,8 +280,7 @@ function App() {
             </div>
             <div className="price-scenarios">
               <div className="subhead"><span>価格シナリオ</span><small>COMPARE OPTIONS</small></div>
-              {scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}
-              <div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div>
+              {proActive ? <>{scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}<div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div></> : <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>価格シミュレーション</h3><p>販売手数料・送料・目標利益率を考慮した販売価格と利益の試算はPro専用です。</p><button className="secondary-btn" onClick={startProCheckout}>Proを利用する ↗</button></div>}
             </div>
           </div>
         </section>
