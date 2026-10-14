@@ -128,12 +128,18 @@ function App() {
           body: JSON.stringify({ licenseToken: token })
         });
         const data = await response.json();
-        if (!cancelled) {
+        if (!cancelled && response.ok) {
           setLicenseToken(token);
-          setProActive(response.ok && data.active === true);
-          if (!data.active) window.localStorage.removeItem("formcost_pro_license");
+          setProActive(data.active === true);
+          if (data.active !== true) window.localStorage.removeItem("formcost_pro_license");
+        } else if (!cancelled) {
+          // Keep the saved token during temporary API/configuration errors.
+          // A failed verification response is not proof that the subscription ended.
+          setProMessage("会員資格を確認できませんでした。時間をおいて再読み込みしてください。");
         }
       } catch {
+        // Preserve the saved token on network errors so a temporary outage cannot
+        // force the customer to purchase again.
         if (!cancelled) setProMessage("会員資格を確認できません。通信環境を確認してください。");
       }
     };
