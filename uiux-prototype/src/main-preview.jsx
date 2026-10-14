@@ -62,9 +62,34 @@ function App() {
   const [proActive, setProActive] = useState(false);
   const [proMessage, setProMessage] = useState("");
   const [proBusy, setProBusy] = useState(false);
+  const [savedConditions, setSavedConditions] = useState([]);
+  const [conditionName, setConditionName] = useState("");
+  const [selectedCondition, setSelectedCondition] = useState("");
+  const [orderQuantity, setOrderQuantity] = useState(10);
+  const [orderSalePrice, setOrderSalePrice] = useState(0);
+  const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA A", price: 2500, weight: 1000 }, { name: "PLA B", price: 3200, weight: 1000 }]);
   const reduced = useReducedMotion();
   const result = useMemo(() => calculate(values), [values]);
   const update = (id, value) => setValues(old => ({ ...old, [id]: value }));
+  const goSection = id => { if (id === "selling" && !proActive) { setProMessage("販売手数料・送料を含む価格シミュレーションはPro専用です。"); return; } setActive(id); };
+  const saveCondition = () => {
+    if (!proActive) return;
+    const name = conditionName.trim();
+    if (!name) { setProMessage("保存名を入力してください。"); return; }
+    const item = { id: crypto.randomUUID(), name, values: { ...values }, savedAt: new Date().toISOString() };
+    const next = [...savedConditions, item].slice(-20); setSavedConditions(next);
+    window.localStorage.setItem("formcost_saved_conditions", JSON.stringify(next)); setConditionName(""); setProMessage("計算条件をこのブラウザに保存しました。");
+  };
+  const loadCondition = () => { if (!proActive || !selectedCondition) return; const item = savedConditions.find(x => x.id === selectedCondition); if (item) { setValues({ ...defaults, ...item.values }); setProMessage("保存した計算条件を呼び出しました。"); } };
+  const addFilament = () => { if (filamentOptions.length < 10) setFilamentOptions(old => [...old, { name: "フィラメント " + (old.length + 1), price: 2500, weight: 1000 }]); };
+  const updateFilament = (index, key, value) => setFilamentOptions(old => old.map((item, i) => i === index ? { ...item, [key]: value } : item));
+  const orderUnitPrice = orderSalePrice > 0 ? Number(orderSalePrice) : (Number.isFinite(result.suggested) ? result.suggested : 0);
+  const orderCost = result.landed * Math.max(0, Number(orderQuantity) || 0);
+  const orderRevenue = orderUnitPrice * Math.max(0, Number(orderQuantity) || 0);
+  const orderFee = orderRevenue * Math.min(99, num(values.feeRate)) / 100;
+  const orderProfit = orderRevenue - orderCost - orderFee;
+  const compareFilament = item => { const weight = Math.max(0, Number(item.weight) || 0); const price = Math.max(0, Number(item.price) || 0); return { perGram: weight > 0 ? price / weight : NaN, usedCost: weight > 0 ? price / weight * num(values.usedGrams) : NaN }; };
+  useEffect(() => { try { const stored = JSON.parse(window.localStorage.getItem("formcost_saved_conditions") || "[]"); if (Array.isArray(stored)) setSavedConditions(stored.filter(x => x && typeof x.id === "string" && typeof x.name === "string" && x.values).slice(-20)); } catch { setSavedConditions([]); } }, []);
 
   useEffect(() => {
     let cancelled = false;
