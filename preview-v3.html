@@ -7,7 +7,12 @@
 <title>V3 Preview | 3D Print Pricing Studio</title>
 <link rel="stylesheet" href="./uiux-prototype/src/styles.css">
 <script type="importmap">
-{"imports":{"react":"https://esm.sh/react@18.3.1","react-dom/client":"https://esm.sh/react-dom@18.3.1/client?external=react","motion/react":"https://esm.sh/motion@12.23.24/react?external=react"}}
+{"imports":{
+"react":"https://esm.sh/react@18.3.1",
+"react/jsx-runtime":"https://esm.sh/react@18.3.1/jsx-runtime",
+"react-dom/client":"https://esm.sh/react-dom@18.3.1/client?external=react",
+"motion/react":"https://esm.sh/motion@12.23.24/react?external=react"
+}}
 </script>
 <script src="https://unpkg.com/@babel/standalone@7.28.4/babel.min.js"></script>
 </head>
@@ -17,14 +22,13 @@
 (async () => {
   const response = await fetch("./uiux-prototype/src/main-preview.jsx");
   if (!response.ok) throw new Error("Preview source could not be loaded: " + response.status);
-  let source = await response.text();
-  source = source.replace(/^import\s+["']\.\/styles\.css["'];?\s*$/m, "");
+  const source = await response.text();
   const compiled = Babel.transform(source, { presets: ["react"], filename: "main-preview.jsx" }).code;
   const moduleUrl = URL.createObjectURL(new Blob([compiled], { type: "text/javascript" }));
   await import(moduleUrl);
 })().catch(error => {
   console.error(error);
-  document.getElementById("root").innerHTML = '<main style="font:16px system-ui;padding:32px;max-width:680px;margin:auto"><h1>プレビューを読み込めませんでした</h1><p>読み込みエラーが発生しました。通信環境を確認して再読み込みしてください。</p><pre style="white-space:pre-wrap;color:#b33"></pre></main>';
+  document.getElementById("root").innerHTML = '<main style="font:16px system-ui;padding:32px;max-width:680px;margin:auto"><h1>プレビューを読み込めませんでした</h1><p>読み込みエラーが発生しました。</p><pre style="white-space:pre-wrap;color:#b33"></pre></main>';
   document.querySelector("#root pre").textContent = String(error);
 });
 </script>
