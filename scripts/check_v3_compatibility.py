@@ -15,9 +15,9 @@ expected_ids = [
     "failureRate", "otherCost", "packagingCost", "shippingCost",
     "feeRate", "targetMargin",
 ]
-prod_fields_match = re.search(r"const fields\\s*=\\s*\\[([\\s\\S]*?)\\n\\];", production_app)
+prod_fields_match = re.search(r'const fields\s*=\s*\[([\s\S]*?)\n\];', production_app)
 assert prod_fields_match, "Could not locate canonical calculator fields"
-prod_ids = re.findall(r'\'\bid:\\s*"([^"]+)"\'', prod_fields_match.group(1))
+prod_ids = re.findall(r'\bid:\s*"([^"]+)"', prod_fields_match.group(1))
 fields_match = re.search(r"const fields\s*=\s*\[([\s\S]*?)\n\];", v3)
 assert fields_match, "Could not locate V3 calculator fields"
 v3_ids = re.findall(r'\bid:\s*"([^"]+)"', fields_match.group(1))
