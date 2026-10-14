@@ -22,14 +22,30 @@ export async function onRequestGet({ request, env }) {
 
   const token = session.client_reference_id;
   if (!token || !/^[A-Za-z0-9_-]{40,50}$/.test(token)) return json({ error: "利用権限を確認できません。" }, 403);
+
+  // Only activate a token that this application actually issued before Checkout.
+  const pending = await env.PRO_ACCESS.get(`license:${token}`, "json");
+  if (!pending || !["pending", "active"].includes(pending.status)) {
+    return json({ error: "事前に発行した利用権限を確認できません。" }, 403);
+  }
+
   const subscription = session.subscription;
   const status = typeof subscription === "object" ? subscription.status : null;
-  if (!["active", "trialing"].includes(status)) return json({ error: "有効な契約を確認できません。" }, 403);
+  const subscriptionToken = typeof subscription === "object" ? subscription.metadata?.license_token : null;
+  const subscriptionId = typeof subscription === "object" ? subscription.id : subscription;
+  if (!subscriptionId || !["active", "trialing"].includes(status) || subscriptionToken !== token) {
+    return json({ error: "有効な契約を確認できません。" }, 403);
+  }
+  if (session.customer && typeof subscription === "object" &&
+      String(subscription.customer) !== String(session.customer)) {
+    return json({ error: "契約情報が一致しません。" }, 403);
+  }
 
   await env.PRO_ACCESS.put(`license:${token}`, JSON.stringify({
+    ...pending,
     status: "active",
-    customerId: session.customer || null,
-    subscriptionId: typeof subscription === "object" ? subscription.id : subscription,
+    customerId: session.customer || pending.customerId || null,
+    subscriptionId,
     currentPeriodEnd: subscription.current_period_end || null
   }));
   return json({ licenseToken: token, status: "active" });
