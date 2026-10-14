@@ -16,7 +16,7 @@
 
 
 /* Pro subscription controls */
-.pro-action{font:inherit;cursor:pointer;border:1px solid #c7c8bd;background:#20251f;color:#fff;border-radius:999px;padding:9px 13px;white-space:nowrap}
+.pro-action{transform:translateX(6px);font:inherit;cursor:pointer;border:1px solid #c7c8bd;background:#20251f;color:#fff;border-radius:999px;padding:9px 13px;white-space:nowrap}
 .pro-action:disabled{opacity:.6;cursor:wait}
 .pro-notice{position:sticky;top:0;z-index:50;background:#f4f1e8;border-bottom:1px solid #d9d5c9;color:#292c25;padding:10px 20px;text-align:center;font-size:13px}
 @media(max-width:700px){.masthead{flex-wrap:wrap;gap:10px}.mast-actions{flex-wrap:wrap;gap:8px}.pro-action{font-size:12px;padding:8px 10px}}
