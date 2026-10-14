@@ -68,6 +68,7 @@ function App() {
   const [orderQuantity, setOrderQuantity] = useState(10);
   const [orderSalePrice, setOrderSalePrice] = useState(0);
   const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA A", price: 2500, weight: 1000 }, { name: "PLA B", price: 3200, weight: 1000 }]);
+  const [batchRows, setBatchRows] = useState([{ id: 1, name: "商品A", grams: 80, hours: 5, quantity: 1 }]);
   const reduced = useReducedMotion();
   const result = useMemo(() => calculate(values), [values]);
   const update = (id, value) => setValues(old => ({ ...old, [id]: value }));
@@ -89,6 +90,23 @@ function App() {
   const orderFee = orderRevenue * Math.min(99, num(values.feeRate)) / 100;
   const orderProfit = orderRevenue - orderCost - orderFee;
   const compareFilament = item => { const weight = Math.max(0, Number(item.weight) || 0); const price = Math.max(0, Number(item.price) || 0); return { perGram: weight > 0 ? price / weight : NaN, usedCost: weight > 0 ? price / weight * num(values.usedGrams) : NaN }; };
+  const updateBatchRow = (id, key, value) => setBatchRows(rows => rows.map(row => row.id === id ? { ...row, [key]: value } : row));
+  const addBatchRow = () => setBatchRows(rows => rows.length < 20 ? [...rows, { id: Date.now(), name: "商品" + String.fromCharCode(65 + rows.length), grams: num(values.usedGrams), hours: num(values.printHours), quantity: 1 }] : rows);
+  const batchResults = batchRows.map(row => {
+    const calc = calculate({ ...values, usedGrams: num(row.grams), printHours: num(row.hours) });
+    const quantity = Math.max(1, Math.min(100000, Number(row.quantity) || 1));
+    const unitPrice = Number.isFinite(calc.suggested) ? calc.suggested : 0;
+    const unitProfit = unitPrice * (1 - Math.min(99, num(values.feeRate)) / 100) - calc.landed;
+    return { ...row, calc, quantity, unitPrice, totalCost: calc.landed * quantity, totalRevenue: unitPrice * quantity, totalProfit: unitProfit * quantity };
+  });
+  const exportBatchCsv = () => {
+    if (!proActive || !batchResults.length) return;
+    const rows = [["商品名","使用量(g)","印刷時間(h)","数量","1個あたり原価(円)","推奨販売価格(円)","注文原価合計(円)","売上合計(円)","利益合計(円)"], ...batchResults.map(r => [r.name,r.grams,r.hours,r.quantity,Math.round(r.calc.landed),r.unitPrice,Math.round(r.totalCost),Math.round(r.totalRevenue),Math.round(r.totalProfit)])];
+    const csv = "\uFEFF" + rows.map(row => row.map(value => '"' + String(value ?? "").replace(/"/g, '""') + '"').join(",")).join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+    const link = document.createElement("a"); link.href = url; link.download = "3d-print-batch-estimates.csv"; link.click(); URL.revokeObjectURL(url);
+    setProMessage("一括見積もりをCSV出力しました。データはサーバーへ送信されません。");
+  };
   useEffect(() => { try { const stored = JSON.parse(window.localStorage.getItem("formcost_saved_conditions") || "[]"); if (Array.isArray(stored)) setSavedConditions(stored.filter(x => x && typeof x.id === "string" && typeof x.name === "string" && x.values).slice(-20)); } catch { setSavedConditions([]); } }, []);
 
   useEffect(() => {
@@ -244,8 +262,8 @@ function App() {
         </section>
 
         <section className="pro-tools-section" id="pro-tools">
-          <div className="results-heading"><div><span className="micro-label">PRO WORKSPACE</span><h2>条件を保存し、注文単位で考える。</h2><p>計算条件の保存、注文全体の利益計算、最大10種類のフィラメント比較。</p></div><span className="pro-pill">PRO / ¥500 MONTH</span></div>
-          {!proActive ? <div className="pro-lock-panel pro-wide"><span className="micro-label">PRO FEATURES LOCKED</span><h3>Pro会員向け機能</h3><p>計算条件の保存・呼び出し、複数個印刷の注文利益計算、フィラメント比較、手数料や送料を含む価格シミュレーションはPro会員のみ利用できます。保存した条件はサーバーではなく、このブラウザに保存します。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : <div className="pro-tools-grid">
+          <div className="results-heading"><div><span className="micro-label">PRO WORKSPACE</span><h2>条件を保存し、注文単位で考える。</h2><p>計算条件の保存、注文全体の利益計算、複数商品の一括見積もり・CSV出力、フィラメント比較。</p></div><span className="pro-pill">PRO / ¥500 MONTH</span></div>
+          {!proActive ? <div className="pro-lock-panel pro-wide"><span className="micro-label">PRO FEATURES LOCKED</span><h3>Pro会員向け機能</h3><p>計算条件の保存・呼び出し、複数商品の一括見積もり・CSV出力、注文全体の利益計算、フィラメント比較、手数料や送料を含む価格シミュレーションはPro会員のみ利用できます。保存した条件はサーバーではなく、このブラウザに保存します。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : <div className="pro-tools-grid">
             <article className="pro-tool-card">
               <span className="micro-label">01 / SAVE CONDITIONS</span><h3>計算条件の保存・呼び出し</h3><p>条件はこのブラウザに最大20件保存されます。</p>
               <div className="pro-form-row"><input aria-label="保存名" value={conditionName} onChange={e=>setConditionName(e.target.value)} placeholder="例：PLA・標準設定" maxLength={60}/><button onClick={saveCondition}>保存</button></div>
@@ -258,6 +276,13 @@ function App() {
               <label>販売単価（円・任意）<input type="number" min="0" step="1" value={orderSalePrice} onChange={e=>setOrderSalePrice(Math.max(0,Number(e.target.value)||0))}/></label>
               <div className="pro-result-list"><div><span>注文全体の売上</span><strong>{money(orderRevenue)}</strong></div><div><span>注文全体の原価</span><strong>{money(orderCost)}</strong></div><div><span>販売手数料</span><strong>{money(orderFee)}</strong></div><div className="pro-profit-row"><span>注文全体の利益</span><strong>{money(orderProfit)}</strong></div></div>
               <small className="pro-privacy-note">販売単価が0円の場合は目標販売価格を使用します。</small>
+            </article>
+            <article className="pro-tool-card pro-tool-wide batch-estimate-card">
+              <span className="micro-label">03 / BATCH ESTIMATES</span><h3>複数商品の一括見積もり・CSV出力</h3><p>商品ごとの使用量・印刷時間・注文数を入力すると、原価・推奨販売価格・注文利益をまとめて計算します。最大20商品まで対応。</p>
+              <div className="batch-estimate-table-wrap"><table className="batch-estimate-table"><thead><tr><th>商品名</th><th>使用量 (g)</th><th>印刷時間 (h)</th><th>数量</th><th>1個原価</th><th>推奨価格</th><th>注文利益</th><th></th></tr></thead><tbody>{batchResults.map(row=><tr key={row.id}><td><input aria-label="商品名" value={row.name} maxLength={60} onChange={e=>updateBatchRow(row.id,"name",e.target.value)}/></td><td><input aria-label="使用量" type="number" min="0" step="0.1" value={row.grams} onChange={e=>updateBatchRow(row.id,"grams",e.target.value)}/></td><td><input aria-label="印刷時間" type="number" min="0" step="0.1" value={row.hours} onChange={e=>updateBatchRow(row.id,"hours",e.target.value)}/></td><td><input aria-label="数量" type="number" min="1" max="100000" step="1" value={row.quantity} onChange={e=>updateBatchRow(row.id,"quantity",e.target.value)}/></td><td>{money(row.calc.landed)}</td><td>{money(row.unitPrice)}</td><td>{money(row.totalProfit)}</td><td><button className="remove-filament" onClick={()=>setBatchRows(rows=>rows.length>1?rows.filter(item=>item.id!==row.id):rows.map(item=>({...item,name:"",grams:0,hours:0,quantity:1})))} aria-label="商品行を削除">×</button></td></tr>)}</tbody></table></div>
+              <div className="batch-estimate-actions"><button className="secondary-btn" onClick={addBatchRow} disabled={batchRows.length>=20}>＋ 商品を追加（{batchRows.length}/20）</button><button className="next-btn" onClick={exportBatchCsv}>CSVをダウンロード ↓</button></div>
+              <div className="batch-estimate-summary"><div><span>注文原価合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalCost,0))}</strong></div><div><span>注文売上合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalRevenue,0))}</strong></div><div><span>注文利益合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalProfit,0))}</strong></div></div>
+              <small className="pro-privacy-note">計算とCSV作成はブラウザ内で行います。商品名や見積もりデータをサーバーへ送信しません。</small>
             </article>
             <article className="pro-tool-card pro-tool-wide">
               <span className="micro-label">03 / FILAMENT COMPARISON</span><h3>フィラメント最大10種類の比較</h3><p>価格とスプール重量から、1gあたりの価格と作品1個分の材料費を比較します。</p>
