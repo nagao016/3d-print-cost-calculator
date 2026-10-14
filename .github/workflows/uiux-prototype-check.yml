@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "uiux-prototype/**"
+      - "scripts/check_v3_compatibility.py"
       - ".github/workflows/uiux-prototype-check.yml"
   workflow_dispatch:
 
