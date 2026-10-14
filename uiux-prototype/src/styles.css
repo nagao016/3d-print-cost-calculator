@@ -153,3 +153,95 @@
   .pro-tools-section .batch-estimate-actions{align-items:stretch;flex-direction:column}
   .pro-tools-section .batch-estimate-actions button{width:100%}
 }
+
+
+/* Mobile usability pass: touch targets, narrow screens, and table scrolling */
+@media(max-width:700px){
+  .masthead{
+    height:auto;
+    min-height:64px;
+    padding:12px 16px;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .masthead>.wordmark{flex:1 1 auto;min-width:0}
+  .mast-meta{margin-left:auto}
+  .mast-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%;
+    gap:8px;
+  }
+  .mast-actions .mast-link{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:42px;
+    padding:9px 6px;
+    border:1px solid var(--line);
+    text-align:center;
+    font-size:11px;
+    white-space:normal;
+  }
+  .mast-actions .pro-action{
+    grid-column:1/-1;
+    transform:none;
+    min-height:44px;
+    font-size:12px;
+  }
+  .field-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .batch-estimate-table-wrap,.filament-table-wrap{
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+  }
+  .batch-estimate-table-wrap::before,.filament-table-wrap::before{
+    display:block;
+    padding:0 0 9px;
+    color:#77786f;
+    font-size:10px;
+    content:"表は左右にスクロールできます →";
+  }
+  .batch-estimate-table th,.batch-estimate-table td,
+  .filament-table th,.filament-table td{padding:10px 8px}
+  .batch-estimate-table td input,.filament-table td input{min-height:40px}
+  .remove-filament{min-width:40px;min-height:40px}
+  .pro-form-row button,.pro-tool-card>.secondary-btn,
+  .pro-tools-section .next-btn,.panel-bottom button,.rail-note button{
+    min-height:44px;
+  }
+  .toast{
+    left:12px;
+    right:12px;
+    bottom:max(12px,env(safe-area-inset-bottom));
+    text-align:center;
+    overflow-wrap:anywhere;
+  }
+}
+@media(max-width:390px){
+  .masthead{padding:11px 12px}
+  .masthead>.wordmark{font-size:9px;gap:7px}
+  .masthead>.wordmark small{font-size:6px}
+  .mast-meta{font-size:7px}
+  .mast-actions .mast-link{font-size:10px}
+  .opening-copy{padding-left:18px;padding-right:18px}
+  .config-panel{padding:22px 16px 24px}
+  .field-grid{grid-template-columns:minmax(0,1fr);gap:17px;min-height:0}
+  .panel-heading{gap:8px}
+  .panel-heading h2{font-size:25px}
+  .panel-count{font-size:23px}
+  .panel-bottom>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  .panel-bottom>div button{min-width:0;padding:11px 8px}
+  .pro-form-row{flex-direction:column}
+  .pro-form-row button{width:100%}
+  .batch-estimate-summary strong{overflow-wrap:anywhere}
+  .subhead{align-items:flex-start}
+}
+@media(hover:none){
+  .pro-tool-card:hover{box-shadow:0 8px 24px #25272208;border-top-color:#b8b8ad}
+}
+:where(button,a,input,select):focus-visible{
+  outline:3px solid #f05a35;
+  outline-offset:3px;
+}
