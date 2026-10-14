@@ -26,3 +26,6 @@ jobs:
         run: npm install
       - name: Build prototype
         run: npm run build
+      - name: Verify production compatibility
+        working-directory: .
+        run: python scripts/check_v3_compatibility.py
