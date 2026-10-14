@@ -8,8 +8,10 @@ on:
 permissions:
   contents: write
 
+# Shared with daily-auto-publish-article.yml to avoid concurrent writes
+# to index.html and sitemap.xml.
 concurrency:
-  group: auto-publish-seo-guides
+  group: seo-content-publishers
   cancel-in-progress: false
 
 jobs:

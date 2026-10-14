@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: daily-auto-publish-article
+  group: seo-content-publishers
   cancel-in-progress: false
 
 jobs:
