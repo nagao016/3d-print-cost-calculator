@@ -29,7 +29,7 @@ async function verifySignature(rawBody, signatureHeader, secret) {
   );
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
   const expected = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
-  return signatures.some(signature => safeEqual(expected, signature));
+  return signatures.some(signature => typeof signature === "string" && safeEqual(expected, signature));
 }
 
 function idOf(value) {
