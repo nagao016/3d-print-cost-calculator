@@ -1,0 +1,46 @@
+name: SEO Publishing Compatibility Check
+
+on:
+  pull_request:
+    paths:
+      - "guide/**"
+      - "scripts/publish_seo_guides.py"
+      - "scripts/auto_publish_article.py"
+      - ".github/workflows/seo-publishing-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-publishers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run curated SEO guide publisher
+        run: python scripts/publish_seo_guides.py
+      - name: Run scheduled article publisher
+        run: python scripts/auto_publish_article.py
+      - name: Validate article hub and sitemap
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path(".")
+          hub = root / "guide" / "index.html"
+          index = (root / "index.html").read_text(encoding="utf-8")
+          sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
+          assert hub.exists(), "guide/index.html was not created or preserved"
+          hub_html = hub.read_text(encoding="utf-8")
+          assert 'rel="canonical"' in hub_html and "/guide/" in hub_html
+          assert "/guide/" in sitemap, "The article hub is missing from sitemap.xml"
+          assert "AUTO-SEO-GUIDES-START" in index
+          assert "AUTO-SEO-AUTOPOST-START" in index
+          print("SEO publishing compatibility checks passed.")
+          PY
