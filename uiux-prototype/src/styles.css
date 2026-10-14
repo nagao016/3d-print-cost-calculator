@@ -96,3 +96,26 @@
 .model-panel .model-footer{margin-top:20px;padding-top:0}
 @media(max-width:1050px){.model-base-cost{padding:8px 0 15px}.model-panel .mini-breakdown{margin-top:0}.model-panel .model-footer{margin-top:0}}
 @media(max-width:700px){.inline-pro-tools{padding-left:0;padding-right:0}.model-panel{gap:12px}.model-base-cost{padding:10px 0 14px}.model-panel .model-footer{margin-top:5px}}
+
+
+/* Let the material Pro workspace span the full calculator + cost panel width */
+@media(min-width:1051px){
+  .studio{grid-template-columns:215px minmax(0,1fr) minmax(260px,.76fr)}
+  .config-panel{display:contents}
+  .config-panel>.panel-heading,
+  .config-panel>.step-progress,
+  .config-panel>.field-grid,
+  .config-panel>.panel-bottom{grid-column:2}
+  .config-panel>.inline-pro-tools{grid-column:2/4;width:auto;box-sizing:border-box;margin:0 0 24px 0;padding:17px;border-left:1px solid #d7d7ce;border-right:1px solid #d7d7ce}
+  .config-panel>.inline-pro-tools .inline-pro-heading,
+  .config-panel>.inline-pro-tools .inline-pro-feature{margin-left:0;margin-right:0}
+  .config-panel>.inline-pro-tools .filament-table{min-width:0}
+  .config-panel>.inline-pro-tools .filament-table th,
+  .config-panel>.inline-pro-tools .filament-table td{padding-left:7px;padding-right:7px}
+  .config-panel>.inline-pro-tools .filament-table th:first-child,
+  .config-panel>.inline-pro-tools .filament-table td:first-child{padding-left:7px}
+  .studio>.model-panel{grid-column:3;grid-row:1;min-height:0}
+}
+@media(min-width:1051px){
+  .studio:has(.config-panel>.inline-pro-tools) .model-panel{grid-row:1 / span 2}
+}
