@@ -35,7 +35,7 @@ equations = [
     ("break-even price", r"landed\s*/\s*\(1\s*-\s*fee\)", r"landed\s*/\s*\(1\s*-\s*fee\)"),
     ("profit", r"suggested\s*\*\s*\(1\s*-\s*fee\)\s*-\s*landed", r"suggested\s*\*\s*\(1\s*-\s*fee\)\s*-\s*landed"),
 ]
-prod_calc = production_app[production_app.find("function calculate()"): ]
+prod_calc = production_app[production_app.find("function calculate("): ]
 v3_calc = v3[v3.find("function calculate(v)"):]
 for label, prod_pattern, v3_pattern in equations:
     assert re.search(prod_pattern, prod_calc), f"Production formula missing or changed: {label}"
