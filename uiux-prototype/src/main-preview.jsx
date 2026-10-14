@@ -233,6 +233,13 @@ function App() {
                 {active === "selling" && !proActive ? <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>販売価格シミュレーション</h3><p>販売手数料・梱包費・送料・目標利益率を考慮した価格計算はPro専用です。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)}
               </motion.div>
             </AnimatePresence>
+            {active === "material" && <div className="inline-pro-tools">
+              <div className="inline-pro-heading"><div><span className="micro-label">WORKFLOW TOOL / MATERIAL</span><strong>材料の条件を比較・保存</strong></div><span className="pro-inline-tag">PRO</span></div>
+              {!proActive ? <div className="inline-pro-locked"><span>フィラメント比較と計算条件の保存・呼び出し</span><button onClick={startProCheckout} disabled={proBusy}>Proで使う ↗</button></div> : <>
+                <div className="inline-pro-feature"><div className="inline-pro-feature-title"><strong>計算条件を保存</strong><small>このブラウザに最大20件</small></div><div className="pro-form-row"><input aria-label="保存名" value={conditionName} onChange={e=>setConditionName(e.target.value)} placeholder="例：PLA・標準設定" maxLength={60}/><button onClick={saveCondition}>保存</button></div><div className="pro-form-row"><select aria-label="保存条件" value={selectedCondition} onChange={e=>setSelectedCondition(e.target.value)}><option value="">保存した条件を選択</option>{savedConditions.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><button onClick={loadCondition} disabled={!selectedCondition}>呼び出す</button></div></div>
+                <div className="inline-pro-feature"><div className="inline-pro-feature-title"><strong>フィラメント比較</strong><small>{filamentOptions.length}/10種類</small></div><div className="filament-table-wrap"><table className="filament-table"><thead><tr><th>名称</th><th>購入価格（円）</th><th>重量（g）</th><th>円/g</th><th>作品分の材料費</th><th></th></tr></thead><tbody>{filamentOptions.map((item,index)=>{const calc=compareFilament(item);return <tr key={index}><td><input aria-label={"フィラメント名 "+(index+1)} value={item.name} maxLength={40} onChange={e=>updateFilament(index,"name",e.target.value)}/></td><td><input aria-label={"購入価格 "+(index+1)} type="number" min="0" value={item.price} onChange={e=>updateFilament(index,"price",Math.max(0,Number(e.target.value)||0))}/></td><td><input aria-label={"重量 "+(index+1)} type="number" min="1" value={item.weight} onChange={e=>updateFilament(index,"weight",Math.max(1,Number(e.target.value)||1))}/></td><td>{Number.isFinite(calc.perGram)?money(calc.perGram):"—"}</td><td>{Number.isFinite(calc.usedCost)?money(calc.usedCost):"—"}</td><td><button className="remove-filament" onClick={()=>setFilamentOptions(old=>old.length>1?old.filter((_,i)=>i!==index):old.map((item,i)=>i===index?{name:"",price:0,weight:1000}:item))} aria-label="削除">×</button></td></tr>})}</tbody></table></div><button className="secondary-btn" onClick={addFilament} disabled={filamentOptions.length>=10}>＋ 比較用フィラメントを追加</button></div>
+              </>}
+            </div>}
             <div className="panel-bottom"><span><b>●</b> AUTO-CALCULATE ENABLED</span><div>{active !== "material" && <button className="secondary-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)-1].id)}>← 戻る</button>}{active !== "selling" ? <button className="next-btn" onClick={() => goSection(sections[sections.findIndex(s => s.id === active)+1].id)}>次の設定へ <span>→</span></button> : <button className="next-btn" onClick={() => document.getElementById("results").scrollIntoView({ behavior: reduced ? "auto" : "smooth" })}>価格を確認 <span>↓</span></button>}</div></div>
           </div>
           <aside className="model-panel">
@@ -241,31 +248,6 @@ function App() {
             <div className="mini-breakdown"><div><span>材料</span><strong>{money(result.filament)}</strong></div><div><span>電気</span><strong>{money(result.electricity)}</strong></div><div><span>償却</span><strong>{money(result.depreciation)}</strong></div></div>
             <div className="model-footer"><span>CALCULATION STATUS</span><strong><i /> ALL VALUES UPDATED</strong></div>
           </aside>
-        </section>
-
-        <section className="pro-tools-section" id="pro-tools">
-          <div className="results-heading"><div><span className="micro-label">PRO WORKSPACE</span><h2>条件を保存し、注文単位で考える。</h2><p>計算条件の保存、注文全体の利益計算、最大10種類のフィラメント比較。</p></div><span className="pro-pill">PRO / ¥500 MONTH</span></div>
-          {!proActive ? <div className="pro-lock-panel pro-wide"><span className="micro-label">PRO FEATURES LOCKED</span><h3>Pro会員向け機能</h3><p>計算条件の保存・呼び出し、複数個印刷の注文利益計算、フィラメント比較、手数料や送料を含む価格シミュレーションはPro会員のみ利用できます。保存した条件はサーバーではなく、このブラウザに保存します。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : <div className="pro-tools-grid">
-            <article className="pro-tool-card">
-              <span className="micro-label">01 / SAVE CONDITIONS</span><h3>計算条件の保存・呼び出し</h3><p>条件はこのブラウザに最大20件保存されます。</p>
-              <div className="pro-form-row"><input aria-label="保存名" value={conditionName} onChange={e=>setConditionName(e.target.value)} placeholder="例：PLA・標準設定" maxLength={60}/><button onClick={saveCondition}>保存</button></div>
-              <div className="pro-form-row"><select aria-label="保存条件" value={selectedCondition} onChange={e=>setSelectedCondition(e.target.value)}><option value="">保存した条件を選択</option>{savedConditions.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select><button onClick={loadCondition} disabled={!selectedCondition}>呼び出す</button></div>
-              <small className="pro-privacy-note">保存先：このブラウザのみ（最大20件）</small>
-            </article>
-            <article className="pro-tool-card">
-              <span className="micro-label">02 / ORDER PROFIT</span><h3>複数個印刷・注文全体の利益</h3><p>現在の条件を使って、注文全体の原価・売上・利益を試算します。</p>
-              <label>注文数量（個）<input type="number" min="1" max="100000" step="1" value={orderQuantity} onChange={e=>setOrderQuantity(Math.max(1,Math.min(100000,Number(e.target.value)||1)))}/></label>
-              <label>販売単価（円・任意）<input type="number" min="0" step="1" value={orderSalePrice} onChange={e=>setOrderSalePrice(Math.max(0,Number(e.target.value)||0))}/></label>
-              <div className="pro-result-list"><div><span>注文全体の売上</span><strong>{money(orderRevenue)}</strong></div><div><span>注文全体の原価</span><strong>{money(orderCost)}</strong></div><div><span>販売手数料</span><strong>{money(orderFee)}</strong></div><div className="pro-profit-row"><span>注文全体の利益</span><strong>{money(orderProfit)}</strong></div></div>
-              <small className="pro-privacy-note">販売単価が0円の場合は目標販売価格を使用します。</small>
-            </article>
-            <article className="pro-tool-card pro-tool-wide">
-              <span className="micro-label">03 / FILAMENT COMPARISON</span><h3>フィラメント最大10種類の比較</h3><p>価格とスプール重量から、1gあたりの価格と作品1個分の材料費を比較します。</p>
-              <div className="filament-table-wrap"><table className="filament-table"><thead><tr><th>名称</th><th>購入価格（円）</th><th>重量（g）</th><th>円/g</th><th>作品分の材料費</th><th></th></tr></thead><tbody>{filamentOptions.map((item,index)=>{const calc=compareFilament(item);return <tr key={index}><td><input aria-label={"フィラメント名 "+(index+1)} value={item.name} maxLength={40} onChange={e=>updateFilament(index,"name",e.target.value)}/></td><td><input aria-label={"購入価格 "+(index+1)} type="number" min="0" value={item.price} onChange={e=>updateFilament(index,"price",Math.max(0,Number(e.target.value)||0))}/></td><td><input aria-label={"重量 "+(index+1)} type="number" min="1" value={item.weight} onChange={e=>updateFilament(index,"weight",Math.max(1,Number(e.target.value)||1))}/></td><td>{Number.isFinite(calc.perGram)?money(calc.perGram):"—"}</td><td>{Number.isFinite(calc.usedCost)?money(calc.usedCost):"—"}</td><td><button className="remove-filament" onClick={()=>setFilamentOptions(old=>old.length>1?old.filter((_,i)=>i!==index):old.map((item,i)=>i===index?{name:"",price:0,weight:1000}:item))} aria-label="削除">×</button></td></tr>})}</tbody></table></div>
-              <button className="secondary-btn" onClick={addFilament} disabled={filamentOptions.length>=10}>＋ フィラメントを追加（{filamentOptions.length}/10）</button>
-              <small className="pro-privacy-note">比較条件は画面内で計算され、サーバーへ送信されません。</small>
-            </article>
-          </div>}
         </section>
 
         <section className="results-section" id="results">
@@ -282,6 +264,10 @@ function App() {
               <div className="subhead"><span>価格シナリオ</span><small>COMPARE OPTIONS</small></div>
               {proActive ? <>{scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}<div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div></> : <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>価格シミュレーション</h3><p>販売手数料・送料・目標利益率を考慮した販売価格と利益の試算はPro専用です。</p><button className="secondary-btn" onClick={startProCheckout}>Proを利用する ↗</button></div>}
             </div>
+          </div>
+          <div className="order-profit-inline">
+            <div className="inline-pro-heading"><div><span className="micro-label">OUTPUT / ORDER PROFIT</span><strong>注文単位の利益を確認</strong></div><span className="pro-inline-tag">PRO</span></div>
+            {!proActive ? <div className="inline-pro-locked"><span>複数個の注文全体の売上・原価・利益を試算</span><button onClick={startProCheckout} disabled={proBusy}>Proで使う ↗</button></div> : <div className="order-profit-content"><div className="order-inputs"><label>注文数量（個）<input type="number" min="1" max="100000" step="1" value={orderQuantity} onChange={e=>setOrderQuantity(Math.max(1,Math.min(100000,Number(e.target.value)||1)))}/></label><label>販売単価（円・任意）<input type="number" min="0" step="1" value={orderSalePrice} onChange={e=>setOrderSalePrice(Math.max(0,Number(e.target.value)||0))}/></label></div><div className="pro-result-list"><div><span>注文全体の売上</span><strong>{money(orderRevenue)}</strong></div><div><span>注文全体の原価</span><strong>{money(orderCost)}</strong></div><div><span>販売手数料</span><strong>{money(orderFee)}</strong></div><div className="pro-profit-row"><span>注文全体の利益</span><strong>{money(orderProfit)}</strong></div></div><small className="pro-privacy-note">販売単価が0円の場合は目標販売価格を使用します。</small></div>}
           </div>
         </section>
 
