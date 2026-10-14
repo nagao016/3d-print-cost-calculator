@@ -55,3 +55,19 @@
 .pro-lock-panel .next-btn,.pro-lock-panel .secondary-btn{margin-top:8px}
 .pro-wide{max-width:1220px;margin:0 auto}
 @media(max-width:700px){.pro-tools-section{padding:38px 17px}.pro-tools-grid{grid-template-columns:1fr}.pro-tool-wide{grid-column:auto}.pro-tools-section>.results-heading{align-items:flex-start}.pro-form-row{align-items:stretch}.pro-form-row button{padding:9px}.pro-tool-card h3,.pro-lock-panel h3{font-size:17px}}
+
+
+/* Pro batch estimate workspace */
+.batch-estimate-card{grid-column:1/-1}
+.batch-estimate-table-wrap{width:100%;overflow-x:auto;margin:16px 0 12px}
+.batch-estimate-table{width:100%;min-width:780px;border-collapse:collapse;font-size:10px}
+.batch-estimate-table th,.batch-estimate-table td{padding:9px 7px;border-bottom:1px solid #deded5;text-align:left;white-space:nowrap}
+.batch-estimate-table th{font-size:9px;color:#77786f;font-weight:600}
+.batch-estimate-table td input{box-sizing:border-box;width:84px;min-width:0;background:#fff;border:1px solid #d3d3ca;border-radius:0;padding:8px 6px;color:#252722;font:11px var(--mono)}
+.batch-estimate-table td:first-child input{width:140px}
+.batch-estimate-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.batch-estimate-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid #deded5}
+.batch-estimate-summary>div{display:grid;gap:7px}
+.batch-estimate-summary span{font-size:10px;color:#77786f}
+.batch-estimate-summary strong{font:16px var(--mono);letter-spacing:-.04em}
+@media(max-width:700px){.batch-estimate-summary{grid-template-columns:1fr}.batch-estimate-actions{align-items:stretch;flex-direction:column}.batch-estimate-actions button{width:100%}}
