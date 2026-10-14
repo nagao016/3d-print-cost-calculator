@@ -55,3 +55,27 @@
 .pro-lock-panel .next-btn,.pro-lock-panel .secondary-btn{margin-top:8px}
 .pro-wide{max-width:1220px;margin:0 auto}
 @media(max-width:700px){.pro-tools-section{padding:38px 17px}.pro-tools-grid{grid-template-columns:1fr}.pro-tool-wide{grid-column:auto}.pro-tools-section>.results-heading{align-items:flex-start}.pro-form-row{align-items:stretch}.pro-form-row button{padding:9px}.pro-tool-card h3,.pro-lock-panel h3{font-size:17px}}
+
+
+/* Inline Pro tools embedded in the calculator flow */
+.inline-pro-tools,.order-profit-inline{min-width:0;margin-top:24px;border:1px solid #d7d7ce;background:#f5f4ee;padding:17px}
+.inline-pro-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.inline-pro-heading>div{display:grid;gap:6px}
+.inline-pro-heading>div>strong{font-size:13px;letter-spacing:-.02em}
+.inline-pro-locked{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #deded5}
+.inline-pro-locked>span{font-size:10px;line-height:1.7;color:#77786f}
+.inline-pro-locked button{flex:none;background:#252722;color:#fff;border:1px solid #252722;padding:9px 11px;font-size:10px;font-weight:700}
+.inline-pro-feature{border-top:1px solid #deded5;padding-top:13px;margin-top:13px}
+.inline-pro-feature-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.inline-pro-feature-title strong{font-size:11px}
+.inline-pro-feature-title small{font-size:9px;color:#85867d}
+.inline-pro-tools .pro-form-row{margin:8px 0}
+.inline-pro-tools .filament-table-wrap{margin:10px 0}
+.inline-pro-tools .filament-table{min-width:620px}
+.order-profit-inline{max-width:1220px;margin:20px auto 0;background:#f0eee6}
+.order-profit-content{border-top:1px solid #deded5;padding-top:14px}
+.order-inputs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.order-inputs label{display:grid;gap:7px;font-size:10px;font-weight:700}
+.order-inputs input{width:100%;min-width:0;box-sizing:border-box;border:1px solid #d3d3ca;background:#fff;padding:10px;font:12px var(--mono)}
+.order-profit-content .pro-result-list{margin-top:14px}
+@media(max-width:700px){.inline-pro-tools,.order-profit-inline{padding:13px;margin-top:17px}.inline-pro-heading>div>strong{font-size:12px}.inline-pro-locked{align-items:flex-start;flex-direction:column}.order-inputs{grid-template-columns:1fr 1fr;gap:9px}.order-inputs input{padding:9px 7px}.inline-pro-tools .pro-form-row{gap:6px}.inline-pro-tools .pro-form-row button{font-size:9px;padding:8px}}
