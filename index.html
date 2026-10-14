@@ -230,25 +230,179 @@
     @media(max-width:650px) { .site-nav { padding:9px 14px; gap:8px; } .brand-mark { width:34px; height:34px; } .nav-links { gap:16px; } .nav-links a { font-size:.76rem; } header.hero { padding:0; } .hero-inner { grid-template-columns:1fr; gap:18px; padding:29px 17px 25px; } .hero h1 { font-size:2.05rem; } .hero-visual img { aspect-ratio:16/9; } main.wrap { padding:18px 12px 32px; } .intro { align-items:flex-start; font-size:.82rem; } .panel { padding:18px 16px; } .results { padding:18px 15px; } .metric { min-height:88px; padding:12px; } .metric.primary { min-height:112px; } .metric.primary .value { font-size:2rem; } .details th,.details td { padding:10px 8px; font-size:.77rem; } .actions button { flex:1 1 140px; } }
     @media(prefers-reduced-motion:no-preference) { .panel,.results,.guide,.article-card { animation:rise-in .38s ease-out both; } .panel:nth-child(2) { animation-delay:.04s; } .panel:nth-child(3) { animation-delay:.08s; } .results { animation-delay:.05s; } input,button,.article-card { transition:box-shadow .18s ease,border-color .18s ease,background .18s ease,transform .18s ease; } @keyframes rise-in { from { opacity:.78; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } } }
 
+  
+    /* Photo-led redesign: editorial hero, visual guide cards, and a clearer calculator workspace */
+    :root { --ink:#101827; --muted:#64748b; --line:#e2e8f0; --accent:#1764e8; --accent-dark:#0d48b5; --accent-soft:#eaf2ff; --navy:#0b1830; --shadow:0 18px 46px rgba(15,35,70,.08); }
+    html { scroll-padding-top:86px; }
+    body { font-family:Inter,"Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans-serif; background:#f7f8fa; color:#101827; }
+    .site-nav { min-height:76px; padding:10px clamp(18px,5vw,76px); gap:26px; background:rgba(255,255,255,.97); border-bottom:1px solid #e7ebf1; box-shadow:0 3px 18px #0c23400a; }
+    .brand { gap:12px; color:#111827; }
+    .brand-mark { width:42px; height:42px; border:0; border-radius:13px; background:linear-gradient(145deg,#1764e8,#40b7ed); color:#fff; font-size:30px; box-shadow:0 7px 18px #1764e82e; }
+    .brand strong { font-size:1.02rem; letter-spacing:-.035em; }
+    .brand small { margin-top:3px; font-size:.7rem; color:#64748b; letter-spacing:.01em; }
+    .nav-links { gap:clamp(12px,2vw,27px); }
+    .nav-links a { font-size:.82rem; color:#3f4b60; padding:10px 0; position:relative; }
+    .nav-links a:hover { color:var(--accent); }
+    header.hero { padding:0; background:#0b1830; color:white; isolation:isolate; }
+    header.hero:before { width:560px;height:560px;right:-110px;top:-310px;border-color:#ffffff1a;box-shadow:0 0 0 42px #ffffff08,0 0 0 92px #ffffff05; }
+    header.hero:after { width:300px;height:300px;right:42%;bottom:-250px;background:#ffffff06;border-color:#ffffff14; }
+    .hero-inner { max-width:1440px; min-height:440px; padding:clamp(38px,5.4vw,76px) clamp(20px,5vw,76px); display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:clamp(30px,5vw,76px); align-items:center; }
+    .hero-copy { position:relative; z-index:2; max-width:610px; }
+    .eyebrow-pill { display:inline-flex;align-items:center;gap:9px;padding:7px 12px;background:#ffffff12;border:1px solid #ffffff24;border-radius:999px;color:#bcd5ff;font-size:.72rem;font-weight:800;letter-spacing:.11em; }
+    .eyebrow-dot { width:7px;height:7px;border-radius:50%;background:#4ce0b4;box-shadow:0 0 0 4px #4ce0b41c; }
+    .hero h1 { margin:22px 0 18px;color:#fff;font-size:clamp(2.45rem,4.7vw,4.25rem);line-height:1.18;letter-spacing:-.065em;font-weight:900; }
+    .hero h1 span { color:#75c5ff; }
+    .hero p { max-width:560px;color:#d4deee;font-size:clamp(.95rem,1.2vw,1.06rem);line-height:2; }
+    .hero-benefits { display:flex;flex-wrap:wrap;gap:9px;margin-top:24px; }
+    .hero-benefits span { padding:8px 11px;border:1px solid #ffffff24;border-radius:9px;background:#ffffff0b;color:#e7effb;font-size:.76rem;font-weight:650; }
+    .hero-cta { display:inline-flex;align-items:center;gap:30px;margin-top:27px;padding:14px 18px;border-radius:10px;background:#fff;color:#0e2a57;font-size:.88rem;font-weight:850;box-shadow:0 9px 26px #00000020;transition:transform .2s,box-shadow .2s; }
+    .hero-cta:hover { transform:translateY(-2px);box-shadow:0 13px 30px #0000002b; }
+    .hero-cta span { color:var(--accent);font-size:1.2rem; }
+    .hero-visual { min-width:0;position:relative; }
+    .hero-visual img { display:block;width:100%;height:clamp(280px,32vw,420px);object-fit:cover;aspect-ratio:auto;border:1px solid #ffffff25;border-radius:20px;box-shadow:0 28px 70px #00000045; }
+    .hero-photo-caption { position:absolute;left:18px;bottom:18px;display:flex;align-items:center;gap:11px;padding:12px 15px;border:1px solid #ffffff38;border-radius:12px;background:#0b1830c9;backdrop-filter:blur(14px);color:#fff; }
+    .photo-caption-mark { display:grid;place-items:center;width:36px;height:36px;border-radius:9px;background:#ffffff17;color:#8ed5ff;font-size:.85rem;font-weight:900; }
+    .hero-photo-caption strong,.hero-photo-caption small { display:block; }
+    .hero-photo-caption strong { font-size:.75rem;letter-spacing:.1em; }
+    .hero-photo-caption small { margin-top:3px;color:#d3ddec;font-size:.7rem; }
+    .hero-stat { position:absolute;right:-15px;top:24px;display:flex;align-items:center;gap:11px;padding:13px 16px;border:1px solid #ffffff65;border-radius:13px;background:#fff;color:#14223a;box-shadow:0 12px 35px #00000026; }
+    .stat-icon { display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#eaf2ff;color:#1764e8;font-weight:900;font-size:1.25rem; }
+    .hero-stat small,.hero-stat strong { display:block; }
+    .hero-stat small { color:#718096;font-size:.68rem; }
+    .hero-stat strong { margin-top:3px;font-size:.78rem; }
+    .hero-bottomline { display:flex;justify-content:space-between;gap:15px;max-width:1440px;margin:auto;padding:0 clamp(20px,5vw,76px) 20px;color:#9daec6;font-size:.7rem;letter-spacing:.08em; }
+    main.wrap { max-width:1300px;padding:32px clamp(14px,3vw,38px) 54px; }
+    .intro { display:flex;gap:12px;align-items:center;margin:0 0 22px;padding:13px 16px;border:1px solid #dce9fc;border-radius:12px;background:#eef5ff;color:#375070;font-size:.84rem; }
+    .layout { grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start; }
+    .panel,.results { border-radius:17px;background:#fff;border:1px solid #e4e9f1;box-shadow:0 10px 34px #12284c0a; }
+    .panel { padding:clamp(19px,2.3vw,28px); }
+    .panel h2 { margin-bottom:23px;font-size:1.02rem;letter-spacing:-.02em; }
+    .panel h2:before { width:6px;height:25px;background:linear-gradient(#1764e8,#56b9f0); }
+    .fields { gap:18px 15px; }
+    label { font-size:.82rem;color:#27364c; }
+    .hint { margin-top:6px;font-size:.73rem;color:#8490a2; }
+    .control { margin-top:8px; }
+    input { min-height:47px;padding:11px 12px;border-color:#d6deea;border-radius:9px;background:#fbfcfe;font-size:.93rem; }
+    input:hover { border-color:#9db6db; }
+    input:focus { outline:0;background:#fff;border-color:#1764e8;box-shadow:0 0 0 4px #1764e81a; }
+    .control:has(.unit) input { border-radius:9px 0 0 9px; }
+    .unit { border-color:#d6deea;background:#f0f4f9;color:#56647a;border-radius:0 9px 9px 0; }
+    .results { grid-column:2;grid-row:1 / span 4;position:sticky;top:92px;padding:clamp(19px,2.3vw,28px);background:linear-gradient(150deg,#fff 0%,#f5f9ff 100%);border-color:#d7e4f8;box-shadow:0 18px 48px #1a4a8b12; }
+    .results h2 { margin-bottom:20px;font-size:1.2rem; }
+    .results h2:before { width:6px;height:28px;background:linear-gradient(#1764e8,#56b9f0); }
+    .metrics { grid-template-columns:repeat(2,minmax(0,1fr));gap:11px; }
+    .metric { min-height:105px;padding:16px;border:1px solid #e0e8f3;border-radius:13px;background:#fff; }
+    .metric .name { color:#66758b;font-size:.77rem;font-weight:700; }
+    .metric .value { margin-top:8px;font-size:clamp(1.2rem,2vw,1.75rem);font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums; }
+    .metric.primary { grid-column:1 / -1;min-height:140px;padding:21px;background:linear-gradient(120deg,#e6f1ff,#d9eaff);border-color:#c5ddff; }
+    .metric.primary .name { color:#24549c;font-size:.84rem; }
+    .metric.primary .value { color:#145bd7;font-size:clamp(2.1rem,3.4vw,3rem); }
+    .details { margin-top:20px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden; }
+    .details th,.details td { padding:12px 13px;font-size:.84rem; }
+    .details th { background:#f7f9fc;color:#55647a; }
+    .details td { color:#182b49;font-weight:700; }
+    .actions { gap:10px;margin-top:20px; }
+    button { min-height:45px;padding:12px 16px;border-radius:10px; }
+    .btn-primary { background:linear-gradient(120deg,#1764e8,#218fe7);box-shadow:0 7px 17px #1764e82a; }
+    .btn-primary:hover { box-shadow:0 11px 22px #1764e839; }
+    .btn-secondary { background:#edf2f8;color:#3d4d65; }
+    .note { font-size:.8rem; }
+    .photo-guides { margin:30px 0 26px; }
+    .photo-guides-heading { display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:17px; }
+    .section-kicker { color:#1764e8;font-size:.69rem;font-weight:900;letter-spacing:.14em; }
+    .photo-guides-heading h2 { margin:7px 0 5px;font-size:clamp(1.4rem,2.7vw,2rem);letter-spacing:-.045em;color:#101827; }
+    .photo-guides-heading p { margin:0;color:#718096;font-size:.86rem; }
+    .text-link { display:inline-flex;align-items:center;gap:9px;white-space:nowrap;color:#1764e8;font-size:.83rem;font-weight:800; }
+    .photo-guide-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px; }
+    .photo-guide-card { position:relative;isolation:isolate;min-height:250px;overflow:hidden;border-radius:16px;background:#12213b;color:#fff;box-shadow:0 10px 28px #10284a12; }
+    .photo-guide-card img { position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.2,.7,.2,1); }
+    .photo-guide-card:hover img { transform:scale(1.06); }
+    .photo-guide-overlay { position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#071326e8 0%,#0713266b 45%,#07132605 100%); }
+    .photo-guide-copy { position:absolute;left:20px;right:20px;bottom:20px;display:grid;gap:7px; }
+    .photo-guide-copy small { color:#a9d8ff;font-size:.67rem;font-weight:850;letter-spacing:.12em; }
+    .photo-guide-copy strong { font-size:1.2rem;letter-spacing:-.03em; }
+    .photo-guide-copy>span { color:#e0e8f5;font-size:.79rem;line-height:1.6; }
+    .photo-guide-arrow { position:absolute;right:16px;top:16px;display:grid;place-items:center;width:34px;height:34px;border:1px solid #ffffff70;border-radius:50%;background:#ffffff1a;backdrop-filter:blur(8px);font-size:1rem; }
+    .guide { border-radius:18px;box-shadow:0 10px 34px #12284c0a; }
+    .guide h2 { letter-spacing:-.03em; }
+    .article-card { overflow:hidden;border-radius:14px;box-shadow:0 8px 22px #10284a0c; }
+    .article-card img { transition:transform .4s ease; }
+    .article-card:hover img { transform:scale(1.04); }
+    footer.wrap { color:#7c8798; }
+    @media(max-width:980px) {
+      .hero-inner { grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:28px; }
+      .hero-stat { right:-6px; }
+      .layout { grid-template-columns:1fr; }
+      .results { grid-column:auto;grid-row:auto;position:static; }
+      .photo-guide-card { min-height:220px; }
+    }
+    @media(max-width:650px) {
+      .site-nav { min-height:64px;padding:8px 13px;gap:8px; }
+      .brand { gap:8px; }
+      .brand-mark { width:34px;height:34px;border-radius:10px;font-size:25px; }
+      .brand strong { font-size:.86rem; }
+      .brand small { font-size:.62rem; }
+      .nav-links { gap:12px;overflow-x:auto;max-width:55vw;scrollbar-width:none; }
+      .nav-links::-webkit-scrollbar { display:none; }
+      .nav-links a { font-size:.72rem; }
+      .hero-inner { grid-template-columns:1fr;gap:23px;padding:34px 17px 28px; }
+      .hero h1 { margin:17px 0 14px;font-size:clamp(2.25rem,9vw,3.1rem); }
+      .hero p { font-size:.9rem;line-height:1.85; }
+      .hero-benefits { gap:7px;margin-top:17px; }
+      .hero-benefits span { font-size:.7rem;padding:7px 9px; }
+      .hero-cta { margin-top:20px;padding:13px 15px; }
+      .hero-visual img { height:245px;border-radius:14px; }
+      .hero-photo-caption { left:10px;bottom:10px;padding:9px 11px; }
+      .hero-photo-caption small { font-size:.62rem; }
+      .hero-stat { top:10px;right:10px;padding:9px 11px; }
+      .hero-stat strong { font-size:.68rem; }
+      .hero-bottomline { padding:0 17px 16px;font-size:.62rem; }
+      main.wrap { padding:19px 12px 35px; }
+      .intro { align-items:flex-start;font-size:.78rem;padding:11px 12px; }
+      .layout { gap:13px; }
+      .panel,.results { padding:18px 15px; }
+      .panel h2 { margin-bottom:18px; }
+      .fields { gap:15px 12px; }
+      input { min-height:45px;font-size:16px; }
+      .results h2 { font-size:1.08rem; }
+      .metric { min-height:88px;padding:12px; }
+      .metric.primary { min-height:115px;padding:16px; }
+      .metric.primary .value { font-size:2.2rem; }
+      .details th,.details td { padding:10px 8px;font-size:.77rem; }
+      .photo-guides-heading { align-items:flex-start;flex-direction:column;gap:10px; }
+      .photo-guide-grid { grid-template-columns:1fr;gap:11px; }
+      .photo-guide-card { min-height:225px; }
+      .photo-guide-copy { left:17px;right:17px;bottom:17px; }
+      .guide { padding:21px 16px; }
+      .actions button { flex:1 1 140px; }
+    }
+    @media(prefers-reduced-motion:reduce) { html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important} }
+
   </style>
 </head>
 <body>
 <nav class="site-nav" aria-label="メインナビゲーション">
-  <a class="brand" href="/" aria-label="ホーム"><span class="brand-mark" aria-hidden="true">◇</span><span><strong>3Dプリンター</strong><small>原価・販売価格計算ツール</small></span></a>
-  <div class="nav-links"><a href="/">ホーム</a><a href="#how-to-use">使い方</a><a href="#guide-title">計算の考え方</a><a href="#seo-guides">記事一覧</a><a href="#faq">よくある質問</a></div>
+  <a class="brand" href="/" aria-label="ホーム"><span class="brand-mark" aria-hidden="true">◇</span><span><strong>3D PRINT COST</strong><small>3Dプリンター原価計算</small></span></a>
+  <div class="nav-links"><a href="#calculator">原価を計算</a><a href="#how-to-use">使い方</a><a href="#photo-guides">活用シーン</a><a href="#seo-guides">材料・価格ガイド</a><a href="#faq">よくある質問</a></div>
 </nav>
 <header class="hero">
   <div class="hero-inner wrap">
     <div class="hero-copy">
-      <span class="eyebrow-pill">無料・登録不要で使える</span>
-      <h1>3Dプリンター<br><span>原価・販売価格計算ツール</span></h1>
-      <p>フィラメント代・電気代・機材の償却費・失敗率・梱包費・送料・販売手数料をまとめて計算。作品1個あたりの原価と、目標利益率に応じた販売価格を確認できます。</p>
-      <div class="hero-benefits"><span>▦　無料で使える</span><span>￥　費用をまとめて計算</span><span>◎　価格設定をサポート</span></div>
+      <span class="eyebrow-pill"><span class="eyebrow-dot"></span> FREE COST CALCULATOR</span>
+      <h1>つくる楽しさに、<br><span>価格の自信を。</span></h1>
+      <p>フィラメント代だけで終わらせない。電気代、プリンターの償却費、印刷失敗、梱包・送料まで。作品1個の原価と、利益を残せる販売価格をかんたんに見える化します。</p>
+      <div class="hero-benefits"><span>✓ 登録不要・無料</span><span>✓ 入力すると自動計算</span><span>✓ スマホでも使いやすい</span></div>
+      <a class="hero-cta" href="#calculator">原価計算をはじめる <span aria-hidden="true">→</span></a>
     </div>
-    <div class="hero-visual"><img src="/assets/hero-3d-printer.png" alt="3Dプリンターで青や白の立体作品を造形している様子" width="550" height="210"><div class="hero-callout">作品1個あたりの<br>原価と価格を見える化</div></div>
+    <div class="hero-visual">
+      <img src="/assets/hero-3d-printer.png" alt="3Dプリンターで作品を造形している様子" width="550" height="210" fetchpriority="high">
+      <div class="hero-photo-caption"><span class="photo-caption-mark">3D</span><span><strong>MADE BY YOU</strong><small>作品づくりを、価格設定までサポート</small></span></div>
+      <div class="hero-stat"><span class="stat-icon">¥</span><span><small>計算できる費用</small><strong>材料・電気・機材・販売費</strong></span></div>
+    </div>
   </div>
+  <div class="hero-bottomline"><span>01 / COST</span><span>材料から販売価格まで、ひとつの画面で。</span></div>
 </header>
-<main class="wrap">
+<main class="wrap" id="calculator">
   <p class="intro">安心してお試しください。入力値はこのブラウザ内で計算され、サーバーへ送信・保存されません。</p>
   <div class="layout">
     <section class="panel">
@@ -343,6 +497,14 @@
       <p class="note" id="warning"></p>
     </section>
   </div>
+  <section class="photo-guides" id="photo-guides" aria-labelledby="photo-guides-title">
+  <div class="photo-guides-heading"><div><span class="section-kicker">MADE FOR YOUR WORK</span><h2 id="photo-guides-title">趣味の造形から、作品販売まで。</h2><p>つくり方や売り方が変わっても、原価を知ることが価格設定の第一歩です。</p></div><a href="#how-to-use" class="text-link">計算方法を見る <span aria-hidden="true">↗</span></a></div>
+  <div class="photo-guide-grid">
+    <a class="photo-guide-card" href="#calculator"><img src="/assets/article-filament.png" alt="3Dプリント用フィラメントと造形サンプル" loading="lazy" width="520" height="300"><span class="photo-guide-overlay"></span><span class="photo-guide-copy"><small>01 / MATERIAL</small><strong>材料費を知る</strong><span>使った量から作品1個の材料費を計算</span></span><span class="photo-guide-arrow">↗</span></a>
+    <a class="photo-guide-card" href="#calculator"><img src="/assets/hero-3d-printer.png" alt="3Dプリンターで造形している様子" loading="lazy" width="520" height="300"><span class="photo-guide-overlay"></span><span class="photo-guide-copy"><small>02 / PRODUCTION</small><strong>つくるコストを知る</strong><span>印刷時間・電気代・機材の償却費も計算</span></span><span class="photo-guide-arrow">↗</span></a>
+    <a class="photo-guide-card" href="#calculator"><img src="/assets/article-selling-price.png" alt="さまざまな形や色の3Dプリント作品" loading="lazy" width="520" height="300"><span class="photo-guide-overlay"></span><span class="photo-guide-copy"><small>03 / PRICING</small><strong>販売価格に自信を</strong><span>手数料や送料を考慮して価格を決める</span></span><span class="photo-guide-arrow">↗</span></a>
+  </div>
+</section>
   <section class="guide" id="how-to-use" aria-labelledby="guide-title">
     <h2 id="guide-title">3Dプリンター作品の原価・販売価格の計算方法</h2>
     <p>3Dプリンターで作った作品を販売する場合、フィラメント代だけで価格を決めると、電気代、プリンターの消耗、印刷失敗、梱包・送料、販売手数料を回収できないことがあります。このツールでは、入力した条件から作品1個あたりの概算原価と販売価格を計算します。</p>
