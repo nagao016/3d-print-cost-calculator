@@ -2,7 +2,34 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>3Dプリントの失敗率を原価に反映する考え方</title><meta name="description" content="造形失敗や試し刷りによる材料ロスを、原価計算にどう反映するかを整理します。"><meta name="robots" content="index,follow">
 <link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/guide/3d-printer-failure-rate-cost/"><meta property="og:type" content="article"><meta property="og:title" content="3Dプリントの失敗率を原価に反映する考え方"><meta property="og:description" content="造形失敗や試し刷りによる材料ロスを、原価計算にどう反映するかを整理します。"><meta property="og:url" content="https://3d-print-cost-calculator-7ce.pages.dev/guide/3d-printer-failure-rate-cost/"><meta property="og:image" content="https://3d-print-cost-calculator-7ce.pages.dev/assets/article-selling-price.png"><meta property="og:image:alt" content="複数の色と形の3Dプリント作品"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://3d-print-cost-calculator-7ce.pages.dev/assets/article-selling-price.png">
-<style>body{margin:0;background:#f4f7fb;color:#172033;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.85}header{background:#13264b;padding:18px}header a{color:#fff}main{max-width:850px;margin:28px auto;padding:0 16px}article{background:#fff;border:1px solid #dce2eb;border-radius:16px;padding:clamp(18px,4vw,36px)}h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4}h2{margin-top:32px;padding-bottom:8px;border-bottom:1px solid #dce2eb;font-size:1.3rem}.hero{margin:24px 0}.hero img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:12px;border:1px solid #dce2eb;background:#f8fafc}figcaption,.muted{color:#657084;font-size:.9rem}a{color:#1559d6}.cta{display:inline-block;background:#1559d6;color:#fff;text-decoration:none;border-radius:9px;padding:10px 15px;font-weight:700}footer{max-width:850px;margin:auto;padding:18px;color:#657084;font-size:.85rem}</style></head>
+<style>body{margin:0;background:#f4f7fb;color:#172033;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.85}header{background:#13264b;padding:18px}header a{color:#fff}main{max-width:850px;margin:28px auto;padding:0 16px}article{background:#fff;border:1px solid #dce2eb;border-radius:16px;padding:clamp(18px,4vw,36px)}h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4}h2{margin-top:32px;padding-bottom:8px;border-bottom:1px solid #dce2eb;font-size:1.3rem}.hero{margin:24px 0}.hero img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:12px;border:1px solid #dce2eb;background:#f8fafc}figcaption,.muted{color:#657084;font-size:.9rem}a{color:#1559d6}.cta{display:inline-block;background:#1559d6;color:#fff;text-decoration:none;border-radius:9px;padding:10px 15px;font-weight:700}footer{max-width:850px;margin:auto;padding:18px;color:#657084;font-size:.85rem}</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://3d-print-cost-calculator-7ce.pages.dev/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "3Dプリンター原価計算ガイド",
+      "item": "https://3d-print-cost-calculator-7ce.pages.dev/guide/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "3Dプリントの失敗率を原価に反映する考え方",
+      "item": "https://3d-print-cost-calculator-7ce.pages.dev/guide/3d-printer-failure-rate-cost/"
+    }
+  ]
+}
+</script>
+</head>
 <body><header><a href="/">← 3Dプリンター原価・販売価格計算ツールへ戻る</a></header><main><article><p class="muted">3Dプリンター 原価計算ガイド</p><h1>3Dプリントの失敗率を原価に反映する考え方</h1><p>造形失敗があると、完成品に使われた材料以外にも費用が発生します。失敗率を原価に反映する方法を決め、実績に合わせて定期的に見直すことが大切です。</p>
 <figure class="hero"><img src="/assets/article-failure.svg" alt="複数の色と形の3Dプリント作品" width="1200" height="800" fetchpriority="high"><figcaption>失敗分を考慮するときは、計算方法の重複に注意します。</figcaption></figure>
 <section><h2>失敗率の記録</h2><p>成功した造形数と失敗した造形数、失敗時に消費した材料や時間を記録します。少数の結果だけで判断せず、一定期間の実績をもとに傾向を確認します。</p></section><section><h2>計算に反映する方法</h2><p>一定期間の総費用を販売可能な完成品数で割る方法や、通常の原価にロス分を加味する方法などが考えられます。採用する方法と前提を明確にしてください。</p></section><section><h2>二重計上を避ける</h2><p>材料使用量に失敗分を含めているのに、さらに同じロス率を上乗せすると費用を二重計上する可能性があります。計算式の各項目が何を含むかを確認します。</p></section><section><h2>計算ツールで試算する</h2><p>入力条件に基づく概算を確認するには、原価・販売価格計算ツールをご利用ください。実際の費用や販売条件に応じて前提を確認してください。</p><p><a class="cta" href="/">無料の計算ツールを使う</a></p></section><section><h2>関連記事</h2><ul><li><a href="/guide/3d-printing-electricity-cost/">3Dプリンターの電気代を計算する方法</a></li></ul></section><p class="muted">公開日：2026年10月13日（UTC基準）</p></article></main><footer>本ページは一般的な費用見積もりの解説です。実際の条件・料金を確認してください。</footer></body></html>
