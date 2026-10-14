@@ -71,3 +71,85 @@
 .batch-estimate-summary span{font-size:10px;color:#77786f}
 .batch-estimate-summary strong{font:16px var(--mono);letter-spacing:-.04em}
 @media(max-width:700px){.batch-estimate-summary{grid-template-columns:1fr}.batch-estimate-actions{align-items:stretch;flex-direction:column}.batch-estimate-actions button{width:100%}}
+
+
+/* Pro workspace: full-width, premium visual hierarchy */
+.pro-tools-section{
+  width:100%;
+  padding:clamp(32px,4vw,58px) clamp(16px,3.2vw,48px) clamp(40px,5vw,68px);
+  background:linear-gradient(180deg,#e7e5dc 0%,#f4f2eb 100%);
+  border-top:3px solid var(--orange);
+  border-bottom:1px solid #d2d1c7;
+}
+.pro-tools-section>.results-heading{
+  width:100%;
+  max-width:none;
+  margin:0 0 26px;
+  padding:0 0 22px;
+  border-bottom:1px solid #cecec3;
+  align-items:center;
+}
+.pro-tools-section>.results-heading>div{min-width:0}
+.pro-tools-section>.results-heading .micro-label{color:#b94a2c}
+.pro-tools-section>.results-heading h2{font-size:clamp(25px,3.1vw,38px);margin:9px 0 8px;letter-spacing:-.065em}
+.pro-tools-section>.results-heading p{max-width:800px;font-size:12px}
+.pro-tools-section>.results-heading .pro-pill{padding:8px 12px;background:#252722;color:#f8f7f1;border:1px solid #252722;font-size:10px;letter-spacing:.08em}
+.pro-tools-grid{
+  width:100%;
+  max-width:none;
+  margin:0;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+  align-items:stretch;
+}
+.pro-tool-card,.pro-lock-panel{
+  min-width:0;
+  border:1px solid #d1d0c5;
+  border-top:3px solid #b8b8ad;
+  background:#fbfaf6;
+  padding:clamp(20px,2.6vw,34px);
+  box-shadow:0 8px 24px #25272208;
+  transition:border-color .18s,box-shadow .18s,transform .18s;
+}
+.pro-tool-card:hover{border-top-color:var(--orange);box-shadow:0 12px 30px #25272210}
+.pro-tool-card>.micro-label{display:inline-flex;align-items:center;gap:8px;color:#b94a2c;font-size:9px}
+.pro-tool-card h3{font-size:clamp(17px,1.7vw,22px);margin:14px 0 9px;line-height:1.45}
+.pro-tool-card p{max-width:850px;font-size:12px;line-height:1.9;margin-bottom:20px}
+.pro-tool-wide{grid-column:1/-1}
+.pro-tool-wide .filament-table-wrap,.pro-tool-wide .batch-estimate-table-wrap{margin-top:20px}
+.pro-tool-wide .pro-privacy-note{padding-top:10px;border-top:1px solid #e2e1d8}
+.pro-tools-section .pro-form-row input,.pro-tools-section .pro-form-row select,
+.pro-tools-section .pro-tool-card input,.pro-tools-section .pro-tool-card select{
+  min-height:42px;
+  border-color:#cecec3;
+  background:#fff;
+}
+.pro-tools-section .pro-form-row button,.pro-tools-section .pro-tool-card>.secondary-btn{
+  min-height:42px;
+  padding:11px 17px;
+}
+.pro-tools-section .next-btn{min-height:42px;padding:12px 18px}
+.pro-tools-section .pro-result-list{margin-top:20px}
+.pro-tools-section .pro-result-list>div{padding:14px 0;font-size:11px}
+.pro-tools-section .pro-result-list>div strong{font-size:14px}
+.pro-tools-section .pro-result-list .pro-profit-row{margin-top:6px;padding:15px 12px;background:#eaf2e9;border-bottom:0}
+.pro-tools-section .batch-estimate-summary{gap:14px;margin-top:20px}
+.pro-tools-section .batch-estimate-summary>div{padding:16px;background:#efeee7;border:1px solid #e0dfd5}
+.pro-tools-section .batch-estimate-summary strong{font-size:clamp(16px,1.7vw,22px);color:#2e8064}
+.pro-tools-section .batch-estimate-actions{margin-top:16px}
+.pro-tools-section .batch-estimate-actions .next-btn{background:var(--orange);border-color:var(--orange);color:#fff}
+.pro-tools-section .batch-estimate-actions .next-btn span{color:#fff}
+.pro-tools-section .pro-lock-panel{max-width:none;width:100%;min-height:250px;border-top-color:var(--orange);padding:clamp(24px,4vw,48px)}
+.pro-tools-section .pro-lock-panel h3{font-size:clamp(21px,2.5vw,30px)}
+.pro-tools-section .pro-lock-panel p{max-width:900px;font-size:12px}
+@media(max-width:700px){
+  .pro-tools-section{padding:32px 16px 40px}
+  .pro-tools-section>.results-heading{align-items:flex-start;flex-direction:column;gap:16px}
+  .pro-tools-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+  .pro-tool-wide{grid-column:auto}
+  .pro-tool-card,.pro-lock-panel{padding:20px 16px}
+  .pro-tool-card h3{font-size:18px}
+  .pro-tools-section .batch-estimate-summary{grid-template-columns:1fr}
+  .pro-tools-section .batch-estimate-actions{align-items:stretch;flex-direction:column}
+  .pro-tools-section .batch-estimate-actions button{width:100%}
+}
