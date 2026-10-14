@@ -26,9 +26,9 @@ assert v3_ids == expected_ids, f"V3 input IDs differ from production: {v3_ids}"
 
 # Verify core equations are present in both implementations.
 equations = [
-    ("filament", r'num\("filamentPrice"\)\s*/\s*spool\s*\*\s*num\("usedGrams"\)', r"num\(v\.filamentPrice\)\s*/\s*spool\s*\*\s*num\(v\.usedGrams\)"),
-    ("electricity", r'num\("printHours"\)\s*\*\s*num\("powerWatts"\)\s*/\s*1000\s*\*\s*num\("electricityRate"\)', r"num\(v\.printHours\)\s*\*\s*num\(v\.powerWatts\)\s*/\s*1000\s*\*\s*num\(v\.electricityRate\)"),
-    ("depreciation", r'num\("printerPrice"\)\s*/\s*life\s*\*\s*num\("printHours"\)', r"num\(v\.printerPrice\)\s*/\s*life\s*\*\s*num\(v\.printHours\)"),
+    ("filament", r"num\(v\.filamentPrice\)\s*/\s*spool\s*\*\s*num\(v\.usedGrams\)", r"num\(v\.filamentPrice\)\s*/\s*spool\s*\*\s*num\(v\.usedGrams\)"),
+    ("electricity", r"num\(v\.printHours\)\s*\*\s*num\(v\.powerWatts\)\s*/\s*1000\s*\*\s*num\(v\.electricityRate\)", r"num\(v\.printHours\)\s*\*\s*num\(v\.powerWatts\)\s*/\s*1000\s*\*\s*num\(v\.electricityRate\)"),
+    ("depreciation", r"num\(v\.printerPrice\)\s*/\s*life\s*\*\s*num\(v\.printHours\)", r"num\(v\.printerPrice\)\s*/\s*life\s*\*\s*num\(v\.printHours\)"),
     ("failure adjustment", r"base\s*/\s*\(1\s*-\s*failure\)", r"base\s*/\s*\(1\s*-\s*failure\)"),
     ("landed cost", r"production\s*\+\s*packaging\s*\+\s*shipping", r"production\s*\+\s*packaging\s*\+\s*shipping"),
     ("suggested price", r"landed\s*/\s*denominator", r"landed\s*/\s*denominator"),
