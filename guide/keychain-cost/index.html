@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="3Dプリンターでキーホルダーを作る場合の原価と販売価格を試算。材料費・電気代・機材費・失敗率・梱包送料・販売手数料を例とともに解説します。">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3Dプリンターのキーホルダー原価と販売価格｜計算例">
+<meta property="og:description" content="キーホルダー1個の原価と販売価格を試算。材料使用量・印刷時間・失敗率を変えて条件別に比較できます。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="3Dプリンターのキーホルダー原価と販売価格｜計算例">
+<meta name="twitter:description" content="材料費・電気代・機材費・失敗率・梱包送料・販売手数料を試算し、条件の違いを比較。">
+<meta property="og:url" content="https://3d-print-cost-calculator-7ce.pages.dev/guide/keychain-cost/">
+<link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/guide/keychain-cost/">
+<title>3Dプリンターのキーホルダー原価と販売価格｜計算例</title>
+<style>
+:root{color-scheme:light;--ink:#172033;--muted:#5b6577;--line:#dce2eb;--accent:#225bd6;--bg:#f4f7fb;--panel:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.8}
+header{background:#13264b;color:#fff;padding:18px 16px}header .wrap,footer .wrap{max-width:900px;margin:auto}header a{color:#fff}
+main{max-width:900px;margin:auto;padding:24px 16px 48px}article{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,34px)}
+.eyebrow{color:var(--muted);font-size:.88rem}h1{font-size:clamp(1.7rem,4vw,2.35rem);line-height:1.4;letter-spacing:-.035em;margin:8px 0 14px}h2{font-size:1.35rem;margin:34px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--line)}h3{font-size:1.05rem}a{color:var(--accent)}.lead{font-size:1.05rem}
+.note{background:#f3f6fb;border-left:4px solid var(--accent);padding:13px 16px;margin:18px 0}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.95rem}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}th{background:#f4f7fb}
+.calculator{border:1px solid var(--line);border-radius:12px;padding:18px;background:#fbfcfe;margin:20px 0}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{display:flex;flex-direction:column;gap:5px;font-size:.9rem}.field input{width:100%;min-height:44px;border:1px solid #bfc9d8;border-radius:8px;padding:9px 10px;font:inherit;background:#fff;color:var(--ink)}.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}.result{background:#eef3fb;border-radius:9px;padding:13px}.comparison{margin-top:28px}.comparison-table-wrap{margin-top:16px}.comparison-table{min-width:590px}.comparison-table th{font-weight:650}.comparison-table td,.comparison-table th{white-space:nowrap}.comparison-table td:last-child{font-weight:700}.comparison-table td,.comparison-table th{font-variant-numeric:tabular-nums}.result span{display:block;color:var(--muted);font-size:.82rem}.result strong{font-size:1.35rem;overflow-wrap:anywhere}.small{font-size:.85rem;color:var(--muted)}.cta{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:12px 16px;border-radius:9px;font-weight:700;margin-top:8px}.faq{border-top:1px solid var(--line);padding:10px 0}footer{padding:20px 16px 34px;color:var(--muted);font-size:.85rem}
+@media(max-width:560px){.fields,.results{grid-template-columns:1fr}.calculator{padding:14px}th,td{padding:8px;font-size:.85rem}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a href="/">← 原価・販売価格計算ツールへ戻る</a></div></header>
+<main><article>
+<p class="eyebrow">用途別シミュレーション / キーホルダー</p>
+<h1>3Dプリンターのキーホルダー原価と販売価格｜計算例</h1>
+<p class="lead">3Dプリンターで小型のキーホルダーを製作して販売するとき、材料費だけで価格を決めると、電気代や機材費、失敗分、梱包・送料、販売手数料を回収できないことがあります。ここでは仮の条件で1個あたりの原価と販売価格を試算します。</p>
+<div class="note"><strong>このページの数値は計算例です。</strong> 実際の原価は形状、インフィル、サポート材、印刷設定、機種、販売条件によって変わります。入力欄を実際の条件に変更してご利用ください。</div>
+<h2>キーホルダー1個の計算例</h2>
+<p>まずは、フィラメント価格2,500円・スプール重量1,000g、作品の使用量15g、印刷時間1.2時間などの仮定で試算します。金具、後処理、人件費、税金、固定出品料などは必要に応じて別途計上してください。</p>
+<div class="calculator" aria-labelledby="calc-title">
+<h3 id="calc-title">条件を変更して試算</h3>
+<div class="fields">
+<label class="field">フィラメント価格（円）<input id="filamentPrice" type="number" min="0" step="1" value="2500"></label>
+<label class="field">スプール重量（g）<input id="spoolWeight" type="number" min="1" step="1" value="1000"></label>
+<label class="field">キーホルダーの材料使用量（g）<input id="usedGrams" type="number" min="0" step="0.1" value="15"></label>
+<label class="field">印刷時間（時間）<input id="printHours" type="number" min="0" step="0.1" value="1.2"></label>
+<label class="field">平均消費電力（W）<input id="powerWatts" type="number" min="0" step="1" value="150"></label>
+<label class="field">電気料金単価（円/kWh）<input id="electricityRate" type="number" min="0" step="0.1" value="31"></label>
+<label class="field">プリンター購入価格（円）<input id="printerPrice" type="number" min="0" step="1" value="60000"></label>
+<label class="field">想定使用可能時間（時間）<input id="printerLifeHours" type="number" min="1" step="1" value="3000"></label>
+<label class="field">印刷失敗率（%）<input id="failureRate" type="number" min="0" max="99" step="1" value="5"></label>
+<label class="field">消耗品など（円/個）<input id="otherCost" type="number" min="0" step="1" value="10"></label>
+<label class="field">梱包費（円/個）<input id="packagingCost" type="number" min="0" step="1" value="30"></label>
+<label class="field">送料（円/個）<input id="shippingCost" type="number" min="0" step="1" value="0"></label>
+<label class="field">販売手数料率（%）<input id="feeRate" type="number" min="0" max="99" step="0.1" value="10"></label>
+<label class="field">目標利益率（%）<input id="targetMargin" type="number" min="0" max="95" step="1" value="30"></label>
+</div>
+<div class="results" aria-live="polite">
+<div class="result"><span>材料費</span><strong id="materialResult">—</strong></div>
+<div class="result"><span>製造原価（失敗率を反映）</span><strong id="productionResult">—</strong></div>
+<div class="result"><span>梱包・送料を含む原価</span><strong id="totalResult">—</strong></div>
+<div class="result"><span>目標利益率を考慮した販売価格</span><strong id="priceResult">—</strong></div>
+<div class="result"><span>販売価格での概算利益</span><strong id="profitResult">—</strong></div>
+<div class="result"><span>手数料控除後の利益率</span><strong id="marginResult">—</strong></div>
+</div>
+<p class="small" id="calcWarning">結果は入力条件に基づく概算です。</p>
+</div>
+<section class="calculator comparison" aria-labelledby="compare-title">
+<h3 id="compare-title">条件を変えて原価・販売価格を比較</h3>
+<p class="small">左側の計算条件を基準に、材料使用量・印刷時間・失敗率だけを変えたケースと比較します。フィラメント単価や電気料金など、その他の条件は共通です。</p>
+<div class="fields">
+<label class="field">比較条件の材料使用量（g）<input id="compareUsedGrams" type="number" min="0" step="0.1" value="20"></label>
+<label class="field">比較条件の印刷時間（時間）<input id="comparePrintHours" type="number" min="0" step="0.1" value="1.5"></label>
+<label class="field">比較条件の失敗率（%）<input id="compareFailureRate" type="number" min="0" max="99" step="1" value="10"></label>
+</div>
+<div class="table-wrap comparison-table-wrap">
+<table class="comparison-table">
+<thead><tr><th>比較項目</th><th>基準条件</th><th>変更条件</th><th>差額</th></tr></thead>
+<tbody>
+<tr><th scope="row">材料使用量</th><td id="compareBaseGrams">—</td><td id="compareAltGrams">—</td><td id="compareDeltaGrams">—</td></tr>
+<tr><th scope="row">印刷時間</th><td id="compareBaseHours">—</td><td id="compareAltHours">—</td><td id="compareDeltaHours">—</td></tr>
+<tr><th scope="row">製造原価（失敗率反映）</th><td id="compareBaseProduction">—</td><td id="compareAltProduction">—</td><td id="compareDeltaProduction">—</td></tr>
+<tr><th scope="row">梱包・送料込み原価</th><td id="compareBaseTotal">—</td><td id="compareAltTotal">—</td><td id="compareDeltaTotal">—</td></tr>
+<tr><th scope="row">目標利益率を考慮した販売価格</th><td id="compareBasePrice">—</td><td id="compareAltPrice">—</td><td id="compareDeltaPrice">—</td></tr>
+</tbody></table></div>
+<p class="small" id="compareWarning" aria-live="polite">結果は入力条件に基づく概算です。</p>
+</section>
+<h2>初期設定での原価と販売価格の計算例</h2>
+<p>上の初期設定では、フィラメント15g・印刷1.2時間・失敗率5%を想定しています。この条件での製造原価は約81円、梱包費を含む原価は約111円です。販売手数料10%、目標利益率30%として計算すると、販売価格の試算は186円になります。これは入力した費用だけを使った計算例であり、実際の販売価格を保証するものではありません。</p>
+<div class="table-wrap"><table><thead><tr><th>計算項目</th><th>計算例</th><th>金額（概算）</th></tr></thead><tbody>
+<tr><td>フィラメント材料費</td><td>2,500円 ÷ 1,000g × 15g</td><td>約38円</td></tr>
+<tr><td>電気代</td><td>150W × 1.2時間 ÷ 1,000 × 31円/kWh</td><td>約6円</td></tr>
+<tr><td>機材費</td><td>60,000円 ÷ 3,000時間 × 1.2時間</td><td>24円</td></tr>
+<tr><td>消耗品など</td><td>入力した1個あたりの費用</td><td>10円</td></tr>
+<tr><td>失敗率の調整</td><td>製造にかかる費用 ÷（1 − 5%）</td><td>製造原価 約81円</td></tr>
+<tr><td>梱包・送料込み原価</td><td>製造原価 ＋ 梱包費30円 ＋ 送料0円</td><td>約111円</td></tr>
+<tr><td>販売価格の試算</td><td>総原価 ÷（1 − 手数料10% − 目標利益率30%）を切り上げ</td><td>186円</td></tr>
+</tbody></table></div>
+<p>販売価格186円の場合、手数料を10%として差し引いた後の利益は約56円、売価に対する利益率は約30%です。ここでいう利益率は「原価に30%を上乗せする」という意味ではなく、販売価格に対する利益の割合です。金具・作業時間・税金・固定出品料などを追加すると必要な価格は上がります。</p>
+<h3>材料使用量や失敗率が増えたら？</h3>
+<p>比較欄の初期設定（材料20g・印刷1.5時間・失敗率10%）では、同じフィラメント単価や販売条件でも、製造原価は約108円、梱包費込み原価は約138円、目標利益率を考慮した販売価格は230円になります。材料使用量だけでなく、印刷時間と失敗率も価格に影響するため、スライサーの見積もりや実際の製作記録に合わせて条件を更新してください。</p>
+<h2>原価の内訳を確認する</h2>
+<div class="table-wrap"><table><thead><tr><th>費用</th><th>計算の考え方</th><th>確認ポイント</th></tr></thead><tbody>
+<tr><td>材料費</td><td>フィラメント価格 ÷ スプール重量 × 使用量</td><td>サポート材やパージ分を含めるか</td></tr>
+<tr><td>電気代</td><td>消費電力 × 印刷時間 × 電気料金単価</td><td>消費電力は機種や加熱状況で変わる</td></tr>
+<tr><td>機材費</td><td>購入価格 ÷ 想定使用可能時間 × 印刷時間</td><td>修理・保守費を別途考慮する</td></tr>
+<tr><td>失敗分</td><td>失敗率を踏まえて製造原価を調整</td><td>失敗率の定義を一貫させる</td></tr>
+<tr><td>梱包・送料</td><td>1個あたりの梱包費と出品者負担送料</td><td>購入者負担なら送料を二重計上しない</td></tr>
+<tr><td>販売手数料</td><td>販売価格に手数料率を適用</td><td>固定手数料があれば別途加算する</td></tr>
+</tbody></table></div>
+<h2>キーホルダーの価格を決めるときの注意点</h2>
+<ul>
+<li><strong>金具や付属品：</strong>リング、チェーン、接着剤などが必要なら材料費に加えます。</li>
+<li><strong>後処理：</strong>サポート除去、研磨、組み立て、検品などの作業時間を見積もります。</li>
+<li><strong>デザインとライセンス：</strong>配布データや購入したモデルを販売に使う場合、商用利用条件を確認します。</li>
+<li><strong>価格と需要：</strong>計算上の価格は最低限の判断材料です。品質、独自性、納期、競合価格、顧客が感じる価値も検討します。</li>
+<li><strong>複数個の注文：</strong>一度に複数個を造形できる場合、段取り時間や失敗率が変わる可能性があります。数量ごとに条件を確認してください。</li>
+</ul>
+<h2>よくある質問</h2>
+<div class="faq"><h3>材料費が数十円なら、販売価格も安くてよいですか？</h3><p>材料費だけでは判断できません。印刷時間、機材費、失敗分、金具、後処理、梱包、送料、手数料などを含め、需要や品質も考慮します。</p></div>
+<div class="faq"><h3>この計算結果をそのまま販売価格にしてよいですか？</h3><p>計算結果は価格検討の目安です。入力漏れや固定手数料、税金、人件費、返品・再発送などがある場合は別途確認してください。</p></div>
+<div class="faq"><h3>実際の造形で使う材料量はどう調べますか？</h3><p>スライサーが表示する材料使用量や印刷時間を使うと、モデルごとの見積もりに近づきます。サポート材やブリムなどの設定も確認してください。</p></div>
+<h2>実際の条件で詳しく計算する</h2>
+<p>材料費、電気代、機材費、失敗率、梱包・送料、販売手数料などをまとめて確認したい場合は、メインの原価計算ツールをご利用ください。</p>
+<p><a class="cta" href="/">3Dプリンター原価・販売価格計算ツールを使う</a></p>
+<h2>複数商品の見積もりを効率化する</h2>
+<p>キーホルダー以外の商品も扱う場合は、Proの一括見積もり機能で最大20商品までの原価・販売価格・注文利益をまとめて計算し、CSVで出力できます。</p>
+<p><a class="cta" href="/#pro-tools">Proの一括見積もり機能を見る（月額500円）</a></p>
+<h2>関連記事</h2>
+<ul><li><a href="/guide/cost-calculation/">3Dプリンターの原価計算ガイド</a></li><li><a href="/guide/filament-cost/">フィラメント材料費の計算方法</a></li><li><a href="/guide/selling-price/">3Dプリント作品の販売価格の決め方</a></li><li><a href="/guide/3d-printing-electricity-cost/">3Dプリンターの電気代の計算方法</a></li></ul>
+<p class="eyebrow">計算例の前提は、利用する機材・材料・販売条件に合わせて見直してください。</p>
+</article></main>
+<footer><div class="wrap">本ページは一般的な試算方法の説明です。実際の費用、販売条件、ライセンスを確認してご利用ください。</div></footer>
+<script>
+(() => {
+  const ids = ["filamentPrice","spoolWeight","usedGrams","printHours","powerWatts","electricityRate","printerPrice","printerLifeHours","failureRate","otherCost","packagingCost","shippingCost","feeRate","targetMargin"];
+  const value = id => Math.max(0, Number(document.getElementById(id).value) || 0);
+  const money = n => Number.isFinite(n) ? "¥" + Math.round(n).toLocaleString("ja-JP") : "計算不可";
+  const show = (id, text) => { document.getElementById(id).textContent = text; };
+  function calculate() {
+    const v = Object.fromEntries(ids.map(id => [id, value(id)]));
+    const warning = document.getElementById("calcWarning");
+    if (v.spoolWeight <= 0 || v.printerLifeHours <= 0) {
+      ["materialResult","productionResult","totalResult","priceResult","profitResult","marginResult"].forEach(id => show(id,"入力を確認"));
+      warning.textContent = "スプール重量と想定使用可能時間は0より大きい値を入力してください。";
+      return;
+    }
+    if (v.failureRate >= 100 || v.feeRate >= 100 || v.targetMargin > 95 || v.feeRate + v.targetMargin >= 100) {
+      ["materialResult","productionResult","totalResult","priceResult","profitResult","marginResult"].forEach(id => show(id,"計算不可"));
+      warning.textContent = "失敗率・手数料率は100%未満、目標利益率は95%以下とし、手数料率と利益率の合計を100%未満にしてください。";
+      return;
+    }
+    const material = v.filamentPrice / v.spoolWeight * v.usedGrams;
+    const electricity = v.printHours * v.powerWatts / 1000 * v.electricityRate;
+    const depreciation = v.printerPrice / v.printerLifeHours * v.printHours;
+    const production = (material + electricity + depreciation + v.otherCost) / (1 - v.failureRate / 100);
+    const total = production + v.packagingCost + v.shippingCost;
+    const price = Math.ceil(total / (1 - v.feeRate / 100 - v.targetMargin / 100));
+    const profit = price * (1 - v.feeRate / 100) - total;
+    const margin = price > 0 ? profit / price * 100 : 0;
+    show("materialResult",money(material));
+    show("productionResult",money(production));
+    show("totalResult",money(total));
+    show("priceResult",money(price));
+    show("profitResult",money(profit));
+    show("marginResult",margin.toFixed(1) + "%");
+    warning.textContent = "概算です。金具・人件費・税金・固定手数料・返品等は含めていません。実際の条件で確認してください。";
+  }
+  function compareScenarios() {
+    const v = Object.fromEntries(ids.map(id => [id, value(id)]));
+    const gramsB = Math.max(0, Number(document.getElementById("compareUsedGrams").value) || 0);
+    const hoursB = Math.max(0, Number(document.getElementById("comparePrintHours").value) || 0);
+    const failureB = Math.max(0, Number(document.getElementById("compareFailureRate").value) || 0);
+    const warning = document.getElementById("compareWarning");
+    const outputIds = ["compareBaseGrams","compareAltGrams","compareDeltaGrams","compareBaseHours","compareAltHours","compareDeltaHours","compareBaseProduction","compareAltProduction","compareDeltaProduction","compareBaseTotal","compareAltTotal","compareDeltaTotal","compareBasePrice","compareAltPrice","compareDeltaPrice"];
+    if (v.spoolWeight <= 0 || v.printerLifeHours <= 0 || v.failureRate >= 100 || failureB >= 100 || v.feeRate >= 100 || v.targetMargin > 95 || v.feeRate + v.targetMargin >= 100) {
+      outputIds.forEach(id => show(id, "計算不可"));
+      warning.textContent = "基準条件・比較条件の失敗率、手数料率、目標利益率、重量・使用時間の入力を確認してください。";
+      return;
+    }
+    const scenario = (grams, hours, failure) => {
+      const material = v.filamentPrice / v.spoolWeight * grams;
+      const electricity = hours * v.powerWatts / 1000 * v.electricityRate;
+      const depreciation = v.printerPrice / v.printerLifeHours * hours;
+      const production = (material + electricity + depreciation + v.otherCost) / (1 - failure / 100);
+      const total = production + v.packagingCost + v.shippingCost;
+      const price = Math.ceil(total / (1 - v.feeRate / 100 - v.targetMargin / 100));
+      return { production, total, price };
+    };
+    const a = scenario(v.usedGrams, v.printHours, v.failureRate);
+    const b = scenario(gramsB, hoursB, failureB);
+    const moneyDiff = n => (n > 0 ? "+" : n < 0 ? "−" : "") + money(Math.abs(n));
+    const numericDiff = (n, digits, unit) => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(digits) + unit;
+    show("compareBaseGrams", v.usedGrams.toFixed(1) + " g");
+    show("compareAltGrams", gramsB.toFixed(1) + " g");
+    show("compareDeltaGrams", numericDiff(gramsB - v.usedGrams, 1, " g"));
+    show("compareBaseHours", v.printHours.toFixed(1) + " 時間");
+    show("compareAltHours", hoursB.toFixed(1) + " 時間");
+    show("compareDeltaHours", numericDiff(hoursB - v.printHours, 1, " 時間"));
+    show("compareBaseProduction", money(a.production));
+    show("compareAltProduction", money(b.production));
+    show("compareDeltaProduction", moneyDiff(b.production - a.production));
+    show("compareBaseTotal", money(a.total));
+    show("compareAltTotal", money(b.total));
+    show("compareDeltaTotal", moneyDiff(b.total - a.total));
+    show("compareBasePrice", money(a.price));
+    show("compareAltPrice", money(b.price));
+    show("compareDeltaPrice", moneyDiff(b.price - a.price));
+    warning.textContent = "差額は「変更条件 − 基準条件」です。金具・人件費・税金・固定手数料など、計算に含めていない費用は別途確認してください。";
+  }
+  ids.forEach(id => document.getElementById(id).addEventListener("input", () => { calculate(); compareScenarios(); }));
+  ["compareUsedGrams","comparePrintHours","compareFailureRate"].forEach(id => document.getElementById(id).addEventListener("input", compareScenarios));
+  calculate();
+  compareScenarios();
+})();
+</script>
+</body>
+</html>
