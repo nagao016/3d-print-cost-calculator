@@ -1,153 +1,161 @@
 import React, { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { motion, MotionConfig, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from "motion/react";
 import "./styles.css";
 
 const fields = [
-  { group: "材料", title: "フィラメント購入価格", id: "filamentPrice", unit: "円", value: 2500, step: 1, hint: "スプール1個の購入価格" },
-  { group: "材料", title: "スプール総重量", id: "spoolWeight", unit: "g", value: 1000, step: 1 },
-  { group: "材料", title: "作品1個の使用量", id: "usedGrams", unit: "g", value: 80, step: 0.1 },
-  { group: "印刷・機材", title: "印刷時間", id: "printHours", unit: "時間", value: 5, step: 0.1 },
-  { group: "印刷・機材", title: "消費電力", id: "powerWatts", unit: "W", value: 150, step: 1, hint: "平均消費電力の目安" },
-  { group: "印刷・機材", title: "電気料金単価", id: "electricityRate", unit: "円/kWh", value: 31, step: 0.1 },
-  { group: "印刷・機材", title: "プリンター購入価格", id: "printerPrice", unit: "円", value: 60000, step: 1 },
-  { group: "印刷・機材", title: "想定使用可能時間", id: "printerLifeHours", unit: "時間", value: 3000, step: 1 },
-  { group: "印刷・機材", title: "印刷失敗率", id: "failureRate", unit: "%", value: 5, step: 1 },
-  { group: "印刷・機材", title: "その他消耗品費", id: "otherCost", unit: "円/個", value: 20, step: 1 },
-  { group: "販売条件", title: "梱包費", id: "packagingCost", unit: "円/個", value: 80, step: 1 },
-  { group: "販売条件", title: "送料（出品者負担）", id: "shippingCost", unit: "円/個", value: 230, step: 1 },
-  { group: "販売条件", title: "販売手数料率", id: "feeRate", unit: "%", value: 10, step: 0.1 },
-  { group: "販売条件", title: "目標利益率", id: "targetMargin", unit: "%", value: 30, step: 1, hint: "販売価格に対する利益の割合" }
+  { group: "material", title: "フィラメント購入価格", id: "filamentPrice", unit: "円", value: 2500, step: 1, note: "スプール1個の価格" },
+  { group: "material", title: "スプール総重量", id: "spoolWeight", unit: "g", value: 1000, step: 1 },
+  { group: "material", title: "作品の使用量", id: "usedGrams", unit: "g", value: 80, step: 0.1 },
+  { group: "machine", title: "印刷時間", id: "printHours", unit: "時間", value: 5, step: 0.1 },
+  { group: "machine", title: "平均消費電力", id: "powerWatts", unit: "W", value: 150, step: 1 },
+  { group: "machine", title: "電気料金単価", id: "electricityRate", unit: "円/kWh", value: 31, step: 0.1 },
+  { group: "machine", title: "プリンター購入価格", id: "printerPrice", unit: "円", value: 60000, step: 1 },
+  { group: "machine", title: "想定使用可能時間", id: "printerLifeHours", unit: "時間", value: 3000, step: 1 },
+  { group: "machine", title: "印刷失敗率", id: "failureRate", unit: "%", value: 5, step: 1 },
+  { group: "machine", title: "その他消耗品費", id: "otherCost", unit: "円/個", value: 20, step: 1 },
+  { group: "selling", title: "梱包費", id: "packagingCost", unit: "円/個", value: 80, step: 1 },
+  { group: "selling", title: "送料（出品者負担）", id: "shippingCost", unit: "円/個", value: 230, step: 1 },
+  { group: "selling", title: "販売手数料率", id: "feeRate", unit: "%", value: 10, step: 0.1 },
+  { group: "selling", title: "目標利益率", id: "targetMargin", unit: "%", value: 30, step: 1 }
 ];
-
-const defaults = Object.fromEntries(fields.map((f) => [f.id, f.value]));
-const yen = (n) => Number.isFinite(n) ? Math.round(n).toLocaleString("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }) : "計算不可";
-const pct = (n) => Number.isFinite(n) ? `${n.toFixed(1)}%` : "計算不可";
-const val = (v) => Math.max(0, Number(v) || 0);
-
+const defaults = Object.fromEntries(fields.map(f => [f.id, f.value]));
+const money = n => Number.isFinite(n) ? "¥" + Math.round(n).toLocaleString("ja-JP") : "—";
+const pct = n => Number.isFinite(n) ? n.toFixed(1) + "%" : "—";
+const num = n => Math.max(0, Number(n) || 0);
 function calculate(v) {
-  const spool = val(v.spoolWeight);
-  const life = val(v.printerLifeHours);
-  const failureInput = val(v.failureRate);
-  const feeInput = val(v.feeRate);
-  const targetInput = val(v.targetMargin);
-  const failure = Math.min(99, failureInput) / 100;
-  const fee = Math.min(99, feeInput) / 100;
-  const target = Math.min(95, targetInput) / 100;
-  const filament = spool > 0 ? val(v.filamentPrice) / spool * val(v.usedGrams) : NaN;
-  const electricity = val(v.printHours) * val(v.powerWatts) / 1000 * val(v.electricityRate);
-  const depreciation = life > 0 ? val(v.printerPrice) / life * val(v.printHours) : NaN;
-  const other = val(v.otherCost);
-  const base = filament + electricity + depreciation + other;
+  const spool = num(v.spoolWeight), life = num(v.printerLifeHours);
+  const failureInput = num(v.failureRate), feeInput = num(v.feeRate), targetInput = num(v.targetMargin);
+  const failure = Math.min(99, failureInput) / 100, fee = Math.min(99, feeInput) / 100, target = Math.min(95, targetInput) / 100;
+  const filament = spool > 0 ? num(v.filamentPrice) / spool * num(v.usedGrams) : NaN;
+  const electricity = num(v.printHours) * num(v.powerWatts) / 1000 * num(v.electricityRate);
+  const depreciation = life > 0 ? num(v.printerPrice) / life * num(v.printHours) : NaN;
+  const other = num(v.otherCost), base = filament + electricity + depreciation + other;
   const production = base / (1 - failure);
-  const packaging = val(v.packagingCost);
-  const shipping = val(v.shippingCost);
-  const landed = production + packaging + shipping;
+  const packaging = num(v.packagingCost), shipping = num(v.shippingCost), landed = production + packaging + shipping;
   const denominator = 1 - fee - target;
-  const suggestedExact = denominator > 0 ? landed / denominator : NaN;
-  const breakEvenExact = fee < 1 ? landed / (1 - fee) : NaN;
-  const suggested = Number.isFinite(suggestedExact) ? Math.ceil(suggestedExact) : NaN;
-  const breakEven = Number.isFinite(breakEvenExact) ? Math.ceil(breakEvenExact) : NaN;
-  const profit = suggested * (1 - fee) - landed;
-  const margin = suggested > 0 ? profit / suggested * 100 : NaN;
-  let warning = "販売価格は1円単位で切り上げています。人件費・税金・固定手数料などは別途考慮してください。";
+  const suggested = denominator > 0 ? Math.ceil(landed / denominator) : NaN;
+  const breakEven = fee < 1 ? Math.ceil(landed / (1 - fee)) : NaN;
+  const profit = suggested * (1 - fee) - landed, margin = suggested > 0 ? profit / suggested * 100 : NaN;
+  let warning = "概算です。人件費・税金・固定手数料などは別途考慮してください。";
   if (spool <= 0) warning = "スプール総重量は1g以上を入力してください。";
   else if (life <= 0) warning = "想定使用可能時間は1時間以上を入力してください。";
   else if (failureInput >= 100) warning = "失敗率は100%未満を入力してください（計算上99%として扱います）。";
   else if (feeInput >= 100) warning = "販売手数料率は100%未満を入力してください（計算上99%として扱います）。";
   else if (targetInput > 95) warning = "目標利益率は95%以下を入力してください（計算上95%として扱います）。";
-  else if (denominator <= 0) warning = "販売手数料率と目標利益率の合計が100%以上のため、販売価格を計算できません。";
-  return { filament, electricity, depreciation, other, base, landed, suggested, breakEven, profit, margin, feeCost: suggested * fee, warning };
+  else if (denominator <= 0) warning = "手数料率と目標利益率の合計が100%以上のため、価格を計算できません。";
+  return { filament, electricity, depreciation, other, base, production, packaging, shipping, landed, suggested, breakEven, profit, margin, feeCost: suggested * fee, warning };
 }
-
+const sections = [
+  { id: "material", n: "01", title: "材料", subtitle: "MATERIAL", detail: "素材と使用量" },
+  { id: "machine", n: "02", title: "製造", subtitle: "MACHINE", detail: "時間・電力・機材" },
+  { id: "selling", n: "03", title: "販売", subtitle: "SELLING", detail: "配送と利益の条件" }
+];
 function Field({ field, value, onChange }) {
-  return <label className="field" htmlFor={field.id}>
-    <span className="field-title">{field.title}</span>
-    <span className="input-wrap">
-      <input id={field.id} type="number" min="0" step={field.step} value={value} onChange={(e) => onChange(field.id, e.target.value)} inputMode="decimal" />
-      <span className="unit">{field.unit}</span>
-    </span>
-    {field.hint && <span className="hint">{field.hint}</span>}
-  </label>;
+  return <label className="field" htmlFor={field.id}><span className="field-label">{field.title}</span><span className="input-shell"><input id={field.id} type="number" min="0" step={field.step} inputMode="decimal" value={value} onChange={e => onChange(field.id, e.target.value)} /><span>{field.unit}</span></span>{field.note && <small>{field.note}</small>}</label>;
 }
-
 function App() {
   const [values, setValues] = useState(defaults);
-  const [copyStatus, setCopyStatus] = useState("");
+  const [active, setActive] = useState("material");
+  const [copied, setCopied] = useState("");
+  const reduced = useReducedMotion();
   const result = useMemo(() => calculate(values), [values]);
-  const reducedMotion = useReducedMotion();
-  const groups = ["材料", "印刷・機材", "販売条件"];
-  const update = (id, value) => setValues((old) => ({ ...old, [id]: value }));
-  const copyResult = async () => {
-    const lines = [
-      "3Dプリンター原価・販売価格計算結果",
-      `目標利益率での販売価格: ${yen(result.suggested)}`,
-      `梱包・送料を含む原価: ${yen(result.landed)}`,
-      `販売時の利益額: ${yen(result.profit)}`,
-      `販売利益率: ${pct(result.margin)}`,
-      `フィラメント代: ${yen(result.filament)}`,
-      `電気代: ${yen(result.electricity)}`,
-      `プリンター償却費: ${yen(result.depreciation)}`,
-      `損益分岐価格: ${yen(result.breakEven)}`
-    ].join("\n");
-    try {
-      await navigator.clipboard.writeText(lines);
-      setCopyStatus("計算結果をコピーしました。");
-    } catch {
-      setCopyStatus("自動コピーできませんでした。ブラウザのコピー許可を確認してください。");
-    }
+  const update = (id, value) => setValues(old => ({ ...old, [id]: value }));
+  const costRows = [
+    { label: "フィラメント", value: result.filament, color: "orange" },
+    { label: "電気代", value: result.electricity, color: "blue" },
+    { label: "機材償却", value: result.depreciation, color: "violet" },
+    { label: "消耗品", value: result.other, color: "grey" },
+    { label: "梱包・送料", value: result.packaging + result.shipping, color: "sand" }
+  ];
+  const totalForBar = costRows.reduce((sum, row) => sum + (Number.isFinite(row.value) ? Math.max(0, row.value) : 0), 0) || 1;
+  const scenarios = [
+    { label: "最低ライン", desc: "赤字を避ける", price: result.breakEven, style: "floor" },
+    { label: "目標価格", desc: "設定した利益率", price: result.suggested, style: "target" },
+    { label: "利益 +10pt", desc: "利益率を10pt上乗せ", price: (() => { const d = 1 - Math.min(99, num(values.feeRate))/100 - Math.min(95, num(values.targetMargin)+10)/100; return d > 0 ? Math.ceil(result.landed/d) : NaN; })(), style: "stretch" }
+  ];
+  const copy = async () => {
+    const text = ["3Dプリンター原価・販売価格試算", `目標販売価格: ${money(result.suggested)}`, `原価（梱包・送料込み）: ${money(result.landed)}`, `利益額: ${money(result.profit)}`, `利益率: ${pct(result.margin)}`, `損益分岐価格: ${money(result.breakEven)}`, ...costRows.map(r => `${r.label}: ${money(r.value)}`)].join("\n");
+    try { await navigator.clipboard.writeText(text); setCopied("コピーしました"); } catch { setCopied("ブラウザのコピー許可を確認してください"); }
   };
-  return <MotionConfig reducedMotion="user">
-    <div className="site-shell">
-      <header className="topbar">
-        <a className="brand" href="#top" aria-label="ページ先頭へ"><span className="brand-mark">3D</span><span>PRINT COST <small>CALCULATOR</small></span></a>
-        <nav aria-label="メインナビゲーション"><a href="#calculator">原価計算</a><a href="#method">計算方法</a></nav>
+  return <MotionConfig reducedMotion="user" transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+    <div className="app">
+      <header className="masthead">
+        <a className="wordmark" href="#top" aria-label="ページ先頭"><span className="mark-cube"><i /></span><span>FORM / COST<small>3D PRINT PRICING LAB</small></span></a>
+        <div className="mast-meta"><span className="status-dot" /> FREE TOOL <span className="meta-divider" /> 日本語 / JPY</div>
+        <a className="mast-link" href="#method">計算ロジック <span>↗</span></a>
       </header>
       <main id="top">
-        <section className="hero">
-          <motion.div className="hero-copy" initial={reducedMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
-            <span className="eyebrow"><span className="live-dot" /> FREE CALCULATOR</span>
-            <h1>原価がわかると、<br /><em>価格に自信</em>が持てる。</h1>
-            <p>材料費から販売手数料まで。3Dプリント作品1個あたりのコストと、目標利益率に合わせた販売価格をかんたん試算。</p>
-            <a className="primary-cta" href="#calculator">無料で原価を計算する <span aria-hidden="true">↓</span></a>
-            <div className="hero-proof"><span>✓ 登録不要</span><span>✓ ブラウザ内で計算</span><span>✓ 無料で利用可能</span></div>
-          </motion.div>
-          <div className="hero-visual" aria-hidden="true">
-            <div className="visual-glow" />
-            <div className="printer"><div className="printer-top"><span /><span /><span /></div><div className="printer-frame"><div className="rail" /><div className="print-head" /><div className="print-object"><i /><i /><i /><i /><i /></div><div className="build-plate" /></div><div className="printer-base" /></div>
-            <div className="floating-chip chip-cost"><span>製造原価</span><strong>見える化</strong></div>
-            <div className="floating-chip chip-price"><span>目標利益率</span><strong>価格を逆算</strong></div>
+        <section className="opening">
+          <div className="opening-copy">
+            <motion.div initial={reduced ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="overline"><span>PRICING WORKSPACE</span><span>NO. 001 — 2026</span></motion.div>
+            <motion.h1 initial={reduced ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .06 }}>その造形に、<br /><em>値段の根拠</em>を。</motion.h1>
+            <motion.p initial={reduced ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .12 }}>材料・機材・販売条件をひとつのワークスペースに。数字を動かしながら、納得できる販売価格を見つける。</motion.p>
+            <div className="opening-foot"><span className="big-index">01</span><span>INPUT → MODEL → PRICE</span><span className="short-rule" /></div>
+          </div>
+          <div className="opening-art" aria-label="積層造形を表現した図">
+            <div className="art-grid" />
+            <motion.div className="wire-cube" animate={reduced ? {} : { rotate: [0, 3, 0], y: [0, -5, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}><div className="cube-top" /><div className="cube-face face-left" /><div className="cube-face face-right" /><div className="layer-lines" /></motion.div>
+            <div className="art-caption"><span>FIG. 01</span><span>LAYER BY LAYER</span></div>
+            <div className="art-coordinate">X / 120<br />Y / 120<br />Z / 084</div>
           </div>
         </section>
-        <section className="trust-row" aria-label="サービスの特徴"><div><span className="trust-icon">01</span><span><strong>入力するだけ</strong><small>難しい設定は不要</small></span></div><div><span className="trust-icon">02</span><span><strong>費用をまとめて計算</strong><small>材料・電気・機材・販売費</small></span></div><div><span className="trust-icon">03</span><span><strong>条件を比較できる</strong><small>数字を変えてすぐ試算</small></span></div></section>
-        <section className="calculator-section" id="calculator">
-          <div className="section-intro"><span className="eyebrow">COST ESTIMATOR</span><h2>作品1個あたりの原価を計算</h2><p>わかる範囲で入力してください。数値を変えると結果がすぐに更新されます。</p></div>
-          <div className="workspace">
-            <div className="input-column">
-              {groups.map((group, index) => <motion.section className="input-card" key={group} initial={reducedMotion ? false : { opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.3, delay: reducedMotion ? 0 : index * 0.06 }}>
-                <div className="card-heading"><span className="step-number">0{index + 1}</span><div><h3>{group}</h3><p>{["作品に使う材料の量と購入単価","印刷条件と機材の使用コスト","販売時に発生する費用と利益"][index]}</p></div></div>
-                <div className="field-grid">{fields.filter((f) => f.group === group).map((field) => <Field key={field.id} field={field} value={values[field.id]} onChange={update} />)}</div>
-              </motion.section>)}
-              <div className="form-actions"><button className="text-button" type="button" onClick={() => { setValues(defaults); setCopyStatus("初期値に戻しました。"); }}>↺ 初期値に戻す</button><span>入力内容はサーバーに送信されません</span></div>
+
+        <section className="live-strip" aria-live="polite">
+          <div className="live-label"><span className="pulse" /> LIVE ESTIMATE <small>入力に合わせて更新</small></div>
+          <div className="live-price"><span>推奨販売価格</span><motion.strong key={String(result.suggested)} initial={reduced ? false : { opacity: .35, y: 8 }} animate={{ opacity: 1, y: 0 }}>{money(result.suggested)}</motion.strong></div>
+          <div className="live-metric"><span>製造・販売原価</span><strong>{money(result.landed)}</strong></div>
+          <div className="live-metric"><span>想定利益</span><strong className="green">{money(result.profit)}</strong></div>
+          <div className="live-metric"><span>利益率</span><strong>{pct(result.margin)}</strong></div>
+        </section>
+
+        <section className="studio" id="calculator">
+          <aside className="rail-nav">
+            <div className="rail-title">CONFIGURE <span>3 STEPS</span></div>
+            {sections.map((s, i) => <button key={s.id} className={active === s.id ? "rail-step active" : "rail-step"} onClick={() => setActive(s.id)} aria-current={active === s.id ? "step" : undefined}><span className="rail-num">{s.n}</span><span className="rail-text"><strong>{s.title}</strong><small>{s.subtitle}</small></span><span className="rail-arrow">{active === s.id ? "↳" : "↗"}</span></button>)}
+            <div className="rail-note"><span className="note-icon">↗</span><strong>数字はいつでも変更可能</strong><p>入力値はブラウザ内で計算され、サーバーへ送信されません。</p><button onClick={() => { setValues(defaults); setCopied("初期値に戻しました"); }}>↺ 初期値に戻す</button></div>
+          </aside>
+          <div className="config-panel">
+            <div className="panel-heading"><div><span className="micro-label">CONFIGURATION / {sections.find(s => s.id === active).subtitle}</span><h2>{sections.find(s => s.id === active).title}<span>を設定する</span></h2><p>{sections.find(s => s.id === active).detail}に関する条件を入力してください。</p></div><span className="panel-count">{sections.find(s => s.id === active).n} <i>/ 03</i></span></div>
+            <div className="step-progress"><span className={active === "material" ? "done" : "done"} /><span className={active !== "material" ? "done" : ""} /><span className={active === "selling" ? "done" : ""} /></div>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div key={active} className="field-grid" initial={reduced ? false : { opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? {} : { opacity: 0, x: -8 }} transition={{ duration: .2 }}>
+                {fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)}
+              </motion.div>
+            </AnimatePresence>
+            <div className="panel-bottom"><span><b>●</b> AUTO-CALCULATE ENABLED</span><div>{active !== "material" && <button className="secondary-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)-1].id)}>← 戻る</button>}{active !== "selling" ? <button className="next-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)+1].id)}>次の設定へ <span>→</span></button> : <button className="next-btn" onClick={() => document.getElementById("results").scrollIntoView({ behavior: reduced ? "auto" : "smooth" })}>価格を確認 <span>↓</span></button>}</div></div>
+          </div>
+          <aside className="model-panel">
+            <div className="model-top"><span className="micro-label">COST MODEL / LIVE</span><span className="model-live"><i /> RUNNING</span></div>
+            <div className="model-figure"><div className="ring ring-outer" /><div className="ring ring-inner" /><div className="model-center"><span>BASE COST</span><strong>{money(result.base)}</strong><small>製造ベース原価</small></div><div className="orbit-label label-a">01 / MATERIAL</div><div className="orbit-label label-b">02 / MACHINE</div><div className="orbit-label label-c">03 / SELLING</div></div>
+            <div className="mini-breakdown"><div><span>材料</span><strong>{money(result.filament)}</strong></div><div><span>電気</span><strong>{money(result.electricity)}</strong></div><div><span>償却</span><strong>{money(result.depreciation)}</strong></div></div>
+            <div className="model-footer"><span>CALCULATION STATUS</span><strong><i /> ALL VALUES UPDATED</strong></div>
+          </aside>
+        </section>
+
+        <section className="results-section" id="results">
+          <div className="results-heading"><div><span className="micro-label">OUTPUT / 01</span><h2>価格を、分解して考える。</h2><p>目標利益率から逆算した価格と、コスト構造を確認できます。</p></div><button className="copy-action" onClick={copy}>結果をコピー <span>↗</span></button></div>
+          <div className="results-grid">
+            <div className="cost-map">
+              <div className="subhead"><span>コスト構成</span><small>PER ITEM / ESTIMATE</small></div>
+              <div className="stacked-bar">{costRows.map(row => <motion.div key={row.label} className={row.color} initial={false} animate={{ width: ((Number.isFinite(row.value) ? Math.max(0,row.value) : 0) / totalForBar * 100) + "%" }} />)}</div>
+              <div className="legend">{costRows.map(row => <div key={row.label}><i className={row.color} /><span>{row.label}</span><strong>{money(row.value)}</strong></div>)}</div>
+              <div className="cost-total"><span>原価合計（梱包・送料込み）</span><strong>{money(result.landed)}</strong></div>
+              <p className="result-warning">{result.warning}</p>
             </div>
-            <motion.aside className="result-card" aria-live="polite" key="result-card" initial={reducedMotion ? false : { opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35 }}>
-              <div className="result-top"><span className="eyebrow">YOUR ESTIMATE</span><span className="result-badge">作品1個あたり</span></div>
-              <p className="result-label">目標利益率での販売価格</p>
-              <motion.div className="big-price" key={String(result.suggested)} initial={reducedMotion ? false : { opacity: 0.6, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>{yen(result.suggested)}</motion.div>
-              <p className="result-sub">販売手数料・目標利益率を考慮した概算</p>
-              <div className="result-highlights"><div><span>原価（梱包・送料込み）</span><strong>{yen(result.landed)}</strong></div><div><span>販売時の利益額</span><strong className="profit-value">{yen(result.profit)}</strong></div><div><span>販売利益率</span><strong>{pct(result.margin)}</strong></div></div>
-              <div className="cost-breakdown"><h3>費用の内訳</h3>{[["フィラメント代",result.filament],["電気代",result.electricity],["プリンター償却費",result.depreciation],["その他消耗品費",result.other],["販売手数料（提案価格）",result.feeCost],["損益分岐となる販売価格",result.breakEven]].map(([label, amount]) => <div className="breakdown-row" key={label}><span>{label}</span><strong>{yen(amount)}</strong></div>)}</div>
-              <button className="copy-button" type="button" onClick={copyResult}><span aria-hidden="true">▣</span> 計算結果をコピー</button>
-              <p className="copy-status" role="status">{copyStatus}</p>
-              <p className="warning">{result.warning}</p>
-            </motion.aside>
+            <div className="price-scenarios">
+              <div className="subhead"><span>価格シナリオ</span><small>COMPARE OPTIONS</small></div>
+              {scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}
+              <div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div>
+            </div>
           </div>
         </section>
-        <section className="method-section" id="method"><span className="eyebrow">HOW IT WORKS</span><h2>価格の根拠を、わかりやすく。</h2><div className="method-grid"><article><span>01</span><h3>材料費</h3><p>フィラメントの購入価格と、作品1個に使用する重量から計算します。</p><code>購入価格 ÷ 総重量 × 使用量</code></article><article><span>02</span><h3>製造コスト</h3><p>電気代・機材費・消耗品費を加算し、印刷失敗率も考慮します。</p><code>材料費 + 電気代 + 機材費</code></article><article><span>03</span><h3>販売価格</h3><p>梱包費・送料・販売手数料を考慮して目標利益率から逆算します。</p><code>原価 ÷ (1 − 手数料率 − 利益率)</code></article></div><p className="fine-print">※ 概算ツールです。人件費、税金、固定出品料、返品・再発送費などは含まれません。実際の販売前にご自身の条件でご確認ください。</p></section>
+
+        <section className="method" id="method"><div className="method-head"><span className="micro-label">THE LOGIC BEHIND THE NUMBER</span><h2>計算の仕組み</h2><p>透明な計算式で、価格設定の根拠を確認できます。</p></div><div className="logic-steps"><article><span>01</span><div><h3>製造ベース原価</h3><p>フィラメント代・電気代・プリンター償却費・その他消耗品を合算。</p><code>材料 + 電気 + 償却 + 消耗品</code></div></article><article><span>02</span><div><h3>失敗率・販売関連費用</h3><p>印刷失敗を見込み、梱包費と送料を加算します。</p><code>製造ベース原価 ÷ (1 − 失敗率)</code></div></article><article><span>03</span><div><h3>目標利益率から逆算</h3><p>販売手数料と目標利益率を差し引いた割合で原価を割ります。</p><code>原価 ÷ (1 − 手数料率 − 目標利益率)</code></div></article></div><div className="method-foot"><span>FORM / COST — PRICING TOOL</span><span>人件費・税金・固定出品料・返品費などは含まれません。</span></div></section>
       </main>
-      <footer><a className="brand footer-brand" href="#top"><span className="brand-mark">3D</span><span>PRINT COST <small>CALCULATOR</small></span></a><span>シンプルに、根拠のある価格設定を。</span></footer>
+      <footer><a className="wordmark" href="#top"><span className="mark-cube"><i /></span><span>FORM / COST<small>3D PRINT PRICING LAB</small></span></a><span>つくることに、価格の根拠を。</span><a href="#calculator">上へ戻る ↑</a></footer>
+      {copied && <motion.div className="toast" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>{copied}</motion.div>}
     </div>
   </MotionConfig>;
 }
-
 createRoot(document.getElementById("root")).render(<App />);
