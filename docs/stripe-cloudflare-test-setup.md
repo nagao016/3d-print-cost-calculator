@@ -34,6 +34,7 @@ Stripe Dashboardのサンドボックス → Developers → Webhooks → Add des
   - `customer.subscription.created`
   - `customer.subscription.updated`
   - `customer.subscription.deleted`
+  - `invoice.payment_failed`
 - この実装では、会員資格の更新は主にサブスクリプションイベントで処理します。初期テストでは上記4イベントのみを選択してください。
 - 表示された signing secret（`whsec_...`）を `STRIPE_WEBHOOK_SECRET` に登録する。
 - 設定変更後に Pages を再デプロイする。
