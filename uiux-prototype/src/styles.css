@@ -120,3 +120,11 @@
   .config-panel>.inline-pro-tools .filament-table td:first-child{padding-left:7px}
   .studio>.model-panel{position:absolute;top:0;right:0;width:calc(34% - 1px);box-sizing:border-box;min-height:0}
 }
+
+
+/* Match the reference layout: compact material inputs, Pro workspace directly below */
+@media(min-width:1051px){
+  .config-panel>.field-grid{min-height:0;align-content:start;row-gap:18px}
+  .config-panel>.panel-bottom{margin-top:16px}
+  .config-panel>.inline-pro-tools{margin-top:0;margin-bottom:24px}
+}
