@@ -1,6 +1,7 @@
-const React = await import("react");
-const { createRoot } = await import("react-dom/client");
-const { motion, MotionConfig, useReducedMotion, AnimatePresence } = await import("motion/react");
+import React, { useMemo, useState } from "react";
+import { createRoot } from "react-dom/client";
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from "motion/react";
+import "./styles.css";
 
 const fields = [
   { group: "material", title: "フィラメント購入価格", id: "filamentPrice", unit: "円", value: 2500, step: 1, note: "スプール1個の価格" },
