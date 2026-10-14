@@ -213,16 +213,16 @@ function App() {
 
         <section className="live-strip" aria-live="polite">
           <div className="live-label"><span className="pulse" /> LIVE ESTIMATE <small>入力に合わせて更新</small></div>
-          <div className="live-price"><span>推奨販売価格</span><motion.strong key={String(result.suggested)} initial={reduced ? false : { opacity: .35, y: 8 }} animate={{ opacity: 1, y: 0 }}>{money(result.suggested)}</motion.strong></div>
+          <div className="live-price"><span>推奨販売価格 {!proActive && <i className="pro-inline-tag">PRO</i>}</span><motion.strong key={String(result.suggested)} initial={reduced ? false : { opacity: .35, y: 8 }} animate={{ opacity: 1, y: 0 }}>{proActive ? money(result.suggested) : "Pro限定"}</motion.strong></div>
           <div className="live-metric"><span>製造・販売原価</span><strong>{money(result.landed)}</strong></div>
-          <div className="live-metric"><span>想定利益</span><strong className="green">{money(result.profit)}</strong></div>
-          <div className="live-metric"><span>利益率</span><strong>{pct(result.margin)}</strong></div>
+          <div className="live-metric"><span>想定利益</span><strong className="green">{proActive ? money(result.profit) : "Pro限定"}</strong></div>
+          <div className="live-metric"><span>利益率</span><strong>{proActive ? pct(result.margin) : "Pro限定"}</strong></div>
         </section>
 
         <section className="studio" id="calculator">
           <aside className="rail-nav">
             <div className="rail-title">CONFIGURE <span>3 STEPS</span></div>
-            {sections.map((s, i) => <button key={s.id} className={active === s.id ? "rail-step active" : "rail-step"} onClick={() => setActive(s.id)} aria-current={active === s.id ? "step" : undefined}><span className="rail-num">{s.n}</span><span className="rail-text"><strong>{s.title}</strong><small>{s.subtitle}</small></span><span className="rail-arrow">{active === s.id ? "↳" : "↗"}</span></button>)}
+            {sections.map((s, i) => <button key={s.id} className={active === s.id ? "rail-step active" : "rail-step"} onClick={() => goSection(s.id)} aria-current={active === s.id ? "step" : undefined}><span className="rail-num">{s.n}</span><span className="rail-text"><strong>{s.title}</strong><small>{s.subtitle}</small></span><span className="rail-arrow">{s.id === "selling" && !proActive ? "🔒" : active === s.id ? "↳" : "↗"}</span></button>)}
             <div className="rail-note"><span className="note-icon">↗</span><strong>数字はいつでも変更可能</strong><p>入力値はブラウザ内で計算され、サーバーへ送信されません。</p><button onClick={() => { setValues(defaults); setCopied("初期値に戻しました"); }}>↺ 初期値に戻す</button></div>
           </aside>
           <div className="config-panel">
@@ -230,10 +230,10 @@ function App() {
             <div className="step-progress"><span className={active === "material" ? "done" : "done"} /><span className={active !== "material" ? "done" : ""} /><span className={active === "selling" ? "done" : ""} /></div>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={active} className="field-grid" initial={reduced ? false : { opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? {} : { opacity: 0, x: -8 }} transition={{ duration: .2 }}>
-                {fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)}
+                {active === "selling" && !proActive ? <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>販売価格シミュレーション</h3><p>販売手数料・梱包費・送料・目標利益率を考慮した価格計算はPro専用です。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)}
               </motion.div>
             </AnimatePresence>
-            <div className="panel-bottom"><span><b>●</b> AUTO-CALCULATE ENABLED</span><div>{active !== "material" && <button className="secondary-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)-1].id)}>← 戻る</button>}{active !== "selling" ? <button className="next-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)+1].id)}>次の設定へ <span>→</span></button> : <button className="next-btn" onClick={() => document.getElementById("results").scrollIntoView({ behavior: reduced ? "auto" : "smooth" })}>価格を確認 <span>↓</span></button>}</div></div>
+            <div className="panel-bottom"><span><b>●</b> AUTO-CALCULATE ENABLED</span><div>{active !== "material" && <button className="secondary-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)-1].id)}>← 戻る</button>}{active !== "selling" ? <button className="next-btn" onClick={() => goSection(sections[sections.findIndex(s => s.id === active)+1].id)}>次の設定へ <span>→</span></button> : <button className="next-btn" onClick={() => document.getElementById("results").scrollIntoView({ behavior: reduced ? "auto" : "smooth" })}>価格を確認 <span>↓</span></button>}</div></div>
           </div>
           <aside className="model-panel">
             <div className="model-top"><span className="micro-label">COST MODEL / LIVE</span><span className="model-live"><i /> RUNNING</span></div>
