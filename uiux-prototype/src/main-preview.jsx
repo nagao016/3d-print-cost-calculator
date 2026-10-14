@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AnimatePresence, motion, MotionConfig, useReducedMotion } from "motion/react";
 import "./styles.css";
@@ -58,9 +58,93 @@ function App() {
   const [values, setValues] = useState(defaults);
   const [active, setActive] = useState("material");
   const [copied, setCopied] = useState("");
+  const [licenseToken, setLicenseToken] = useState("");
+  const [proActive, setProActive] = useState(false);
+  const [proMessage, setProMessage] = useState("");
+  const [proBusy, setProBusy] = useState(false);
   const reduced = useReducedMotion();
   const result = useMemo(() => calculate(values), [values]);
   const update = (id, value) => setValues(old => ({ ...old, [id]: value }));
+
+  useEffect(() => {
+    let cancelled = false;
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+    const savedToken = window.localStorage.getItem("formcost_pro_license");
+    const cleanUrl = () => {
+      params.delete("pro");
+      params.delete("session_id");
+      const query = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : "") + window.location.hash);
+    };
+    const verify = async token => {
+      if (!token) return;
+      try {
+        const response = await fetch("/api/verify-pro", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ licenseToken: token })
+        });
+        const data = await response.json();
+        if (!cancelled) {
+          setLicenseToken(token);
+          setProActive(response.ok && data.active === true);
+          if (!data.active) window.localStorage.removeItem("formcost_pro_license");
+        }
+      } catch {
+        if (!cancelled) setProMessage("会員資格を確認できません。通信環境を確認してください。");
+      }
+    };
+    if (params.get("pro") === "success" && sessionId) {
+      setProBusy(true);
+      fetch("/api/complete-checkout?session_id=" + encodeURIComponent(sessionId))
+        .then(async response => {
+          const data = await response.json();
+          if (!response.ok || !data.licenseToken) throw new Error(data.error || "購入状況を確認できません。");
+          window.localStorage.setItem("formcost_pro_license", data.licenseToken);
+          if (!cancelled) {
+            setLicenseToken(data.licenseToken);
+            setProActive(true);
+            setProMessage("Proの購入が完了しました。");
+          }
+        })
+        .catch(error => { if (!cancelled) setProMessage(error.message || "購入状況を確認できません。"); })
+        .finally(() => { cleanUrl(); if (!cancelled) setProBusy(false); });
+    } else {
+      if (params.get("pro") === "cancelled") setProMessage("購入手続きはキャンセルされました。");
+      if (params.has("pro") || params.has("session_id")) cleanUrl();
+      if (savedToken) verify(savedToken);
+    }
+    return () => { cancelled = true; };
+  }, []);
+
+  const startProCheckout = async () => {
+    setProBusy(true); setProMessage("");
+    try {
+      const response = await fetch("/api/create-checkout-session", { method: "POST" });
+      const data = await response.json();
+      if (!response.ok || !data.url) throw new Error(data.error || "購入ページを開けませんでした。");
+      window.location.assign(data.url);
+    } catch (error) {
+      setProMessage(error.message || "購入ページを開けませんでした。");
+      setProBusy(false);
+    }
+  };
+
+  const openBillingPortal = async () => {
+    setProBusy(true); setProMessage("");
+    try {
+      const response = await fetch("/api/create-customer-portal", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ licenseToken })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.url) throw new Error(data.error || "契約管理ページを開けませんでした。");
+      window.location.assign(data.url);
+    } catch (error) {
+      setProMessage(error.message || "契約管理ページを開けませんでした。");
+      setProBusy(false);
+    }
+  };
   const costRows = [
     { label: "フィラメント", value: result.filament, color: "orange" },
     { label: "電気代", value: result.electricity, color: "blue" },
@@ -83,8 +167,9 @@ function App() {
       <header className="masthead">
         <a className="wordmark" href="#top" aria-label="ページ先頭"><span className="mark-cube"><i /></span><span>FORM / COST<small>3D PRINT PRICING LAB</small></span></a>
         <div className="mast-meta"><span className="status-dot" /> FREE TOOL <span className="meta-divider" /> 日本語 / JPY</div>
-        <div className="mast-actions"><a className="mast-link" href="/guide/">記事一覧 <span>↗</span></a><a className="mast-link" href="#method">計算ロジック <span>↗</span></a></div>
+        <div className="mast-actions"><a className="mast-link" href="/guide/">記事一覧 <span>↗</span></a><a className="mast-link" href="#method">計算ロジック <span>↗</span></a><button className="mast-link pro-action" onClick={proActive ? openBillingPortal : startProCheckout} disabled={proBusy}>{proBusy ? "確認中…" : proActive ? "Pro会員・契約管理 ↗" : "Pro 月額500円 ↗"}</button></div>
       </header>
+      {proMessage && <div className="pro-notice" role="status">{proMessage}</div>}
       <main id="top">
         <section className="opening">
           <div className="opening-copy">
