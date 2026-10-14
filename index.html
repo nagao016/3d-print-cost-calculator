@@ -125,6 +125,60 @@
     @media(max-width:900px){.site-nav{align-items:flex-start;flex-direction:column;gap:10px;padding:10px 18px}.nav-links{width:100%;overflow-x:auto;padding-bottom:3px;gap:20px}.nav-links a{font-size:.8rem}.hero-inner{grid-template-columns:1fr 0.9fr;gap:12px;padding:26px 20px}.hero-benefits span{font-size:.75rem;padding:8px 9px}.article-cards{grid-template-columns:1fr}.article-card>img{width:32%;max-width:200px}.article-card-body{padding:14px}.article-card h3{font-size:1rem}.article-card p{font-size:.86rem}}
     @media(max-width:650px){.site-nav{position:relative}.brand-mark{width:34px;height:34px}.hero-inner{grid-template-columns:1fr;padding:26px 17px 23px}.hero h1{font-size:2.1rem}.hero-visual{margin-top:2px}.hero-visual img{aspect-ratio:16/9}.hero-callout{right:8px;top:8px;font-size:.76rem;padding:9px 12px}.hero-benefits{display:grid;grid-template-columns:1fr 1fr}.hero-benefits span:last-child{grid-column:1/-1}.main{padding:18px 12px 30px}main{padding:18px 12px 30px}.layout{grid-template-columns:1fr}.section-heading{align-items:flex-start;flex-direction:column;gap:8px}.article-guide{padding:19px 14px}.article-card>img{width:34%;min-width:100px}.article-card-body{padding:10px}.article-card h3{font-size:.88rem}.article-card p{font-size:.76rem}.article-card .read-more{font-size:.75rem}}
     @media(prefers-reduced-motion:reduce){.article-card{transition:none}}
+  
+    /* Production-safe UI/UX refresh: preserve static HTML and SEO publisher anchors. */
+    :root { --ink:#17243b; --muted:#68768c; --line:#e2e8f1; --surface:#fff; --bg:#f5f7fb; --accent:#315fe8; --accent-dark:#244bc4; --accent-soft:#edf2ff; --navy:#14223c; --good:#087a57; --shadow:0 16px 44px rgba(24,48,91,.07); }
+    body { font-family: Inter, "Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif; background:#f5f7fb; }
+    .site-nav { padding-top:10px; padding-bottom:10px; box-shadow:0 3px 12px rgba(24,48,91,.035); }
+    .brand-mark { border-radius:10px; background:#315fe8; border:0; color:#fff; transform:none; font-size:19px; }
+    header.hero { background:linear-gradient(125deg,#fff 0%,#f2f6ff 100%); }
+    .hero-inner { min-height:340px; padding-top:42px; padding-bottom:42px; }
+    .hero h1 { line-height:1.24; letter-spacing:-.04em; }
+    .hero h1 span { color:#315fe8; }
+    .eyebrow-pill { box-shadow:0 2px 8px rgba(49,95,232,.06); }
+    .hero-benefits span { border-radius:999px; box-shadow:none; }
+    .hero-visual img { aspect-ratio:550/250; object-fit:cover; border-radius:18px; }
+    main.wrap { padding-top:28px; }
+    .intro { border-radius:12px; background:#fff; }
+    .layout { grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr); align-items:start; gap:16px; }
+    .panel { border-radius:16px; padding:23px; box-shadow:0 10px 28px rgba(24,48,91,.045); }
+    .panel h2 { margin-bottom:20px; font-size:1rem; }
+    .panel h2:before { height:25px; border-radius:6px; }
+    .fields { gap:17px 14px; }
+    label { font-size:.82rem; }
+    input { border-radius:9px; background:#fbfcfe; }
+    .control:has(.unit) input { border-radius:9px 0 0 9px; }
+    .unit { border-radius:0 9px 9px 0; }
+    .results { grid-column:2; grid-row:1 / span 3; position:sticky; top:88px; padding:23px; border-radius:17px; }
+    .results h2 { font-size:1.12rem; }
+    .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .metric { min-height:94px; padding:14px; border-radius:12px; }
+    .metric.primary { grid-column:1 / -1; min-height:112px; }
+    .metric.primary .value { font-size:clamp(1.8rem,3vw,2.5rem); }
+    .details { margin-top:18px; }
+    .details th,.details td { padding:10px 11px; font-size:.82rem; }
+    .btn-primary { background:#315fe8; }
+    button { border-radius:9px; }
+    .guide { border-radius:17px; box-shadow:0 10px 28px rgba(24,48,91,.045); }
+    .article-card { border-radius:13px; }
+    footer { margin-top:16px; }
+    @media(max-width:900px) {
+      .layout { grid-template-columns:1fr; }
+      .results { grid-column:auto; grid-row:auto; position:static; }
+      .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .metric.primary { grid-column:1 / -1; }
+    }
+    @media(max-width:650px) {
+      .site-nav { position:sticky; top:0; }
+      .hero-inner { padding:26px 17px 23px; }
+      .hero h1 { font-size:2.1rem; }
+      .hero-visual img { aspect-ratio:16/9; }
+      .panel { padding:18px 16px; }
+      .results { padding:18px 16px; }
+      .metric.primary .value { font-size:2rem; }
+      .details th,.details td { font-size:.78rem; }
+    }
+
   </style>
 </head>
 <body>
