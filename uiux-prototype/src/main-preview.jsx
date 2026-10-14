@@ -67,7 +67,7 @@ function App() {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [orderQuantity, setOrderQuantity] = useState(10);
   const [orderSalePrice, setOrderSalePrice] = useState(0);
-  const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA A", price: 2500, weight: 1000 }, { name: "PLA B", price: 3200, weight: 1000 }]);
+  const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA", price: 2500, weight: 1000 }]);
   const reduced = useReducedMotion();
   const result = useMemo(() => calculate(values), [values]);
   const update = (id, value) => setValues(old => ({ ...old, [id]: value }));
@@ -261,7 +261,7 @@ function App() {
             </article>
             <article className="pro-tool-card pro-tool-wide">
               <span className="micro-label">03 / FILAMENT COMPARISON</span><h3>フィラメント最大10種類の比較</h3><p>価格とスプール重量から、1gあたりの価格と作品1個分の材料費を比較します。</p>
-              <div className="filament-table-wrap"><table className="filament-table"><thead><tr><th>名称</th><th>購入価格（円）</th><th>重量（g）</th><th>円/g</th><th>作品分の材料費</th><th></th></tr></thead><tbody>{filamentOptions.map((item,index)=>{const calc=compareFilament(item);return <tr key={index}><td><input aria-label={"フィラメント名 "+(index+1)} value={item.name} maxLength={40} onChange={e=>updateFilament(index,"name",e.target.value)}/></td><td><input aria-label={"購入価格 "+(index+1)} type="number" min="0" value={item.price} onChange={e=>updateFilament(index,"price",Math.max(0,Number(e.target.value)||0))}/></td><td><input aria-label={"重量 "+(index+1)} type="number" min="1" value={item.weight} onChange={e=>updateFilament(index,"weight",Math.max(1,Number(e.target.value)||1))}/></td><td>{Number.isFinite(calc.perGram)?money(calc.perGram):"—"}</td><td>{Number.isFinite(calc.usedCost)?money(calc.usedCost):"—"}</td><td>{filamentOptions.length>2&&<button className="remove-filament" onClick={()=>setFilamentOptions(old=>old.filter((_,i)=>i!==index))} aria-label="削除">×</button>}</td></tr>})}</tbody></table></div>
+              <div className="filament-table-wrap"><table className="filament-table"><thead><tr><th>名称</th><th>購入価格（円）</th><th>重量（g）</th><th>円/g</th><th>作品分の材料費</th><th></th></tr></thead><tbody>{filamentOptions.map((item,index)=>{const calc=compareFilament(item);return <tr key={index}><td><input aria-label={"フィラメント名 "+(index+1)} value={item.name} maxLength={40} onChange={e=>updateFilament(index,"name",e.target.value)}/></td><td><input aria-label={"購入価格 "+(index+1)} type="number" min="0" value={item.price} onChange={e=>updateFilament(index,"price",Math.max(0,Number(e.target.value)||0))}/></td><td><input aria-label={"重量 "+(index+1)} type="number" min="1" value={item.weight} onChange={e=>updateFilament(index,"weight",Math.max(1,Number(e.target.value)||1))}/></td><td>{Number.isFinite(calc.perGram)?money(calc.perGram):"—"}</td><td>{Number.isFinite(calc.usedCost)?money(calc.usedCost):"—"}</td><td><button className="remove-filament" onClick={()=>setFilamentOptions(old=>old.length>1?old.filter((_,i)=>i!==index):old.map((item,i)=>i===index?{name:"",price:0,weight:1000}:item))} aria-label="削除">×</button></td></tr>})}</tbody></table></div>
               <button className="secondary-btn" onClick={addFilament} disabled={filamentOptions.length>=10}>＋ フィラメントを追加（{filamentOptions.length}/10）</button>
               <small className="pro-privacy-note">比較条件は画面内で計算され、サーバーへ送信されません。</small>
             </article>
