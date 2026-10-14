@@ -28,6 +28,8 @@ export async function onRequestGet({ request, env }) {
 
   await env.PRO_ACCESS.put(`license:${token}`, JSON.stringify({
     status: "active",
+    customerId: session.customer || null,
+    subscriptionId: typeof subscription === "object" ? subscription.id : subscription,
     currentPeriodEnd: subscription.current_period_end || null
   }));
   return json({ licenseToken: token, status: "active" });
