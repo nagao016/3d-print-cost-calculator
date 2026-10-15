@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="材料費・電気代・機材費・失敗率・梱包費・送料・販売手数料から、3Dプリンター作品の原価と販売価格を試算できます。">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
@@ -11,69 +12,39 @@
 <link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/">
 <title>3Dプリンター原価・販売価格計算ツール</title>
 <link rel="stylesheet" href="./uiux-prototype/src/styles.css">
-<script type="importmap">{"imports":{"react":"https://esm.sh/react@18.3.1","react/jsx-runtime":"https://esm.sh/react@18.3.1/jsx-runtime","react-dom/client":"https://esm.sh/react-dom@18.3.1/client?external=react","motion/react":"https://esm.sh/motion@12.23.24/react?external=react"}}</script>
 <script src="https://unpkg.com/@babel/standalone@7.28.4/babel.min.js"></script>
+<style>
+#seo-guides{box-sizing:border-box;width:calc(100% - 48px);max-width:1180px;margin:24px auto 32px;padding:clamp(22px,3vw,36px);background:#faf9f5;color:#252722;border:1px solid #d7d7ce}
+#seo-guides h2{margin:0 0 18px;font-size:clamp(22px,2.5vw,32px);line-height:1.35;letter-spacing:-.04em}
+#seo-guides a{display:inline-flex;align-items:center;gap:8px;font-size:clamp(15px,1.5vw,19px);font-weight:600;text-underline-offset:4px}
+@media(max-width:700px){#seo-guides{width:calc(100% - 32px);margin:20px auto 24px;padding:22px 18px}#seo-guides h2{font-size:23px;margin-bottom:14px}#seo-guides a{font-size:16px;min-height:44px}}
+#app-load-error{display:none;max-width:720px;margin:24px auto;padding:20px;background:#fff4ef;border:1px solid #e8a58f;color:#572515;font:14px/1.6 system-ui,sans-serif}
+</style>
 </head>
-<body><div id="root"></div>
+<body>
+<div id="root"></div>
+<div id="app-load-error" role="alert"><h2>原価計算ツールを読み込めませんでした</h2><p>ネットワークまたはプレビューの読み込みで問題が発生しました。ページを再読み込みしてください。</p><pre id="app-load-error-detail" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre></div>
+<section id="seo-guides"><h2>3Dプリンター原価計算ガイド</h2><a href="/guide/">記事一覧を見る <span aria-hidden="true">→</span></a></section>
+<section id="auto-seo-articles" hidden></section>
 <script type="module">
 (async () => {
-  const response = await fetch("./uiux-prototype/src/main-preview.jsx");
-  if (!response.ok) throw new Error("Preview source could not be loaded: " + response.status);
+  const root = document.getElementById("root");
+  if (!window.Babel) throw new Error("Babelの読み込みに失敗しました。外部スクリプトへの接続を確認してください。");
+  const response = await fetch("./uiux-prototype/src/main-preview.jsx", { cache: "no-store" });
+  if (!response.ok) throw new Error("プレビューのソースを取得できませんでした (HTTP " + response.status + ")");
   let source = await response.text();
-  source = source.replace('import "./styles.css";', "");
-  source = source.replace("import './styles.css';", "");
-  const compiled = Babel.transform(source, { presets: ["react"], filename: "main-preview.jsx" }).code;
+  source = source.replace(/import\s+["']\.\/styles\.css["'];?/g, "");
+  source = source.replace(/from\s+["']react["']/g, 'from "https://esm.sh/react@18.3.1"');
+  source = source.replace(/from\s+["']react-dom\/client["']/g, 'from "https://esm.sh/react-dom@18.3.1/client?external=react');
+  source = source.replace(/from\s+["']motion\/react["']/g, 'from "https://esm.sh/motion@12.23.24/react?external=react');
+  const compiled = Babel.transform(source, { presets: [["react", { runtime: "classic" }]], filename: "main-preview.jsx" }).code;
   const moduleUrl = URL.createObjectURL(new Blob([compiled], { type: "text/javascript" }));
-  await import(moduleUrl);
+  try { await import(moduleUrl); } finally { URL.revokeObjectURL(moduleUrl); }
 })().catch(error => {
-  console.error(error);
-  document.getElementById("root").innerHTML = '<main style="font:16px system-ui;padding:32px;max-width:680px;margin:auto"><h1>プレビューを読み込めませんでした</h1><p>読み込みエラーが発生しました。</p><pre style="white-space:pre-wrap;color:#b33"></pre></main>';
-  document.querySelector("#root pre").textContent = String(error);
+  console.error("Calculator preview failed:", error);
+  document.getElementById("app-load-error").style.display = "block";
+  document.getElementById("app-load-error-detail").textContent = String(error && (error.stack || error.message) || error);
 });
 </script>
-<!-- AUTO-SEO-GUIDES-START -->
-<section id="seo-guides">
-  <h2>3Dプリンター原価計算ガイド</h2>
-  <a href="/guide/">記事一覧を見る <span aria-hidden="true">→</span></a>
-</section>
-<!-- AUTO-SEO-GUIDES-END -->
-<style>
-  #seo-guides{
-    box-sizing:border-box;
-    width:calc(100% - 48px);
-    max-width:1180px;
-    margin:24px auto 32px;
-    padding:clamp(22px,3vw,36px);
-    background:#faf9f5;
-    color:#252722;
-    border:1px solid #d7d7ce;
-  }
-  #seo-guides h2{
-    margin:0 0 18px;
-    font-size:clamp(22px,2.5vw,32px);
-    line-height:1.35;
-    letter-spacing:-.04em;
-  }
-  #seo-guides a{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    font-size:clamp(15px,1.5vw,19px);
-    font-weight:600;
-    text-underline-offset:4px;
-  }
-  #seo-guides a:hover{text-decoration:underline}
-  @media(max-width:700px){
-    #seo-guides{
-      width:calc(100% - 32px);
-      margin:20px auto 24px;
-      padding:22px 18px;
-    }
-    #seo-guides h2{font-size:23px;margin-bottom:14px}
-    #seo-guides a{font-size:16px;min-height:44px}
-  }
-</style>
-<!-- AUTO-SEO-AUTOPOST-START -->
-<section id="auto-seo-articles" hidden></section>
-<!-- AUTO-SEO-AUTOPOST-END -->
-</body></html>
+</body>
+</html>
