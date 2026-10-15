@@ -19,7 +19,11 @@ test.describe("Toolia / 3D print calculator preview", () => {
     await expect(usedGrams).toHaveValue("80");
     const before = await page.locator(".live-estimate, .estimate-value").first().textContent().catch(() => "");
     // Use the native input setter and bubble React's input event; this avoids flaky browser typing against the animated form.
-    await usedGrams.evaluate((input) => {
+    // Query the live DOM inside the page instead of asking Playwright to retain a locator
+    // across Motion/React renders. The assertion above confirms the field exists first.
+    await page.evaluate(() => {
+      const input = document.querySelector("#usedGrams");
+      if (!(input instanceof HTMLInputElement)) throw new Error("#usedGrams input is missing");
       const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
       setter.call(input, "100");
       input.dispatchEvent(new Event("input", { bubbles: true }));
