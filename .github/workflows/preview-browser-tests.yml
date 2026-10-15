@@ -1,0 +1,31 @@
+name: Preview Browser Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/privacy-first-subscription-foundation
+    paths:
+      - "tests/preview/**"
+      - ".github/workflows/preview-browser-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  browser-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install Playwright
+        run: npm install --no-save @playwright/test
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run preview browser tests
+        env:
+          PREVIEW_URL: https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev/
+        run: npx playwright test tests/preview --reporter=list
