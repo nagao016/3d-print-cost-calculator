@@ -17,10 +17,9 @@ test.describe("Toolia / 3D print calculator preview", () => {
     const usedGrams = page.locator("#usedGrams");
     await expect(usedGrams).toBeVisible({ timeout: 10000 });
     await expect(usedGrams).toHaveValue("80");
-    const before = await page.evaluate(() => {
-      const node = document.querySelector(".live-estimate, .estimate-value");
-      return node ? node.textContent : "";
-    });
+    const scenarioPrice = page.locator("#results .scenario-price").first();
+    await expect(scenarioPrice).toBeVisible({ timeout: 10000 });
+    const priceBefore = (await scenarioPrice.textContent())?.trim();
     // Use the native input setter and bubble React's input event; this avoids flaky browser typing against the animated form.
     // Query the live DOM inside the page instead of asking Playwright to retain a locator
     // across Motion/React renders. The assertion above confirms the field exists first.
@@ -33,8 +32,8 @@ test.describe("Toolia / 3D print calculator preview", () => {
       input.dispatchEvent(new Event("change", { bubbles: true }));
     });
     await expect(usedGrams).toHaveValue("100");
-    await expect(page.locator("#results .scenario-price").first()).toHaveText("¥1,207", { timeout: 10000 });
-    expect(before).toBeDefined();
+    await expect(scenarioPrice).not.toHaveText(priceBefore, { timeout: 10000 });
+    await expect(scenarioPrice).toHaveText("¥805", { timeout: 10000 });
   });
 
   test("navigates through material, machine and selling steps", async ({ page }) => {
