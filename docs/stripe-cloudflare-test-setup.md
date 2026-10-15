@@ -18,7 +18,7 @@
 
 ## 3. Pages Functions 環境変数（テスト）
 対象 Pages プロジェクトの Settings → Variables and Secrets で設定します。まずは **Preview / テスト環境のみ** に登録し、Productionには本番公開前まで登録しないでください。
-- `SITE_URL` = `https://3d-print-cost-calculator-7ce.pages.dev`
+- `SITE_URL` = `https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev` (Preview専用。末尾の `/` は付けない)
 - `STRIPE_SECRET_KEY` = Stripeのテスト Secret key（Secretとして登録）
 - `STRIPE_PRICE_ID` = テスト Price ID
 - `STRIPE_WEBHOOK_SECRET` = Stripe Webhookのテスト signing secret（次の手順後に登録）
@@ -27,8 +27,8 @@
 
 ## 4. Stripe Webhook
 Stripe Dashboardのサンドボックス → Developers → Webhooks → Add destination / endpoint:
-- Endpoint URL: **Cloudflare PagesのPreviewデプロイURL** に `/api/stripe-webhook` を付けたもの。Preview URLを確認してから登録してください。
-- 本番URL `https://3d-print-cost-calculator-7ce.pages.dev/api/stripe-webhook` は、テスト完了・本番用Secrets/KV設定後まで登録しないでください。
+- Endpoint URL: `https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev/api/stripe-webhook` (Preview専用。PreviewデプロイURLが変わった場合は実際のURLに更新してください)。
+- 本番URL `https://3d-print-cost-calculator-7ce.pages.dev/api/stripe-webhook` はテスト用Webhookに登録しないでください。本番公開時はLive mode専用のWebhookとSecrets/KVを別途設定してください。
 - Events:
   - `checkout.session.completed`
   - `customer.subscription.created`
