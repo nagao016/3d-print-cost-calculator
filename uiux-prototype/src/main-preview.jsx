@@ -67,6 +67,7 @@ function App() {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [orderQuantity, setOrderQuantity] = useState(10);
   const [freeQuantity, setFreeQuantity] = useState(1);
+  const [filamentStock, setFilamentStock] = useState(1000);
   const [orderSalePrice, setOrderSalePrice] = useState(0);
   const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA A", price: 2500, weight: 1000 }, { name: "PLA B", price: 3200, weight: 1000 }]);
   const [batchRows, setBatchRows] = useState([{ id: 1, name: "商品A", grams: 80, hours: 5, quantity: 1 }]);
@@ -300,6 +301,8 @@ function App() {
                       </div>}
         </section>
 
+        <section className="filament-stock-section" aria-labelledby="filament-stock-title"><div className="results-heading"><div><span className="micro-label">FREE TOOL / FILAMENT STOCK</span><h2 id="filament-stock-title">フィラメントの残量から、あと何個作れる？</h2><p>残っている材料の重量を入力すると、材料費相当額と、現在の使用量で作れる個数の目安を計算します。複数材料の登録・条件比較・保存はPro機能です。</p></div></div><div className="filament-stock-card"><label htmlFor="filament-stock">現在の残量<input id="filament-stock" type="number" min="0" step="1" value={filamentStock} onChange={e=>setFilamentStock(Math.max(0,Math.min(1000000,Number(e.target.value)||0)))}/> <span>g</span></label><div><span>作れる個数の目安</span><strong>{num(values.usedGrams)>0?Math.floor(filamentStock/num(values.usedGrams)).toLocaleString("ja-JP")+"個":"—"}</strong></div><div><span>残量の材料費相当額</span><strong>{num(values.spoolWeight)>0?money(num(values.filamentPrice)/num(values.spoolWeight)*filamentStock):"—"}</strong></div><div><span>1個あたりの材料費</span><strong>{money(result.filament)}</strong></div></div></section>
+
         <section className="free-quantity-section" aria-labelledby="free-quantity-title"><div className="results-heading"><div><span className="micro-label">FREE TOOL / ORDER QUANTITY</span><h2 id="free-quantity-title">まとめて作ると、原価と利益はいくら？</h2><p>商品1種類の数量を指定して、注文全体の原価と利益を試算できます。複数商品をまとめた詳細見積もりとCSV出力はPro機能です。</p></div></div><div className="free-quantity-card"><label htmlFor="free-quantity">作る個数<input id="free-quantity" type="number" min="1" max="100000" step="1" value={freeQuantity} onChange={e=>setFreeQuantity(Math.max(1,Math.min(100000,Number(e.target.value)||1)))}/></label><div><span>注文全体の原価</span><strong>{money(result.landed * freeQuantity)}</strong></div><div><span>販売売上（推奨価格の場合）</span><strong>{money((Number.isFinite(result.suggested)?result.suggested:0) * freeQuantity)}</strong></div><div><span>注文全体の利益</span><strong>{money((Number.isFinite(result.suggested)?result.suggested*(1-Math.min(99,num(values.feeRate))/100)-result.landed:0) * freeQuantity)}</strong></div><div><span>損益分岐の売上</span><strong>{money(result.breakEven * freeQuantity)}</strong></div></div></section>
 
         <section className="results-section" id="results">
@@ -314,7 +317,7 @@ function App() {
             </div>
             <div className="price-scenarios">
               <div className="subhead"><span>価格シナリオ</span><small>COMPARE OPTIONS</small></div>
-              {proActive ? <>{scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}<div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div></> : <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>価格シミュレーション</h3><p>販売手数料・送料・目標利益率を考慮した販売価格と利益の試算はPro専用です。</p><button className="secondary-btn" onClick={startProCheckout}>Proを利用する ↗</button></div>}
+              {proActive ? <>{scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}<div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div></> : <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>価格シミュレーション</h3><p>最低価格・目標販売価格の計算は無料で利用できます。Proでは利益率を変えた価格シナリオや複数条件の詳細比較ができます。</p><button className="secondary-btn" onClick={startProCheckout}>Proで詳細比較する ↗</button></div>}
             </div>
           </div>
         </section>
