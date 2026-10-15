@@ -112,6 +112,41 @@ test("checkout completion rejects unpaid sessions without granting access", asyn
 });
 
 
+test("checkout completion rejects a subscription with a mismatched license token", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const otherToken = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "pending" }) });
+  const env = { STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    status: "complete", payment_status: "paid", client_reference_id: token, customer: "cus_1",
+    subscription: { id: "sub_1", status: "active", customer: "cus_1", metadata: { license_token: otherToken } }
+  }), { status: 200 });
+  try {
+    const response = await completeCheckout({ request: new Request("https://example.test/api/complete-checkout?session_id=cs_test_mismatch"), env });
+    assert.equal(response.status, 403);
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "pending");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("customer portal rejects a foreign Origin before calling Stripe", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const env = {
+    STRIPE_SECRET_KEY: "sk_test", SITE_URL: "https://calquro.online",
+    PRO_ACCESS: makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_1" }) })
+  };
+  const originalFetch = globalThis.fetch;
+  let called = false;
+  globalThis.fetch = async () => { called = true; throw new Error("Stripe must not be called"); };
+  try {
+    const response = await createPortal({
+      request: req({ licenseToken: token }, { Origin: "https://attacker.example" }), env
+    });
+    assert.equal(response.status, 403);
+    assert.equal(called, false);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
 test("checkout creation fails closed when Stripe configuration is missing", async () => {
   const response = await createCheckout({ request: req({}), env: { PRO_ACCESS: makeKV() } });
   assert.equal(response.status, 503);
