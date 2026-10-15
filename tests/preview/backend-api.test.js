@@ -164,6 +164,26 @@ test("customer portal rejects malformed and unknown license tokens", async () =>
   assert.equal(unknown.status, 404);
 });
 
+
+test("customer portal creates a Stripe portal session for the stored customer", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_portal_test" }) });
+  const env = { STRIPE_SECRET_KEY: "sk_test", SITE_URL: "https://calquro.online", PRO_ACCESS: kv };
+  const originalFetch = globalThis.fetch;
+  let submitted = null;
+  globalThis.fetch = async (_url, options) => {
+    submitted = new URLSearchParams(options.body);
+    return new Response(JSON.stringify({ url: "https://billing.stripe.test/portal" }), { status: 200 });
+  };
+  try {
+    const response = await createPortal({ request: req({ licenseToken: token }, { Origin: "https://calquro.online" }), env });
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).url, "https://billing.stripe.test/portal");
+    assert.equal(submitted.get("customer"), "cus_portal_test");
+    assert.equal(submitted.get("return_url"), "https://calquro.online/");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
 test("webhook duplicate event ID is acknowledged without another Stripe lookup", async () => {
   const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
   const kv = makeKV({ "stripe-event:evt_duplicate": "1" });
