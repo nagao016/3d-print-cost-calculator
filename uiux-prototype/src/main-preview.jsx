@@ -302,6 +302,11 @@ function App() {
               <div className="pro-result-list"><div><span>目標達成に必要な販売数</span><strong>{Number.isFinite(unitsForMonthlyTarget)?unitsForMonthlyTarget.toLocaleString("ja-JP")+" 個":"計算不可"}</strong></div><div><span>必要な印刷時間</span><strong>{Number.isFinite(monthlyTargetHoursNeeded)?monthlyTargetHoursNeeded.toLocaleString("ja-JP")+" 時間":"—"}</strong></div><div><span>月間の印刷可能数（概算）</span><strong>{Number.isFinite(monthlyPrintCapacity)?monthlyPrintCapacity.toLocaleString("ja-JP")+" 個":"—"}</strong></div><div className="pro-profit-row"><span>時間内に達成できる見込み</span><strong>{!Number.isFinite(unitsForMonthlyTarget)?"利益が出る価格を設定":unitsForMonthlyTarget===0?"目標利益 ¥0":Number.isFinite(monthlyPrintCapacity)&&unitsForMonthlyTarget<=monthlyPrintCapacity?"達成可能":"時間が不足"}</strong></div></div>
               <small className="pro-privacy-note">概算です。後処理・梱包・顧客対応・機械停止時間は含みません。計算はブラウザ内で完結します。</small>
             </article>
+            <article className="pro-tool-card pro-tool-wide">
+              <span className="micro-label">06 / PROFITABILITY RANKING</span><h3>商品別・利益効率ランキング</h3><p>一括見積もりの商品を「1時間あたりの利益」で並べ替えます。限られた印刷時間で、どの商品を優先すべきか判断できます。</p>
+              <div className="pro-result-list">{[...batchResults].sort((a,b)=>{const ah=num(a.hours)>0?a.totalProfit/(a.hours*a.quantity):0;const bh=num(b.hours)>0?b.totalProfit/(b.hours*b.quantity):0;return bh-ah;}).map((row,index)=>{const perHour=num(row.hours)>0?row.totalProfit/(row.hours*row.quantity):NaN;return <div key={row.id}><span>{String(index+1).padStart(2,"0")}　{row.name||"名称未設定"}（{row.quantity}個）</span><strong>{Number.isFinite(perHour)?money(perHour)+"/時間":"時間を入力"}</strong></div>;})}</div>
+              <small className="pro-privacy-note">一括見積もりの入力内容を利用します。推奨販売価格と現在の原価・手数料条件に基づく比較で、実際の需要や作業時間を保証するものではありません。</small>
+            </article>
                       </div>}
         </section>
 
