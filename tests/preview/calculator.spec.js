@@ -33,7 +33,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
       input.dispatchEvent(new Event("change", { bubbles: true }));
     });
     await expect(usedGrams).toHaveValue("100");
-    await expect(page.getByText("¥1,207", { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("#results .scenario-price")).toHaveText("¥1,207", { timeout: 10000 });
     expect(before).toBeDefined();
   });
 
