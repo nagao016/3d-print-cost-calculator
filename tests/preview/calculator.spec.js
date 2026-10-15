@@ -62,6 +62,26 @@ test.describe("Toolia / 3D print calculator preview", () => {
     await expect(page.getByRole("heading", { name: /計算条件の保存・呼び出し/ })).toBeVisible();
   });
 
+
+  test("free users see locked Pro results and receive a clear checkout setup error", async ({ page }) => {
+    await page.route("**/api/verify-pro", route =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ active: false }) })
+    );
+    await page.route("**/api/create-checkout-session", route =>
+      route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "Pro決済の設定が完了していません。" })
+      })
+    );
+    await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText("Pro限定").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /複数商品の一括見積もり/ })).toBeVisible();
+    await page.getByRole("button", { name: /Pro 月額500円で利用する/ }).first().click();
+    await expect(page.getByRole("status")).toContainText("Pro決済の設定が完了していません。");
+  });
+
   test("mobile viewport does not create document-level horizontal overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
