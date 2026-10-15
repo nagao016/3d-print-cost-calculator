@@ -4,6 +4,8 @@ import { createHmac, randomBytes } from "node:crypto";
 import { onRequestPost as verifyPro } from "../../functions/api/verify-pro.js";
 import { onRequestPost as stripeWebhook } from "../../functions/api/stripe-webhook.js";
 import { onRequestGet as completeCheckout } from "../../functions/api/complete-checkout.js";
+import { onRequestPost as createCheckout } from "../../functions/api/create-checkout-session.js";
+import { onRequestPost as createPortal } from "../../functions/api/create-customer-portal.js";
 
 function makeKV(seed = {}) {
   const store = new Map(Object.entries(seed));
@@ -107,6 +109,36 @@ test("checkout completion rejects unpaid sessions without granting access", asyn
     assert.equal(response.status, 403);
     assert.equal((await kv.get(`license:${token}`, "json")).status, "pending");
   } finally { globalThis.fetch = originalFetch; }
+});
+
+
+test("checkout creation fails closed when Stripe configuration is missing", async () => {
+  const response = await createCheckout({ request: req({}), env: { PRO_ACCESS: makeKV() } });
+  assert.equal(response.status, 503);
+  assert.match((await response.json()).error, /設定が完了していません/);
+});
+
+test("checkout creation rejects a foreign Origin before calling Stripe", async () => {
+  const env = { STRIPE_SECRET_KEY: "sk_test", STRIPE_PRICE_ID: "price_test", SITE_URL: "https://calquro.online", PRO_ACCESS: makeKV() };
+  const originalFetch = globalThis.fetch;
+  let called = false;
+  globalThis.fetch = async () => { called = true; throw new Error("Stripe must not be called"); };
+  try {
+    const response = await createCheckout({
+      request: req({}, { Origin: "https://attacker.example" }), env
+    });
+    assert.equal(response.status, 403);
+    assert.equal(called, false);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("customer portal rejects malformed and unknown license tokens", async () => {
+  const env = { STRIPE_SECRET_KEY: "sk_test", SITE_URL: "https://calquro.online", PRO_ACCESS: makeKV() };
+  const malformed = await createPortal({ request: req({ licenseToken: "bad" }), env });
+  assert.equal(malformed.status, 400);
+  const unknownToken = randomBytes(32).toString("base64url");
+  const unknown = await createPortal({ request: req({ licenseToken: unknownToken }), env });
+  assert.equal(unknown.status, 404);
 });
 
 test("webhook duplicate event ID is acknowledged without another Stripe lookup", async () => {
