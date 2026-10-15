@@ -36,12 +36,18 @@
   source = source.replace(/from\s+["']react-dom\/client["']/g, 'from "https://esm.sh/react-dom@18.3.1/client?external=react"');
   source = source.replace(/from\s+["']motion\/react["']/g, 'from "https://esm.sh/motion@12.23.24/react?external=react"');
   let compiled = Babel.transform(source, { presets: [["react", { runtime: "classic" }]], filename: "main-preview.jsx" }).code;
-  // Ensure every import in the Blob module is an absolute URL.
-  compiled = compiled
-    .replace(/(["'])react\\/jsx-runtime\\1/g, '"https://esm.sh/react@18.3.1/jsx-runtime"')
-    .replace(/(["'])react-dom\\/client\\1/g, '"https://esm.sh/react-dom@18.3.1/client?external=react"')
-    .replace(/(["'])motion\\/react\\1/g, '"https://esm.sh/motion@12.23.24/react?external=react"')
-    .replace(/(["'])react\\1/g, '"https://esm.sh/react@18.3.1"');
+  // Rewrite any remaining bare module imports using literal replacements.
+  const replacements = [
+    ['"react/jsx-runtime"', '"https://esm.sh/react@18.3.1/jsx-runtime"'],
+    ["'react/jsx-runtime'", '"https://esm.sh/react@18.3.1/jsx-runtime"'],
+    ['"react-dom/client"', '"https://esm.sh/react-dom@18.3.1/client?external=react"'],
+    ["'react-dom/client'", '"https://esm.sh/react-dom@18.3.1/client?external=react"'],
+    ['"motion/react"', '"https://esm.sh/motion@12.23.24/react?external=react"'],
+    ["'motion/react'", '"https://esm.sh/motion@12.23.24/react?external=react"'],
+    ['"react"', '"https://esm.sh/react@18.3.1"'],
+    ["'react'", '"https://esm.sh/react@18.3.1"']
+  ];
+  for (const [from, to] of replacements) compiled = compiled.replaceAll(from, to);
   const blobUrl = URL.createObjectURL(new Blob([compiled], { type: "text/javascript" }));
   try { await import(blobUrl); } finally { URL.revokeObjectURL(blobUrl); }
 })().catch(error => {
