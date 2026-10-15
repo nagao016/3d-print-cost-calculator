@@ -253,3 +253,29 @@ test("webhook does not mark an event processed when Stripe subscription lookup f
     assert.equal((await kv.get(`license:${token}`, "json")).status, "active");
   } finally { globalThis.fetch = originalFetch; }
 });
+
+
+test("invoice.payment_failed supports the nested subscription reference used by newer Stripe API versions", async () => {
+  const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_nested", subscriptionId: "sub_nested" }) });
+  const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  const raw = JSON.stringify({
+    id: "evt_invoice_failed_nested",
+    type: "invoice.payment_failed",
+    data: { object: { id: "in_nested", parent: { subscription_details: { subscription: "sub_nested" } } } }
+  });
+  const originalFetch = globalThis.fetch;
+  let requestedUrl = "";
+  globalThis.fetch = async url => {
+    requestedUrl = String(url);
+    return new Response(JSON.stringify({
+      id: "sub_nested", status: "past_due", customer: "cus_nested", metadata: { license_token: token }
+    }), { status: 200 });
+  };
+  try {
+    const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, secret) }), env });
+    assert.equal(response.status, 200);
+    assert.equal(requestedUrl, "https://api.stripe.com/v1/subscriptions/sub_nested");
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "inactive");
+  } finally { globalThis.fetch = originalFetch; }
+});
