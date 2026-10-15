@@ -35,21 +35,17 @@
   source = source.replace(/from\s+["']react["']/g, 'from "https://esm.sh/react@18.3.1"');
   source = source.replace(/from\s+["']react-dom\/client["']/g, 'from "https://esm.sh/react-dom@18.3.1/client?external=react"');
   source = source.replace(/from\s+["']motion\/react["']/g, 'from "https://esm.sh/motion@12.23.24/react?external=react"');
-  let compiled = Babel.transform(source, { presets: [["react", { runtime: "classic" }]], filename: "main-preview.jsx" }).code;
-  // Blob modules do not reliably inherit document import-map resolution. Rewrite
-  // any bare imports left by the JSX compiler to explicit browser-resolvable URLs.
-  const moduleRewrites = [
-    ["react/jsx-runtime", "https://esm.sh/react@18.3.1/jsx-runtime"],
-    ["react-dom/client", "https://esm.sh/react-dom@18.3.1/client?external=react"],
-    ["motion/react", "https://esm.sh/motion@12.23.24/react?external=react"],
-    ["react", "https://esm.sh/react@18.3.1"]
-  ];
-  for (const [specifier, url] of moduleRewrites) {
-    compiled = compiled.replaceAll('from "' + specifier + '"', 'from "' + url + '"');
-    compiled = compiled.replaceAll("from '" + specifier + "'", 'from "' + url + '"');
-  }
-  const moduleUrl = URL.createObjectURL(new Blob([compiled], { type: "text/javascript" }));
-  try { await import(moduleUrl); } finally { URL.revokeObjectURL(moduleUrl); }
+  // Avoid Blob-module resolution and JSX runtime imports entirely. Load the
+  // pre-authored preview module through an import map and let the browser resolve
+  // its dependencies normally.
+  const rewritten = source
+    .replace(/import\\s+["']\\.\\/styles\\.css["'];?/g, "")
+    .replace(/from\\s+["']react["']/g, 'from "react"')
+    .replace(/from\\s+["']react-dom\\/client["']/g, 'from "react-dom/client"')
+    .replace(/from\\s+["']motion\\/react["']/g, 'from "motion/react"');
+  const compiled = Babel.transform(rewritten, { presets: [["react", { runtime: "classic" }]], filename: "main-preview.jsx" }).code;
+  const blobUrl = URL.createObjectURL(new Blob([compiled], { type: "text/javascript" }));
+  try { await import(blobUrl); } finally { URL.revokeObjectURL(blobUrl); }
 })().catch(error => {
   console.error("Calculator preview failed:", error);
   document.getElementById("app-load-error").style.display = "block";
