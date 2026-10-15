@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://3d-print-cost-calculator-7ce.pages.dev/sitemap.xml
+Sitemap: https://3dprint.calquro.online/sitemap.xml
