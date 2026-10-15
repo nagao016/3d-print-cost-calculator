@@ -47,6 +47,34 @@ test("webhook rejects missing and invalid signatures", async () => {
   assert.equal((await stripeWebhook({ request: req(raw, { "Stripe-Signature": "t=1,v1=bad" }), env })).status, 400);
 });
 
+test("webhook rejects signatures outside the timestamp tolerance", async () => {
+  const secret = "whsec_unit_test";
+  const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: makeKV() };
+  const raw = JSON.stringify({ id: "evt_stale_signature", type: "customer.subscription.deleted", data: { object: { id: "sub_old" } } });
+  const timestamp = Math.floor(Date.now() / 1000) - 600;
+  const digest = createHmac("sha256", secret).update(`${timestamp}.${raw}`).digest("hex");
+  const response = await stripeWebhook({
+    request: req(raw, { "Stripe-Signature": `t=${timestamp},v1=${digest}` }),
+    env
+  });
+  assert.equal(response.status, 400);
+  assert.equal(await env.PRO_ACCESS.get("stripe-event:evt_stale_signature"), null);
+});
+
+test("customer portal returns a client error for malformed JSON", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const env = {
+    STRIPE_SECRET_KEY: "sk_test", SITE_URL: "https://calquro.online",
+    PRO_ACCESS: makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_1" }) })
+  };
+  const response = await createPortal({
+    request: req("{malformed", { Origin: "https://calquro.online" }),
+    env
+  });
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: "入力を確認してください。" });
+});
+
 test("webhook revokes an issued license after Stripe confirms cancellation", async () => {
   const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
   const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_1" }) });
