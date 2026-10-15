@@ -66,15 +66,13 @@ function App() {
   const [conditionName, setConditionName] = useState("");
   const [selectedCondition, setSelectedCondition] = useState("");
   const [orderQuantity, setOrderQuantity] = useState(10);
-  const [freeQuantity, setFreeQuantity] = useState(1);
-  const [filamentStock, setFilamentStock] = useState(1000);
   const [orderSalePrice, setOrderSalePrice] = useState(0);
   const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA A", price: 2500, weight: 1000 }, { name: "PLA B", price: 3200, weight: 1000 }]);
   const [batchRows, setBatchRows] = useState([{ id: 1, name: "商品A", grams: 80, hours: 5, quantity: 1 }]);
   const reduced = useReducedMotion();
   const result = useMemo(() => calculate(values), [values]);
   const update = (id, value) => setValues(old => ({ ...old, [id]: value }));
-  const goSection = id => setActive(id);
+  const goSection = id => { if (id === "selling" && !proActive) { setProMessage("販売手数料・送料を含む価格シミュレーションはPro専用です。"); return; } setActive(id); };
   const saveCondition = () => {
     if (!proActive) return;
     const name = conditionName.trim();
@@ -101,7 +99,6 @@ function App() {
     const unitProfit = unitPrice * (1 - Math.min(99, num(values.feeRate)) / 100) - calc.landed;
     return { ...row, calc, quantity, unitPrice, totalCost: calc.landed * quantity, totalRevenue: unitPrice * quantity, totalProfit: unitProfit * quantity };
   });
-  const productProfitRanking = [...batchResults].sort((a, b) => (b.totalProfit / Math.max(1, b.quantity)) - (a.totalProfit / Math.max(1, a.quantity)));
   const exportBatchCsv = () => {
     if (!proActive || !batchResults.length) return;
     const rows = [["商品名","使用量(g)","印刷時間(h)","数量","1個あたり原価(円)","推奨販売価格(円)","注文原価合計(円)","売上合計(円)","利益合計(円)"], ...batchResults.map(r => [r.name,r.grams,r.hours,r.quantity,Math.round(r.calc.landed),r.unitPrice,Math.round(r.totalCost),Math.round(r.totalRevenue),Math.round(r.totalProfit)])];
@@ -131,18 +128,12 @@ function App() {
           body: JSON.stringify({ licenseToken: token })
         });
         const data = await response.json();
-        if (!cancelled && response.ok) {
+        if (!cancelled) {
           setLicenseToken(token);
-          setProActive(data.active === true);
-          if (data.active !== true) window.localStorage.removeItem("formcost_pro_license");
-        } else if (!cancelled) {
-          // Keep the saved token during temporary API/configuration errors.
-          // A failed verification response is not proof that the subscription ended.
-          setProMessage("会員資格を確認できませんでした。時間をおいて再読み込みしてください。");
+          setProActive(response.ok && data.active === true);
+          if (!data.active) window.localStorage.removeItem("formcost_pro_license");
         }
       } catch {
-        // Preserve the saved token on network errors so a temporary outage cannot
-        // force the customer to purchase again.
         if (!cancelled) setProMessage("会員資格を確認できません。通信環境を確認してください。");
       }
     };
@@ -240,16 +231,16 @@ function App() {
 
         <section className="live-strip" aria-live="polite">
           <div className="live-label"><span className="pulse" /> LIVE ESTIMATE <small>入力に合わせて更新</small></div>
-          <div className="live-price"><span>推奨販売価格</span><motion.strong key={String(result.suggested)} initial={reduced ? false : { opacity: .35, y: 8 }} animate={{ opacity: 1, y: 0 }}>{money(result.suggested)}</motion.strong></div>
+          <div className="live-price"><span>推奨販売価格 {!proActive && <i className="pro-inline-tag">PRO</i>}</span><motion.strong key={String(result.suggested)} initial={reduced ? false : { opacity: .35, y: 8 }} animate={{ opacity: 1, y: 0 }}>{proActive ? money(result.suggested) : "Pro限定"}</motion.strong></div>
           <div className="live-metric"><span>製造・販売原価</span><strong>{money(result.landed)}</strong></div>
-          <div className="live-metric"><span>損益分岐価格</span><strong>{money(result.breakEven)}</strong></div>
-          <div className="live-metric"><span>目標価格での利益</span><strong className="green">{money(result.profit)}</strong></div>
+          <div className="live-metric"><span>想定利益</span><strong className="green">{proActive ? money(result.profit) : "Pro限定"}</strong></div>
+          <div className="live-metric"><span>利益率</span><strong>{proActive ? pct(result.margin) : "Pro限定"}</strong></div>
         </section>
 
         <section className="studio" id="calculator">
           <aside className="rail-nav">
             <div className="rail-title">CONFIGURE <span>3 STEPS</span></div>
-            {sections.map((s, i) => <button key={s.id} className={active === s.id ? "rail-step active" : "rail-step"} onClick={() => goSection(s.id)} aria-current={active === s.id ? "step" : undefined}><span className="rail-num">{s.n}</span><span className="rail-text"><strong>{s.title}</strong><small>{s.subtitle}</small></span><span className="rail-arrow">{active === s.id ? "↳" : "↗"}</span></button>)}
+            {sections.map((s, i) => <button key={s.id} className={active === s.id ? "rail-step active" : "rail-step"} onClick={() => goSection(s.id)} aria-current={active === s.id ? "step" : undefined}><span className="rail-num">{s.n}</span><span className="rail-text"><strong>{s.title}</strong><small>{s.subtitle}</small></span><span className="rail-arrow">{s.id === "selling" && !proActive ? "🔒" : active === s.id ? "↳" : "↗"}</span></button>)}
             <div className="rail-note"><span className="note-icon">↗</span><strong>数字はいつでも変更可能</strong><p>入力値はブラウザ内で計算され、サーバーへ送信されません。</p><button onClick={() => { setValues(defaults); setCopied("初期値に戻しました"); }}>↺ 初期値に戻す</button></div>
           </aside>
           <div className="config-panel">
@@ -257,10 +248,10 @@ function App() {
             <div className="step-progress"><span className={active === "material" ? "done" : "done"} /><span className={active !== "material" ? "done" : ""} /><span className={active === "selling" ? "done" : ""} /></div>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={active} className="field-grid" initial={reduced ? false : { opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? {} : { opacity: 0, x: -8 }} transition={{ duration: .2 }}>
-                fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)
+                {active === "selling" && !proActive ? <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>販売価格シミュレーション</h3><p>販売手数料・梱包費・送料・目標利益率を考慮した価格計算はPro専用です。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)}
               </motion.div>
             </AnimatePresence>
-            <div className="panel-bottom"><span><b>●</b> AUTO-CALCULATE ENABLED</span><div>{active !== "material" && <button className="secondary-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)-1].id)}>← 戻る</button>}{active !== "selling" ? <button className="next-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)+1].id)}>次の設定へ <span>→</span></button> : <button className="next-btn" onClick={() => document.getElementById("results").scrollIntoView({ behavior: reduced ? "auto" : "smooth" })}>価格を確認 <span>↓</span></button>}</div></div>
+            <div className="panel-bottom"><span><b>●</b> AUTO-CALCULATE ENABLED</span><div>{active !== "material" && <button className="secondary-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)-1].id)}>← 戻る</button>}{active !== "selling" ? <button className="next-btn" onClick={() => goSection(sections[sections.findIndex(s => s.id === active)+1].id)}>次の設定へ <span>→</span></button> : <button className="next-btn" onClick={() => document.getElementById("results").scrollIntoView({ behavior: reduced ? "auto" : "smooth" })}>価格を確認 <span>↓</span></button>}</div></div>
           </div>
           <aside className="model-panel">
             <div className="model-top"><span className="micro-label">COST MODEL / LIVE</span><span className="model-live"><i /> RUNNING</span></div>
@@ -277,7 +268,7 @@ function App() {
               <span className="micro-label">01 / BATCH ESTIMATES</span><h3>複数商品の一括見積もり・CSV出力</h3><p>商品ごとの使用量・印刷時間・注文数を入力すると、原価・推奨販売価格・注文利益をまとめて計算します。最大20商品まで対応。</p>
               <div className="batch-estimate-table-wrap"><table className="batch-estimate-table"><thead><tr><th>商品名</th><th>使用量 (g)</th><th>印刷時間 (h)</th><th>数量</th><th>1個原価</th><th>推奨価格</th><th>注文利益</th><th></th></tr></thead><tbody>{batchResults.map(row=><tr key={row.id}><td><input aria-label="商品名" value={row.name} maxLength={60} onChange={e=>updateBatchRow(row.id,"name",e.target.value)}/></td><td><input aria-label="使用量" type="number" min="0" step="0.1" value={row.grams} onChange={e=>updateBatchRow(row.id,"grams",e.target.value)}/></td><td><input aria-label="印刷時間" type="number" min="0" step="0.1" value={row.hours} onChange={e=>updateBatchRow(row.id,"hours",e.target.value)}/></td><td><input aria-label="数量" type="number" min="1" max="100000" step="1" value={row.quantity} onChange={e=>updateBatchRow(row.id,"quantity",e.target.value)}/></td><td>{money(row.calc.landed)}</td><td>{money(row.unitPrice)}</td><td>{money(row.totalProfit)}</td><td><button className="remove-filament" onClick={()=>setBatchRows(rows=>rows.length>1?rows.filter(item=>item.id!==row.id):rows.map(item=>({...item,name:"",grams:0,hours:0,quantity:1})))} aria-label="商品行を削除">×</button></td></tr>)}</tbody></table></div>
               <div className="batch-estimate-actions"><button className="secondary-btn" onClick={addBatchRow} disabled={batchRows.length>=20}>＋ 商品を追加（{batchRows.length}/20）</button><button className="next-btn" onClick={exportBatchCsv}>CSVをダウンロード ↓</button></div>
-              <div className="batch-estimate-summary"><div><span>注文原価合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalCost,0))}</strong></div><div><span>注文売上合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalRevenue,0))}</strong></div><div><span>注文利益合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalProfit,0))}</strong></div></div><div className="product-profit-ranking"><h4>商品別の採算ランキング</h4><p>注文数量を反映した利益合計の高い順です。</p><ol>{productProfitRanking.map(row=><li key={row.id}><span>{row.name || "名称未設定"}</span><strong>{money(row.totalProfit)}</strong><small>{row.hours > 0 ? money(row.totalProfit / row.hours / row.quantity) + "/造形時間あたり" : "造形時間未入力"}</small></li>)}</ol></div>
+              <div className="batch-estimate-summary"><div><span>注文原価合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalCost,0))}</strong></div><div><span>注文売上合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalRevenue,0))}</strong></div><div><span>注文利益合計</span><strong>{money(batchResults.reduce((sum,row)=>sum+row.totalProfit,0))}</strong></div></div>
               <small className="pro-privacy-note">計算とCSV作成はブラウザ内で行います。商品名や見積もりデータをサーバーへ送信しません。</small>
             </article>
             <article className="pro-tool-card pro-tool-wide">
@@ -302,23 +293,19 @@ function App() {
                       </div>}
         </section>
 
-        <section className="filament-stock-section" aria-labelledby="filament-stock-title"><div className="results-heading"><div><span className="micro-label">FREE TOOL / FILAMENT STOCK</span><h2 id="filament-stock-title">フィラメントの残量から、あと何個作れる？</h2><p>残っている材料の重量を入力すると、材料費相当額と、現在の使用量で作れる個数の目安を計算します。複数材料の登録・条件比較・保存はPro機能です。</p></div></div><div className="filament-stock-card"><label htmlFor="filament-stock">現在の残量<input id="filament-stock" type="number" min="0" step="1" value={filamentStock} onChange={e=>setFilamentStock(Math.max(0,Math.min(1000000,Number(e.target.value)||0)))}/> <span>g</span></label><div><span>作れる個数の目安</span><strong>{num(values.usedGrams)>0?Math.floor(filamentStock/num(values.usedGrams)).toLocaleString("ja-JP")+"個":"—"}</strong></div><div><span>残量の材料費相当額</span><strong>{num(values.spoolWeight)>0?money(num(values.filamentPrice)/num(values.spoolWeight)*filamentStock):"—"}</strong></div><div><span>1個あたりの材料費</span><strong>{money(result.filament)}</strong></div></div></section>
-
-        <section className="free-quantity-section" aria-labelledby="free-quantity-title"><div className="results-heading"><div><span className="micro-label">FREE TOOL / ORDER QUANTITY</span><h2 id="free-quantity-title">まとめて作ると、原価と利益はいくら？</h2><p>商品1種類の数量を指定して、注文全体の原価と利益を試算できます。複数商品をまとめた詳細見積もりとCSV出力はPro機能です。</p></div></div><div className="free-quantity-card"><label htmlFor="free-quantity">作る個数<input id="free-quantity" type="number" min="1" max="100000" step="1" value={freeQuantity} onChange={e=>setFreeQuantity(Math.max(1,Math.min(100000,Number(e.target.value)||1)))}/></label><div><span>注文全体の原価</span><strong>{money(result.landed * freeQuantity)}</strong></div><div><span>販売売上（推奨価格の場合）</span><strong>{money((Number.isFinite(result.suggested)?result.suggested:0) * freeQuantity)}</strong></div><div><span>注文全体の利益</span><strong>{money((Number.isFinite(result.suggested)?result.suggested*(1-Math.min(99,num(values.feeRate))/100)-result.landed:0) * freeQuantity)}</strong></div><div><span>損益分岐の売上</span><strong>{money(result.breakEven * freeQuantity)}</strong></div></div></section>
-
         <section className="results-section" id="results">
-          <div className="results-heading"><div><span className="micro-label">OUTPUT / 01</span><h2>価格を、分解して考える。</h2><p>損益分岐価格と目標利益率から逆算した価格、コスト構造を確認できます。</p></div>{proActive ? <button className="copy-action" onClick={copy}>結果をコピー <span>↗</span></button> : <span className="pro-inline-tag">詳細な価格シナリオ比較はPro</span>}</div>
+          <div className="results-heading"><div><span className="micro-label">OUTPUT / 01</span><h2>価格を、分解して考える。</h2><p>目標利益率から逆算した価格と、コスト構造を確認できます。</p></div>{proActive ? <button className="copy-action" onClick={copy}>結果をコピー <span>↗</span></button> : <span className="pro-inline-tag">価格シミュレーションはPro専用</span>}</div>
           <div className="results-grid">
             <div className="cost-map">
               <div className="subhead"><span>コスト構成</span><small>PER ITEM / ESTIMATE</small></div>
               <div className="stacked-bar">{costRows.map(row => <motion.div key={row.label} className={row.color} initial={false} animate={{ width: ((Number.isFinite(row.value) ? Math.max(0,row.value) : 0) / totalForBar * 100) + "%" }} />)}</div>
               <div className="legend">{costRows.map(row => <div key={row.label}><i className={row.color} /><span>{row.label}</span><strong>{money(row.value)}</strong></div>)}</div>
-              <div className="cost-total"><span>原価合計（梱包・送料込み）</span><strong>{money(result.landed)}</strong></div><div className="cost-total"><span>損益分岐価格（手数料込み）</span><strong>{money(result.breakEven)}</strong></div>
+              <div className="cost-total"><span>原価合計（梱包・送料込み）</span><strong>{money(result.landed)}</strong></div>
               <p className="result-warning">{result.warning}</p>
             </div>
             <div className="price-scenarios">
               <div className="subhead"><span>価格シナリオ</span><small>COMPARE OPTIONS</small></div>
-              {proActive ? <>{scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}<div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div></> : <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>価格シミュレーション</h3><p>最低価格・目標販売価格の計算は無料で利用できます。Proでは利益率を変えた価格シナリオや複数条件の詳細比較ができます。</p><button className="secondary-btn" onClick={startProCheckout}>Proで詳細比較する ↗</button></div>}
+              {proActive ? <>{scenarios.map((s, i) => <motion.div key={s.label} className={"scenario " + s.style} whileHover={reduced ? {} : { x: 3 }}><div className="scenario-number">0{i+1}</div><div className="scenario-copy"><strong>{s.label}</strong><small>{s.desc}</small></div><strong className="scenario-price">{money(s.price)}</strong></motion.div>)}<div className="profit-callout"><span>目標価格での利益</span><strong>{money(result.profit)}</strong><small>販売利益率 {pct(result.margin)} · 手数料 {money(result.feeCost)}</small></div></> : <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>価格シミュレーション</h3><p>販売手数料・送料・目標利益率を考慮した販売価格と利益の試算はPro専用です。</p><button className="secondary-btn" onClick={startProCheckout}>Proを利用する ↗</button></div>}
             </div>
           </div>
         </section>
