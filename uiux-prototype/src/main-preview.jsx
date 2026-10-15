@@ -249,7 +249,7 @@ function App() {
         <section className="studio" id="calculator">
           <aside className="rail-nav">
             <div className="rail-title">CONFIGURE <span>3 STEPS</span></div>
-            {sections.map((s, i) => <button key={s.id} className={active === s.id ? "rail-step active" : "rail-step"} onClick={() => goSection(s.id)} aria-current={active === s.id ? "step" : undefined}><span className="rail-num">{s.n}</span><span className="rail-text"><strong>{s.title}</strong><small>{s.subtitle}</small></span><span className="rail-arrow">{s.id === "selling" && !proActive ? "🔒" : active === s.id ? "↳" : "↗"}</span></button>)}
+            {sections.map((s, i) => <button key={s.id} className={active === s.id ? "rail-step active" : "rail-step"} onClick={() => goSection(s.id)} aria-current={active === s.id ? "step" : undefined}><span className="rail-num">{s.n}</span><span className="rail-text"><strong>{s.title}</strong><small>{s.subtitle}</small></span><span className="rail-arrow">{active === s.id ? "↳" : "↗"}</span></button>)}
             <div className="rail-note"><span className="note-icon">↗</span><strong>数字はいつでも変更可能</strong><p>入力値はブラウザ内で計算され、サーバーへ送信されません。</p><button onClick={() => { setValues(defaults); setCopied("初期値に戻しました"); }}>↺ 初期値に戻す</button></div>
           </aside>
           <div className="config-panel">
