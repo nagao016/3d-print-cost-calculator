@@ -118,6 +118,29 @@ test("checkout creation fails closed when Stripe configuration is missing", asyn
   assert.match((await response.json()).error, /設定が完了していません/);
 });
 
+
+test("checkout creation stores a pending token and attaches it to the subscription", async () => {
+  const kv = makeKV();
+  const env = { STRIPE_SECRET_KEY: "sk_test", STRIPE_PRICE_ID: "price_test", SITE_URL: "https://calquro.online", PRO_ACCESS: kv };
+  const originalFetch = globalThis.fetch;
+  let submitted = null;
+  globalThis.fetch = async (_url, options) => {
+    submitted = new URLSearchParams(options.body);
+    return new Response(JSON.stringify({ url: "https://checkout.stripe.test/session" }), { status: 200 });
+  };
+  try {
+    const response = await createCheckout({
+      request: req({}, { Origin: "https://calquro.online" }), env
+    });
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).url, "https://checkout.stripe.test/session");
+    const token = submitted.get("client_reference_id");
+    assert.match(token, /^[A-Za-z0-9_-]{40,50}$/);
+    assert.equal(submitted.get("subscription_data[metadata][license_token]"), token);
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "pending");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
 test("checkout creation rejects a foreign Origin before calling Stripe", async () => {
   const env = { STRIPE_SECRET_KEY: "sk_test", STRIPE_PRICE_ID: "price_test", SITE_URL: "https://calquro.online", PRO_ACCESS: makeKV() };
   const originalFetch = globalThis.fetch;
