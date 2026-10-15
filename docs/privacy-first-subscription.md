@@ -29,7 +29,7 @@
 Preview URLや設定値は、Cloudflareの現在のPreview deployment画面で実際の値を確認してから使用する。ブランチ名が同じでも、デプロイURLが変わる可能性がある。
 
 ## テスト状況
-- GitHub Actions Run #22: API回帰テスト19件成功、ブラウザテスト5件成功。
+- GitHub Actions Run #23（commit `c4d817106ffcf2280290aa89f95da09479daef56`）: API回帰テスト21件成功、ブラウザテスト5件成功（2026-10-15）。
 - 自動テストはモックしたStripe APIやテスト用ブラウザ状態を使用するため、実際のStripe Test modeでの購入・Webhook配信・Billing Portal・解約・支払い失敗が成功したことを意味しない。
 - 未確認: Cloudflare PreviewのKV bindingと環境変数、Stripe Test modeの実購入から権限有効化まで、Billing Portal、解約、支払い失敗のエンドツーエンド動作。
 - 公開前にはPC・スマートフォン、購入完了後の復帰、解約、支払い失敗、Webhook署名不正・重複・順不同、資格失効、Stripe/ネットワーク障害、トークン紛失・端末変更を検証する。
