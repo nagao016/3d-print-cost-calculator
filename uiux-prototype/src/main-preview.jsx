@@ -67,6 +67,8 @@ function App() {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [orderQuantity, setOrderQuantity] = useState(10);
   const [orderSalePrice, setOrderSalePrice] = useState(0);
+  const [monthlyProfitTarget, setMonthlyProfitTarget] = useState(50000);
+  const [monthlyPrintHours, setMonthlyPrintHours] = useState(80);
   const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA A", price: 2500, weight: 1000 }, { name: "PLA B", price: 3200, weight: 1000 }]);
   const [batchRows, setBatchRows] = useState([{ id: 1, name: "商品A", grams: 80, hours: 5, quantity: 1 }]);
   const reduced = useReducedMotion();
@@ -89,6 +91,10 @@ function App() {
   const orderRevenue = orderUnitPrice * Math.max(0, Number(orderQuantity) || 0);
   const orderFee = orderRevenue * Math.min(99, num(values.feeRate)) / 100;
   const orderProfit = orderRevenue - orderCost - orderFee;
+  const unitProfitAtSuggested = Number.isFinite(result.suggested) ? result.suggested * (1 - Math.min(99, num(values.feeRate)) / 100) - result.landed : NaN;
+  const unitsForMonthlyTarget = unitProfitAtSuggested > 0 ? Math.ceil(Math.max(0, Number(monthlyProfitTarget) || 0) / unitProfitAtSuggested) : NaN;
+  const monthlyPrintCapacity = num(values.printHours) > 0 ? Math.floor(Math.max(0, Number(monthlyPrintHours) || 0) / num(values.printHours)) : NaN;
+  const monthlyTargetHoursNeeded = Number.isFinite(unitsForMonthlyTarget) ? unitsForMonthlyTarget * num(values.printHours) : NaN;
   const compareFilament = item => { const weight = Math.max(0, Number(item.weight) || 0); const price = Math.max(0, Number(item.price) || 0); return { perGram: weight > 0 ? price / weight : NaN, usedCost: weight > 0 ? price / weight * num(values.usedGrams) : NaN }; };
   const updateBatchRow = (id, key, value) => setBatchRows(rows => rows.map(row => row.id === id ? { ...row, [key]: value } : row));
   const addBatchRow = () => setBatchRows(rows => rows.length < 20 ? [...rows, { id: Date.now(), name: "商品" + String.fromCharCode(65 + rows.length), grams: num(values.usedGrams), hours: num(values.printHours), quantity: 1 }] : rows);
@@ -289,6 +295,12 @@ function App() {
               <label>販売単価（円・任意）<input type="number" min="0" step="1" value={orderSalePrice} onChange={e=>setOrderSalePrice(Math.max(0,Number(e.target.value)||0))}/></label>
               <div className="pro-result-list"><div><span>注文全体の売上</span><strong>{money(orderRevenue)}</strong></div><div><span>注文全体の原価</span><strong>{money(orderCost)}</strong></div><div><span>販売手数料</span><strong>{money(orderFee)}</strong></div><div className="pro-profit-row"><span>注文全体の利益</span><strong>{money(orderProfit)}</strong></div></div>
               <small className="pro-privacy-note">販売単価が0円の場合は目標販売価格を使用します。</small>
+            </article>
+            <article className="pro-tool-card pro-tool-wide">
+              <span className="micro-label">05 / MONTHLY PROFIT PLAN</span><h3>月間利益目標・生産能力シミュレーター</h3><p>目標利益から必要販売数を逆算し、月の印刷可能時間で達成できるか確認します。現在の推奨販売価格・手数料・原価条件を使って試算します。</p>
+              <div className="pro-form-row"><label>月間利益目標（円）<input aria-label="月間利益目標" type="number" min="0" step="1000" value={monthlyProfitTarget} onChange={e=>setMonthlyProfitTarget(Math.max(0,Number(e.target.value)||0))}/></label><label>月間の印刷可能時間（時間）<input aria-label="月間の印刷可能時間" type="number" min="0" step="1" value={monthlyPrintHours} onChange={e=>setMonthlyPrintHours(Math.max(0,Number(e.target.value)||0))}/></label></div>
+              <div className="pro-result-list"><div><span>目標達成に必要な販売数</span><strong>{Number.isFinite(unitsForMonthlyTarget)?unitsForMonthlyTarget.toLocaleString("ja-JP")+" 個":"計算不可"}</strong></div><div><span>必要な印刷時間</span><strong>{Number.isFinite(monthlyTargetHoursNeeded)?monthlyTargetHoursNeeded.toLocaleString("ja-JP")+" 時間":"—"}</strong></div><div><span>月間の印刷可能数（概算）</span><strong>{Number.isFinite(monthlyPrintCapacity)?monthlyPrintCapacity.toLocaleString("ja-JP")+" 個":"—"}</strong></div><div className="pro-profit-row"><span>時間内に達成できる見込み</span><strong>{!Number.isFinite(unitsForMonthlyTarget)?"利益が出る価格を設定":unitsForMonthlyTarget===0?"目標利益 ¥0":Number.isFinite(monthlyPrintCapacity)&&unitsForMonthlyTarget<=monthlyPrintCapacity?"達成可能":"時間が不足"}</strong></div></div>
+              <small className="pro-privacy-note">概算です。後処理・梱包・顧客対応・機械停止時間は含みません。計算はブラウザ内で完結します。</small>
             </article>
                       </div>}
         </section>
