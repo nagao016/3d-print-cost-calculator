@@ -58,6 +58,22 @@ test("webhook revokes an issued license after Stripe confirms cancellation", asy
   } finally { globalThis.fetch = originalFetch; }
 });
 
+
+test("out-of-order subscription event uses Stripe's current state, not the stale event snapshot", async () => {
+  const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "active" }) });
+  const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  // This older event says active, but Stripe's current subscription state is canceled.
+  const raw = JSON.stringify({ id: "evt_stale_update", type: "customer.subscription.updated", data: { object: { id: "sub_1", status: "active", metadata: { license_token: token } } } });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ id: "sub_1", status: "canceled", metadata: { license_token: token } }), { status: 200 });
+  try {
+    const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, secret) }), env });
+    assert.equal(response.status, 200);
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "inactive");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
 test("webhook duplicate event ID is acknowledged without another Stripe lookup", async () => {
   const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
   const kv = makeKV({ "stripe-event:evt_duplicate": "1" });
