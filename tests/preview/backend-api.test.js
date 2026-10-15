@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createHmac, randomBytes } from "node:crypto";
 import { onRequestPost as verifyPro } from "../../functions/api/verify-pro.js";
 import { onRequestPost as stripeWebhook } from "../../functions/api/stripe-webhook.js";
+import { onRequestGet as completeCheckout } from "../../functions/api/complete-checkout.js";
 
 function makeKV(seed = {}) {
   const store = new Map(Object.entries(seed));
@@ -71,6 +72,40 @@ test("out-of-order subscription event uses Stripe's current state, not the stale
     const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, secret) }), env });
     assert.equal(response.status, 200);
     assert.equal((await kv.get(`license:${token}`, "json")).status, "inactive");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+
+test("checkout completion activates only a paid session with matching issued token", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "pending" }) });
+  const env = { STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    status: "complete", payment_status: "paid", client_reference_id: token, customer: "cus_1",
+    subscription: { id: "sub_1", status: "active", customer: "cus_1", metadata: { license_token: token }, current_period_end: 1790000000 }
+  }), { status: 200, headers: { "content-type": "application/json" } });
+  try {
+    const response = await completeCheckout({ request: new Request(`https://example.test/api/complete-checkout?session_id=cs_test_abc123`), env });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { licenseToken: token, status: "active" });
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "active");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("checkout completion rejects unpaid sessions without granting access", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "pending" }) });
+  const env = { STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    status: "complete", payment_status: "unpaid", client_reference_id: token,
+    subscription: { id: "sub_1", status: "active", metadata: { license_token: token } }
+  }), { status: 200 });
+  try {
+    const response = await completeCheckout({ request: new Request("https://example.test/api/complete-checkout?session_id=cs_test_abc123"), env });
+    assert.equal(response.status, 403);
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "pending");
   } finally { globalThis.fetch = originalFetch; }
 });
 
