@@ -193,3 +193,63 @@ test("webhook duplicate event ID is acknowledged without another Stripe lookup",
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { received: true, duplicate: true });
 });
+
+
+test("invoice.payment_failed revokes Pro access when Stripe confirms the subscription is past_due", async () => {
+  const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_failed", subscriptionId: "sub_failed" }) });
+  const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  const raw = JSON.stringify({
+    id: "evt_invoice_failed_past_due",
+    type: "invoice.payment_failed",
+    data: { object: { id: "in_failed", subscription: "sub_failed" } }
+  });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    id: "sub_failed", status: "past_due", customer: "cus_failed", metadata: { license_token: token }
+  }), { status: 200 });
+  try {
+    const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, secret) }), env });
+    assert.equal(response.status, 200);
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "inactive");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("invoice.payment_failed keeps Pro access when Stripe confirms the subscription is still active", async () => {
+  const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_retry", subscriptionId: "sub_retry" }) });
+  const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  const raw = JSON.stringify({
+    id: "evt_invoice_failed_active",
+    type: "invoice.payment_failed",
+    data: { object: { id: "in_retry", subscription: "sub_retry" } }
+  });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    id: "sub_retry", status: "active", customer: "cus_retry", metadata: { license_token: token }
+  }), { status: 200 });
+  try {
+    const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, secret) }), env });
+    assert.equal(response.status, 200);
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "active");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("webhook does not mark an event processed when Stripe subscription lookup fails", async () => {
+  const secret = "whsec_unit_test", token = randomBytes(32).toString("base64url");
+  const kv = makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", subscriptionId: "sub_unavailable" }) });
+  const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: kv };
+  const raw = JSON.stringify({
+    id: "evt_lookup_failure",
+    type: "customer.subscription.updated",
+    data: { object: { id: "sub_unavailable", metadata: { license_token: token } } }
+  });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: { message: "temporary outage" } }), { status: 503 });
+  try {
+    const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, secret) }), env });
+    assert.equal(response.status, 502);
+    assert.equal(await kv.get("stripe-event:evt_lookup_failure"), null);
+    assert.equal((await kv.get(`license:${token}`, "json")).status, "active");
+  } finally { globalThis.fetch = originalFetch; }
+});
