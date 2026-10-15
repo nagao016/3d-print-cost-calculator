@@ -66,13 +66,14 @@ function App() {
   const [conditionName, setConditionName] = useState("");
   const [selectedCondition, setSelectedCondition] = useState("");
   const [orderQuantity, setOrderQuantity] = useState(10);
+  const [freeQuantity, setFreeQuantity] = useState(1);
   const [orderSalePrice, setOrderSalePrice] = useState(0);
   const [filamentOptions, setFilamentOptions] = useState([{ name: "PLA A", price: 2500, weight: 1000 }, { name: "PLA B", price: 3200, weight: 1000 }]);
   const [batchRows, setBatchRows] = useState([{ id: 1, name: "商品A", grams: 80, hours: 5, quantity: 1 }]);
   const reduced = useReducedMotion();
   const result = useMemo(() => calculate(values), [values]);
   const update = (id, value) => setValues(old => ({ ...old, [id]: value }));
-  const goSection = id => { if (id === "selling" && !proActive) { setProMessage("販売手数料・送料を含む価格シミュレーションはPro専用です。"); return; } setActive(id); };
+  const goSection = id => setActive(id);
   const saveCondition = () => {
     if (!proActive) return;
     const name = conditionName.trim();
@@ -237,10 +238,10 @@ function App() {
 
         <section className="live-strip" aria-live="polite">
           <div className="live-label"><span className="pulse" /> LIVE ESTIMATE <small>入力に合わせて更新</small></div>
-          <div className="live-price"><span>推奨販売価格 {!proActive && <i className="pro-inline-tag">PRO</i>}</span><motion.strong key={String(result.suggested)} initial={reduced ? false : { opacity: .35, y: 8 }} animate={{ opacity: 1, y: 0 }}>{proActive ? money(result.suggested) : "Pro限定"}</motion.strong></div>
+          <div className="live-price"><span>推奨販売価格</span><motion.strong key={String(result.suggested)} initial={reduced ? false : { opacity: .35, y: 8 }} animate={{ opacity: 1, y: 0 }}>{money(result.suggested)}</motion.strong></div>
           <div className="live-metric"><span>製造・販売原価</span><strong>{money(result.landed)}</strong></div>
-          <div className="live-metric"><span>想定利益</span><strong className="green">{proActive ? money(result.profit) : "Pro限定"}</strong></div>
-          <div className="live-metric"><span>利益率</span><strong>{proActive ? pct(result.margin) : "Pro限定"}</strong></div>
+          <div className="live-metric"><span>損益分岐価格</span><strong>{money(result.breakEven)}</strong></div>
+          <div className="live-metric"><span>目標価格での利益</span><strong className="green">{money(result.profit)}</strong></div>
         </section>
 
         <section className="studio" id="calculator">
@@ -254,7 +255,7 @@ function App() {
             <div className="step-progress"><span className={active === "material" ? "done" : "done"} /><span className={active !== "material" ? "done" : ""} /><span className={active === "selling" ? "done" : ""} /></div>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={active} className="field-grid" initial={reduced ? false : { opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? {} : { opacity: 0, x: -8 }} transition={{ duration: .2 }}>
-                {active === "selling" && !proActive ? <div className="pro-lock-panel"><span className="micro-label">PRO FEATURE</span><h3>販売価格シミュレーション</h3><p>販売手数料・梱包費・送料・目標利益率を考慮した価格計算はPro専用です。</p><button className="next-btn" onClick={startProCheckout} disabled={proBusy}>Pro 月額500円で利用する <span>→</span></button></div> : fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)}
+                fields.filter(f => f.group === active).map(f => <Field key={f.id} field={f} value={values[f.id]} onChange={update} />)
               </motion.div>
             </AnimatePresence>
             <div className="panel-bottom"><span><b>●</b> AUTO-CALCULATE ENABLED</span><div>{active !== "material" && <button className="secondary-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)-1].id)}>← 戻る</button>}{active !== "selling" ? <button className="next-btn" onClick={() => setActive(sections[sections.findIndex(s => s.id === active)+1].id)}>次の設定へ <span>→</span></button> : <button className="next-btn" onClick={() => document.getElementById("results").scrollIntoView({ behavior: reduced ? "auto" : "smooth" })}>価格を確認 <span>↓</span></button>}</div></div>
@@ -299,14 +300,16 @@ function App() {
                       </div>}
         </section>
 
+        <section className="free-quantity-section" aria-labelledby="free-quantity-title"><div className="results-heading"><div><span className="micro-label">FREE TOOL / ORDER QUANTITY</span><h2 id="free-quantity-title">まとめて作ると、原価と利益はいくら？</h2><p>商品1種類の数量を指定して、注文全体の原価と利益を試算できます。複数商品をまとめた詳細見積もりとCSV出力はPro機能です。</p></div></div><div className="free-quantity-card"><label htmlFor="free-quantity">作る個数<input id="free-quantity" type="number" min="1" max="100000" step="1" value={freeQuantity} onChange={e=>setFreeQuantity(Math.max(1,Math.min(100000,Number(e.target.value)||1)))}/></label><div><span>注文全体の原価</span><strong>{money(result.landed * freeQuantity)}</strong></div><div><span>販売売上（推奨価格の場合）</span><strong>{money((Number.isFinite(result.suggested)?result.suggested:0) * freeQuantity)}</strong></div><div><span>注文全体の利益</span><strong>{money((Number.isFinite(result.suggested)?result.suggested*(1-Math.min(99,num(values.feeRate))/100)-result.landed:0) * freeQuantity)}</strong></div><div><span>損益分岐の売上</span><strong>{money(result.breakEven * freeQuantity)}</strong></div></div></section>
+
         <section className="results-section" id="results">
-          <div className="results-heading"><div><span className="micro-label">OUTPUT / 01</span><h2>価格を、分解して考える。</h2><p>目標利益率から逆算した価格と、コスト構造を確認できます。</p></div>{proActive ? <button className="copy-action" onClick={copy}>結果をコピー <span>↗</span></button> : <span className="pro-inline-tag">価格シミュレーションはPro専用</span>}</div>
+          <div className="results-heading"><div><span className="micro-label">OUTPUT / 01</span><h2>価格を、分解して考える。</h2><p>損益分岐価格と目標利益率から逆算した価格、コスト構造を確認できます。</p></div>{proActive ? <button className="copy-action" onClick={copy}>結果をコピー <span>↗</span></button> : <span className="pro-inline-tag">詳細な価格シナリオ比較はPro</span>}</div>
           <div className="results-grid">
             <div className="cost-map">
               <div className="subhead"><span>コスト構成</span><small>PER ITEM / ESTIMATE</small></div>
               <div className="stacked-bar">{costRows.map(row => <motion.div key={row.label} className={row.color} initial={false} animate={{ width: ((Number.isFinite(row.value) ? Math.max(0,row.value) : 0) / totalForBar * 100) + "%" }} />)}</div>
               <div className="legend">{costRows.map(row => <div key={row.label}><i className={row.color} /><span>{row.label}</span><strong>{money(row.value)}</strong></div>)}</div>
-              <div className="cost-total"><span>原価合計（梱包・送料込み）</span><strong>{money(result.landed)}</strong></div>
+              <div className="cost-total"><span>原価合計（梱包・送料込み）</span><strong>{money(result.landed)}</strong></div><div className="cost-total"><span>損益分岐価格（手数料込み）</span><strong>{money(result.breakEven)}</strong></div>
               <p className="result-warning">{result.warning}</p>
             </div>
             <div className="price-scenarios">
