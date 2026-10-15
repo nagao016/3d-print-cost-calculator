@@ -6,6 +6,11 @@ const previewUrl =
 
 test.describe("Toolia / 3D print calculator preview", () => {
   test("loads the calculator and recalculates when material usage changes", async ({ page }) => {
+    // The expected suggested selling price is a Pro-only display, so enable Pro only in this test context.
+    await page.addInitScript(() => localStorage.setItem("formcost_pro_license", "playwright-test-token"));
+    await page.route("**/api/verify-pro", route =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ active: true }) })
+    );
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
 
