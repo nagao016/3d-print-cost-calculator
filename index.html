@@ -1,12 +1,10 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="材料費・電気代・機材費・失敗率・梱包費・送料・販売手数料から、3Dプリンター作品の原価と販売価格を試算できます。">
 <meta name="robots" content="index,follow">
-<meta property="og:type" content="website">
-<meta property="og:title" content="3Dプリンター原価・販売価格計算ツール">
+<meta property="og:type" content="website"><meta property="og:title" content="3Dプリンター原価・販売価格計算ツール">
 <meta property="og:description" content="材料・機材・販売条件から、原価と目標利益率に応じた販売価格を計算。">
 <meta property="og:url" content="https://3d-print-cost-calculator-7ce.pages.dev/">
 <link rel="canonical" href="https://3d-print-cost-calculator-7ce.pages.dev/">
@@ -28,15 +26,14 @@
 <section id="auto-seo-articles" hidden></section>
 <script type="module">
 (async () => {
-  const root = document.getElementById("root");
   if (!window.Babel) throw new Error("Babelの読み込みに失敗しました。外部スクリプトへの接続を確認してください。");
   const response = await fetch("./uiux-prototype/src/main-preview.jsx", { cache: "no-store" });
   if (!response.ok) throw new Error("プレビューのソースを取得できませんでした (HTTP " + response.status + ")");
   let source = await response.text();
   source = source.replace(/import\s+["']\.\/styles\.css["'];?/g, "");
   source = source.replace(/from\s+["']react["']/g, 'from "https://esm.sh/react@18.3.1"');
-  source = source.replace(/from\s+["']react-dom\/client["']/g, 'from "https://esm.sh/react-dom@18.3.1/client?external=react');
-  source = source.replace(/from\s+["']motion\/react["']/g, 'from "https://esm.sh/motion@12.23.24/react?external=react');
+  source = source.replace(/from\s+["']react-dom\/client["']/g, 'from "https://esm.sh/react-dom@18.3.1/client?external=react"');
+  source = source.replace(/from\s+["']motion\/react["']/g, 'from "https://esm.sh/motion@12.23.24/react?external=react"');
   const compiled = Babel.transform(source, { presets: [["react", { runtime: "classic" }]], filename: "main-preview.jsx" }).code;
   const moduleUrl = URL.createObjectURL(new Blob([compiled], { type: "text/javascript" }));
   try { await import(moduleUrl); } finally { URL.revokeObjectURL(moduleUrl); }
@@ -46,5 +43,4 @@
   document.getElementById("app-load-error-detail").textContent = String(error && (error.stack || error.message) || error);
 });
 </script>
-</body>
-</html>
+</body></html>
