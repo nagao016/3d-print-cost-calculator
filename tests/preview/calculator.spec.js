@@ -18,8 +18,13 @@ test.describe("Toolia / 3D print calculator preview", () => {
     await expect(usedGrams).toBeVisible({ timeout: 10000 });
     await expect(usedGrams).toHaveValue("80");
     const before = await page.locator(".live-estimate, .estimate-value").first().textContent().catch(() => "");
-    // Force the controlled numeric input directly; the page's animated layout can interfere with scrolling.
-    await usedGrams.fill("100", { timeout: 10000, force: true });
+    // Use the native input setter and bubble React's input event; this avoids flaky browser typing against the animated form.
+    await usedGrams.evaluate((input) => {
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+      setter.call(input, "100");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
     await expect(usedGrams).toHaveValue("100");
     await expect(page.getByText("¥1,207", { exact: true })).toBeVisible({ timeout: 10000 });
     expect(before).toBeDefined();
