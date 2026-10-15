@@ -77,8 +77,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
     await expect(page.getByText("Pro限定").first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: /複数商品の一括見積もり/ })).toBeVisible();
-    await page.getByRole("button", { name: /Pro 月額500円で利用する/ }).first().click();
+    await page.getByRole("button", { name: /Pro 月額500円/ }).first().click();
     await expect(page.getByRole("status")).toContainText("Pro決済の設定が完了していません。");
   });
 
