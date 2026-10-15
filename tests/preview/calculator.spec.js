@@ -10,9 +10,12 @@ test.describe("Toolia / 3D print calculator preview", () => {
     await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
 
     const usedGrams = page.locator("#usedGrams");
+    await expect(usedGrams).toBeVisible({ timeout: 10000 });
     await expect(usedGrams).toHaveValue("80");
     const before = await page.locator(".live-estimate, .estimate-value").first().textContent().catch(() => "");
-    await usedGrams.fill("100");
+    // The page uses animated step transitions; scroll the actual field into view before editing.
+    await usedGrams.scrollIntoViewIfNeeded();
+    await usedGrams.fill("100", { timeout: 10000, force: true });
     await expect(usedGrams).toHaveValue("100");
     await expect(page.getByText("¥1,207", { exact: true })).toBeVisible({ timeout: 10000 });
     expect(before).toBeDefined();
