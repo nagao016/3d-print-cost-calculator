@@ -156,8 +156,14 @@ function App() {
         const data = await response.json();
         if (!cancelled) {
           setLicenseToken(token);
-          setProActive(response.ok && data.active === true);
-          if (!data.active) window.localStorage.removeItem("formcost_pro_license");
+          if (!response.ok) {
+            // A server-side verification failure is not proof that the subscription is inactive.
+            // Keep the token so the user does not lose access credentials during an outage.
+            setProMessage("会員資格を確認できません。通信環境を確認してください。");
+            return;
+          }
+          setProActive(data.active === true);
+          if (data.active !== true) window.localStorage.removeItem("formcost_pro_license");
         }
       } catch {
         if (!cancelled) setProMessage("会員資格を確認できません。通信環境を確認してください。");
