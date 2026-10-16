@@ -10,7 +10,11 @@ export async function onRequestPost({ request, env }) {
     return json({ error: "Pro決済の設定が完了していません。" }, 503);
   }
   const origin = request.headers.get("Origin");
-  const site = new URL(env.SITE_URL).origin;
+  const requestUrl = new URL(request.url);
+  const configuredSite = new URL(env.SITE_URL).origin;
+  // Allow same-origin Cloudflare Pages preview testing without weakening production origin checks.
+  const isPagesDevHost = requestUrl.hostname.endsWith(".pages.dev");
+  const site = isPagesDevHost ? requestUrl.origin : configuredSite;
   if (origin && origin !== site) return json({ error: "許可されていないアクセスです。" }, 403);
 
   let body;

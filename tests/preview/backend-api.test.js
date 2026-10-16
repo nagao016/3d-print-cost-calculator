@@ -47,6 +47,15 @@ test("webhook rejects missing and invalid signatures", async () => {
   assert.equal((await stripeWebhook({ request: req(raw, { "Stripe-Signature": "t=1,v1=bad" }), env })).status, 400);
 });
 
+test("webhook accepts the additional preview signing secret without replacing the existing secret", async () => {
+  const legacySecret = "whsec_legacy_preview", additionalSecret = "whsec_fix_preview";
+  const env = { STRIPE_WEBHOOK_SECRET: legacySecret, STRIPE_WEBHOOK_SECRET_PREVIEW_FIX: additionalSecret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: makeKV() };
+  const raw = JSON.stringify({ id: "evt_additional_secret", type: "checkout.session.completed", data: { object: {} } });
+  const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, additionalSecret) }), env });
+  assert.equal(response.status, 200);
+  assert.equal(await env.PRO_ACCESS.get("stripe-event:evt_additional_secret"), "1");
+});
+
 test("webhook rejects signatures outside the timestamp tolerance", async () => {
   const secret = "whsec_unit_test";
   const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: makeKV() };
@@ -197,10 +206,39 @@ test("checkout creation stores a pending token and attaches it to the subscripti
     });
     assert.equal(response.status, 200);
     assert.equal((await response.json()).url, "https://checkout.stripe.test/session");
+    assert.equal(submitted.has("payment_method_types[0]"), false, "Checkout must rely on Stripe Dashboard payment-method settings");
     const token = submitted.get("client_reference_id");
     assert.match(token, /^[A-Za-z0-9_-]{40,50}$/);
     assert.equal(submitted.get("subscription_data[metadata][license_token]"), token);
     assert.equal((await kv.get(`license:${token}`, "json")).status, "pending");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("customer portal accepts same-origin Pages preview and returns to that preview", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const preview = "https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev";
+  const env = {
+    STRIPE_SECRET_KEY: "sk_test", SITE_URL: "https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev",
+    PRO_ACCESS: makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_1" }) })
+  };
+  const originalFetch = globalThis.fetch;
+  let submitted = null;
+  globalThis.fetch = async (_url, options) => {
+    submitted = new URLSearchParams(options.body);
+    return new Response(JSON.stringify({ url: "https://billing.stripe.test/session" }), { status: 200 });
+  };
+  try {
+    const response = await createPortal({
+      request: new Request(`${preview}/api/create-customer-portal`, {
+        method: "POST",
+        headers: { "content-type": "application/json", Origin: preview },
+        body: JSON.stringify({ licenseToken: token })
+      }),
+      env
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { url: "https://billing.stripe.test/session" });
+    assert.equal(submitted.get("return_url"), preview + "/");
   } finally { globalThis.fetch = originalFetch; }
 });
 

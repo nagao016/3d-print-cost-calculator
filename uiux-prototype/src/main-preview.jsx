@@ -135,6 +135,15 @@ function App() {
   useEffect(() => { try { const stored = JSON.parse(window.localStorage.getItem("formcost_saved_conditions") || "[]"); if (Array.isArray(stored)) setSavedConditions(stored.filter(x => x && typeof x.id === "string" && typeof x.name === "string" && x.values).slice(-20)); } catch { setSavedConditions([]); } }, []);
   useEffect(() => { try { const a=JSON.parse(window.localStorage.getItem("formcost_inventory")||"[]"); const b=JSON.parse(window.localStorage.getItem("formcost_orders")||"[]"); if(Array.isArray(a))setInventory(a);if(Array.isArray(b))setOrders(b); } catch { setInventory([]);setOrders([]); } }, []);
 
+  // When the browser restores this page from the back-forward cache after the
+  // Stripe Billing Portal, clear the navigation spinner so the user can manage
+  // their subscription again without needing a manual reload.
+  useEffect(() => {
+    const handlePageShow = event => { if (event.persisted) setProBusy(false); };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     const params = new URLSearchParams(window.location.search);

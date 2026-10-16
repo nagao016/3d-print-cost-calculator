@@ -47,11 +47,20 @@ async function retrieveSubscription(subscriptionId, secret) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.STRIPE_WEBHOOK_SECRET || !env.STRIPE_SECRET_KEY || !env.PRO_ACCESS) {
+  const webhookSecrets = [env.STRIPE_WEBHOOK_SECRET, env.STRIPE_WEBHOOK_SECRET_PREVIEW_FIX]
+    .filter(secret => typeof secret === "string" && secret.length > 0);
+  if (webhookSecrets.length === 0 || !env.STRIPE_SECRET_KEY || !env.PRO_ACCESS) {
     return json({ error: "設定未完了です。" }, 503);
   }
   const rawBody = await request.text();
-  const valid = await verifySignature(rawBody, request.headers.get("Stripe-Signature"), env.STRIPE_WEBHOOK_SECRET);
+  const signatureHeader = request.headers.get("Stripe-Signature");
+  let valid = false;
+  for (const secret of webhookSecrets) {
+    if (await verifySignature(rawBody, signatureHeader, secret)) {
+      valid = true;
+      break;
+    }
+  }
   if (!valid) return json({ error: "署名が無効です。" }, 400);
 
   let event;

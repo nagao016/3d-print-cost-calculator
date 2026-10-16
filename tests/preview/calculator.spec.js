@@ -12,7 +12,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
       route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ active: true }) })
     );
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: /その造形に.*値段の根拠/ })).toBeVisible({ timeout: 30000 });
 
     const usedGrams = page.locator("#usedGrams");
     await expect(usedGrams).toBeVisible({ timeout: 10000 });
@@ -75,7 +75,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
       })
     );
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: /その造形に.*値段の根拠/ })).toBeVisible({ timeout: 30000 });
     await expect(page.getByText("Pro限定").first()).toBeVisible();
     await page.getByRole("button", { name: /Pro 月額500円/ }).first().click();
     await expect(page.getByRole("status")).toContainText("Pro決済の設定が完了していません。");
@@ -84,7 +84,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
   test("mobile viewport does not create document-level horizontal overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: /その造形に.*値段の根拠/ })).toBeVisible({ timeout: 30000 });
     const widths = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,
       document: document.documentElement.scrollWidth
@@ -138,7 +138,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
     for (const width of [320, 375, 390, 768]) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
-      await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+      await expect(page.getByRole("heading", { name: /その造形に.*値段の根拠/ })).toBeVisible({ timeout: 30000 });
       const dimensions = await page.evaluate(() => ({
         viewport: document.documentElement.clientWidth,
         document: document.documentElement.scrollWidth
@@ -152,7 +152,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
     await page.addInitScript(() => localStorage.setItem("formcost_pro_license", "playwright-test-token"));
     await page.route("**/api/verify-pro", route => route.abort());
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: /その造形に.*値段の根拠/ })).toBeVisible({ timeout: 30000 });
     await expect(page.getByRole("status")).toContainText("会員資格を確認できません。通信環境を確認してください。");
     expect(await page.evaluate(() => localStorage.getItem("formcost_pro_license"))).toBe("playwright-test-token");
   });
@@ -163,7 +163,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
       route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ active: false, error: "設定未完了です。" }) })
     );
     await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: /その造形に.*値段の根拠/ })).toBeVisible({ timeout: 30000 });
     await expect(page.getByRole("status")).toContainText("会員資格を確認できません。通信環境を確認してください。");
     expect(await page.evaluate(() => localStorage.getItem("formcost_pro_license"))).toBe("playwright-test-token");
   });
@@ -182,7 +182,7 @@ test.describe("Toolia / 3D print calculator preview", () => {
     await expect(page.getByRole("heading", { name: /複数商品の一括見積もり/ })).toBeVisible({ timeout: 30000 });
     await page.evaluate(() => localStorage.removeItem("formcost_pro_license"));
     await page.reload({ waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: /その造形に.*値段の根拠/ })).toBeVisible({ timeout: 30000 });
     await expect(page.getByRole("heading", { name: /複数商品の一括見積もり/ })).toHaveCount(0);
     expect(await page.evaluate(() => localStorage.getItem("formcost_pro_license"))).toBeNull();
   });
