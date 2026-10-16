@@ -3,7 +3,8 @@ import re
 
 root = Path(__file__).resolve().parents[1]
 production = (root / "index.html").read_text(encoding="utf-8")
-v3 = (root / "uiux-prototype" / "src" / "main.jsx").read_text(encoding="utf-8")
+production_app = (root / "uiux-prototype" / "src" / "main.jsx").read_text(encoding="utf-8")
+v3 = (root / "uiux-prototype" / "src" / "main-preview.jsx").read_text(encoding="utf-8")
 css = (root / "uiux-prototype" / "src" / "styles.css").read_text(encoding="utf-8")
 preview = (root / "preview-v3.html").read_text(encoding="utf-8")
 hub = (root / "guide" / "index.html").read_text(encoding="utf-8")
@@ -14,9 +15,9 @@ expected_ids = [
     "failureRate", "otherCost", "packagingCost", "shippingCost",
     "feeRate", "targetMargin",
 ]
-prod_ids_match = re.search(r"const ids\s*=\s*\[([^\]]+)\]", production)
-assert prod_ids_match, "Could not locate production calculator input IDs"
-prod_ids = re.findall(r'"([^"]+)"', prod_ids_match.group(1))
+prod_fields_match = re.search(r'const fields\s*=\s*\[([\s\S]*?)\n\];', production_app)
+assert prod_fields_match, "Could not locate canonical calculator fields"
+prod_ids = re.findall(r'\bid:\s*"([^"]+)"', prod_fields_match.group(1))
 fields_match = re.search(r"const fields\s*=\s*\[([\s\S]*?)\n\];", v3)
 assert fields_match, "Could not locate V3 calculator fields"
 v3_ids = re.findall(r'\bid:\s*"([^"]+)"', fields_match.group(1))
@@ -25,16 +26,16 @@ assert v3_ids == expected_ids, f"V3 input IDs differ from production: {v3_ids}"
 
 # Verify core equations are present in both implementations.
 equations = [
-    ("filament", r'num\("filamentPrice"\)\s*/\s*spool\s*\*\s*num\("usedGrams"\)', r"num\(v\.filamentPrice\)\s*/\s*spool\s*\*\s*num\(v\.usedGrams\)"),
-    ("electricity", r'num\("printHours"\)\s*\*\s*num\("powerWatts"\)\s*/\s*1000\s*\*\s*num\("electricityRate"\)', r"num\(v\.printHours\)\s*\*\s*num\(v\.powerWatts\)\s*/\s*1000\s*\*\s*num\(v\.electricityRate\)"),
-    ("depreciation", r'num\("printerPrice"\)\s*/\s*life\s*\*\s*num\("printHours"\)', r"num\(v\.printerPrice\)\s*/\s*life\s*\*\s*num\(v\.printHours\)"),
+    ("filament", r"num\(v\.filamentPrice\)\s*/\s*spool\s*\*\s*num\(v\.usedGrams\)", r"num\(v\.filamentPrice\)\s*/\s*spool\s*\*\s*num\(v\.usedGrams\)"),
+    ("electricity", r"num\(v\.printHours\)\s*\*\s*num\(v\.powerWatts\)\s*/\s*1000\s*\*\s*num\(v\.electricityRate\)", r"num\(v\.printHours\)\s*\*\s*num\(v\.powerWatts\)\s*/\s*1000\s*\*\s*num\(v\.electricityRate\)"),
+    ("depreciation", r"num\(v\.printerPrice\)\s*/\s*life\s*\*\s*num\(v\.printHours\)", r"num\(v\.printerPrice\)\s*/\s*life\s*\*\s*num\(v\.printHours\)"),
     ("failure adjustment", r"base\s*/\s*\(1\s*-\s*failure\)", r"base\s*/\s*\(1\s*-\s*failure\)"),
     ("landed cost", r"production\s*\+\s*packaging\s*\+\s*shipping", r"production\s*\+\s*packaging\s*\+\s*shipping"),
     ("suggested price", r"landed\s*/\s*denominator", r"landed\s*/\s*denominator"),
     ("break-even price", r"landed\s*/\s*\(1\s*-\s*fee\)", r"landed\s*/\s*\(1\s*-\s*fee\)"),
     ("profit", r"suggested\s*\*\s*\(1\s*-\s*fee\)\s*-\s*landed", r"suggested\s*\*\s*\(1\s*-\s*fee\)\s*-\s*landed"),
 ]
-prod_calc = production[production.find("function calculate()"):]
+prod_calc = production_app[production_app.find("function calculate("): ]
 v3_calc = v3[v3.find("function calculate(v)"):]
 for label, prod_pattern, v3_pattern in equations:
     assert re.search(prod_pattern, prod_calc), f"Production formula missing or changed: {label}"
