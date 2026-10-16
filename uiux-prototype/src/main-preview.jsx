@@ -139,7 +139,7 @@ function App() {
   // Stripe Billing Portal, clear the navigation spinner so the user can manage
   // their subscription again without needing a manual reload.
   useEffect(() => {
-    const handlePageShow = () => setProBusy(false);
+    const handlePageShow = event => { if (event.persisted) setProBusy(false); };
     window.addEventListener("pageshow", handlePageShow);
     return () => window.removeEventListener("pageshow", handlePageShow);
   }, []);
