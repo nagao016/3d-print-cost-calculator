@@ -147,4 +147,33 @@ test.describe("Toolia / 3D print calculator preview", () => {
     }
   });
 
+
+  test("transient Pro verification network failure preserves the saved token", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("formcost_pro_license", "playwright-test-token"));
+    await page.route("**/api/verify-pro", route => route.abort());
+    await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("status")).toContainText("会員資格を確認できません。通信環境を確認してください。");
+    expect(await page.evaluate(() => localStorage.getItem("formcost_pro_license"))).toBe("playwright-test-token");
+  });
+
+  test("clearing browser storage fails closed and does not grant Pro access", async ({ page }) => {
+    await page.addInitScript(() => {
+      if (!sessionStorage.getItem("seeded-pro-token")) {
+        localStorage.setItem("formcost_pro_license", "playwright-test-token");
+        sessionStorage.setItem("seeded-pro-token", "1");
+      }
+    });
+    await page.route("**/api/verify-pro", route =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ active: true }) })
+    );
+    await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /複数商品の一括見積もり/ })).toBeVisible({ timeout: 30000 });
+    await page.evaluate(() => localStorage.removeItem("formcost_pro_license"));
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("heading", { name: /複数商品の一括見積もり/ })).toHaveCount(0);
+    expect(await page.evaluate(() => localStorage.getItem("formcost_pro_license"))).toBeNull();
+  });
+
 });
