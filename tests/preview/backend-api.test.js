@@ -197,6 +197,7 @@ test("checkout creation stores a pending token and attaches it to the subscripti
     });
     assert.equal(response.status, 200);
     assert.equal((await response.json()).url, "https://checkout.stripe.test/session");
+    assert.equal(submitted.has("payment_method_types[0]"), false, "Checkout must rely on Stripe Dashboard payment-method settings");
     const token = submitted.get("client_reference_id");
     assert.match(token, /^[A-Za-z0-9_-]{40,50}$/);
     assert.equal(submitted.get("subscription_data[metadata][license_token]"), token);
