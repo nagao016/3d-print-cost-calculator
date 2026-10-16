@@ -220,7 +220,11 @@ test("customer portal accepts same-origin Pages preview and returns to that prev
   };
   try {
     const response = await createPortal({
-      request: req({ licenseToken: token }, { Origin: preview }),
+      request: new Request(`${preview}/api/create-customer-portal`, {
+        method: "POST",
+        headers: { "content-type": "application/json", Origin: preview },
+        body: JSON.stringify({ licenseToken: token })
+      }),
       env
     });
     assert.equal(response.status, 200);
