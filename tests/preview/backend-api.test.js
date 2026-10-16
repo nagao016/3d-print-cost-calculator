@@ -205,6 +205,30 @@ test("checkout creation stores a pending token and attaches it to the subscripti
   } finally { globalThis.fetch = originalFetch; }
 });
 
+test("customer portal accepts same-origin Pages preview and returns to that preview", async () => {
+  const token = randomBytes(32).toString("base64url");
+  const preview = "https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev";
+  const env = {
+    STRIPE_SECRET_KEY: "sk_test", SITE_URL: "https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev",
+    PRO_ACCESS: makeKV({ [`license:${token}`]: JSON.stringify({ status: "active", customerId: "cus_1" }) })
+  };
+  const originalFetch = globalThis.fetch;
+  let submitted = null;
+  globalThis.fetch = async (_url, options) => {
+    submitted = new URLSearchParams(options.body);
+    return new Response(JSON.stringify({ url: "https://billing.stripe.test/session" }), { status: 200 });
+  };
+  try {
+    const response = await createPortal({
+      request: req({ licenseToken: token }, { Origin: preview }),
+      env
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { url: "https://billing.stripe.test/session" });
+    assert.equal(submitted.get("return_url"), preview + "/");
+  } finally { globalThis.fetch = originalFetch; }
+});
+
 test("checkout creation rejects a foreign Origin before calling Stripe", async () => {
   const env = { STRIPE_SECRET_KEY: "sk_test", STRIPE_PRICE_ID: "price_test", SITE_URL: "https://calquro.online", PRO_ACCESS: makeKV() };
   const originalFetch = globalThis.fetch;
