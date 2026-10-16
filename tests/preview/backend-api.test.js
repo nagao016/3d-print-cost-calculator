@@ -47,6 +47,15 @@ test("webhook rejects missing and invalid signatures", async () => {
   assert.equal((await stripeWebhook({ request: req(raw, { "Stripe-Signature": "t=1,v1=bad" }), env })).status, 400);
 });
 
+test("webhook accepts the additional preview signing secret without replacing the existing secret", async () => {
+  const legacySecret = "whsec_legacy_preview", additionalSecret = "whsec_fix_preview";
+  const env = { STRIPE_WEBHOOK_SECRET: legacySecret, STRIPE_WEBHOOK_SECRET_PREVIEW_FIX: additionalSecret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: makeKV() };
+  const raw = JSON.stringify({ id: "evt_additional_secret", type: "checkout.session.completed", data: { object: {} } });
+  const response = await stripeWebhook({ request: req(raw, { "Stripe-Signature": signature(raw, additionalSecret) }), env });
+  assert.equal(response.status, 200);
+  assert.equal(await env.PRO_ACCESS.get("stripe-event:evt_additional_secret"), "1");
+});
+
 test("webhook rejects signatures outside the timestamp tolerance", async () => {
   const secret = "whsec_unit_test";
   const env = { STRIPE_WEBHOOK_SECRET: secret, STRIPE_SECRET_KEY: "sk_test", PRO_ACCESS: makeKV() };
