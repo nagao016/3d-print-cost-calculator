@@ -12,6 +12,56 @@ INDEX_PATH = ROOT / "index.html"
 SITEMAP_PATH = ROOT / "sitemap.xml"
 REPORT_PATH = ROOT / "AUTO-PUBLISH-REPORT.md"
 
+# Reuse a curated library of ten existing article illustrations. The order is deterministic
+# so builds are reproducible; the last three published images are avoided when possible.
+IMAGE_LIBRARY = {
+    "/assets/article-comparison.svg": ("3Dプリント作品や費用項目の比較イメージ", "費用や条件を比較し、作品に合う選択肢を検討します。"),
+    "/assets/article-cost.svg": ("電卓と原価計算の図解", "材料費以外の費用も整理して原価を見積もります。"),
+    "/assets/article-electricity.svg": ("3Dプリンターの電気代の図解", "消費電力と稼働時間をもとに電気代を試算します。"),
+    "/assets/article-failure.svg": ("3Dプリントの失敗と材料ロスの図解", "造形失敗や材料ロスも原価の前提として確認します。"),
+    "/assets/article-filament.svg": ("フィラメントと材料費の図解", "材料の種類や使用量を確認して材料費を見積もります。"),
+    "/assets/article-machine.svg": ("3Dプリンター本体と機材費の図解", "機材の購入費や保守費を配分して考えます。"),
+    "/assets/article-profit.svg": ("原価と利益の関係を示す図解", "原価や手数料を確認し、利益を試算します。"),
+    "/assets/article-quality.svg": ("3Dプリント作品の仕上がりと品質の図解", "仕上がりに必要な作業や品質を考慮します。"),
+    "/assets/article-selling-price.svg": ("3Dプリント作品の販売価格の図解", "原価と販売条件を踏まえて価格を検討します。"),
+    "/assets/article-workflow.svg": ("3Dプリント作品の制作から発送までの流れの図解", "制作から完成・発送までに必要な費用を整理します。"),
+}
+
+# Topic-specific preferences; fallback rotation still prevents recent repetition.
+IMAGE_PREFERENCES = {
+    "electricity": ["/assets/article-electricity.svg", "/assets/article-cost.svg"],
+    "failure": ["/assets/article-failure.svg", "/assets/article-quality.svg"],
+    "machine": ["/assets/article-machine.svg", "/assets/article-cost.svg"],
+    "post-processing": ["/assets/article-quality.svg", "/assets/article-workflow.svg"],
+    "packaging": ["/assets/article-workflow.svg", "/assets/article-comparison.svg"],
+    "shipping": ["/assets/article-workflow.svg", "/assets/article-comparison.svg"],
+    "profit": ["/assets/article-profit.svg", "/assets/article-selling-price.svg"],
+    "filament": ["/assets/article-filament.svg", "/assets/article-comparison.svg"],
+    "print-time": ["/assets/article-electricity.svg", "/assets/article-machine.svg"],
+    "support": ["/assets/article-filament.svg", "/assets/article-failure.svg"],
+    "price": ["/assets/article-selling-price.svg", "/assets/article-profit.svg"],
+}
+
+def select_article_image(topic, published):
+    recent = {item.get("image") for item in published[-3:] if item.get("image")}
+    slug = topic["slug"]
+    preferred = []
+    for keyword, images in IMAGE_PREFERENCES.items():
+        if keyword in slug:
+            preferred.extend(images)
+    offset = len(published) % len(IMAGE_LIBRARY)
+    rotated = list(IMAGE_LIBRARY.keys())[offset:] + list(IMAGE_LIBRARY.keys())[:offset]
+    candidates = list(dict.fromkeys(preferred + rotated))
+    available = [path for path in candidates if path not in recent and (ROOT / path.lstrip("/")).is_file()]
+    if not available:
+        available = [path for path in candidates if (ROOT / path.lstrip("/")).is_file()]
+    if not available:
+        raise FileNotFoundError("No valid article illustration found in IMAGE_LIBRARY.")
+    image = available[0]
+    topic["image"] = image
+    topic["alt"], topic["caption"] = IMAGE_LIBRARY[image]
+    return image
+
 # Curated, template-based topics. One topic is published per scheduled run.
 TOPICS = [
   {"slug":"3d-printing-electricity-cost","title":"3Dプリンターの電気代を計算する方法","description":"消費電力・印刷時間・電気料金単価から、3Dプリンターの電気代を概算する方法を解説します。","image":"/assets/article-cost.png","alt":"電卓と3Dプリント作品","caption":"電力・稼働時間・電気料金単価をそろえて試算します。","intro":"3Dプリンターの電気代は、消費電力、稼働時間、電気料金単価を使って概算できます。ただし、ヒーターの稼働状況や機種、造形条件によって実際の消費電力は変わります。","sections":[["基本的な計算式",["概算では「消費電力（kW）×稼働時間（時間）×電気料金単価（円/kWh）」で電気代を求めます。Wで表示された消費電力は、1,000で割ってkWに換算します。","例として、平均消費電力を100W、稼働時間を5時間、電気料金単価を30円/kWhと仮定すると、0.1kW×5時間×30円＝15円です。これは仮定に基づく例で、実機の実測値ではありません。"]],["消費電力の見方",["製品仕様に記載された最大消費電力は、印刷中の平均消費電力と同じとは限りません。可能であればワットチェッカーなどで実際の稼働状況を測定し、条件を記録します。"]],["原価計算に反映する",["作品ごとの電気代を求める場合は、印刷時間と消費電力の前提を明記します。材料費や機材費、失敗分なども別途確認し、同じ費用を二重計上しないようにします。"]]]},
@@ -45,7 +95,7 @@ def render_article(t):
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{escape(t["title"])}</title><meta name="description" content="{escape(t["description"], quote=True)}"><meta name="robots" content="index,follow">
 <link rel="canonical" href="{escape(url, quote=True)}"><meta property="og:type" content="article"><meta property="og:title" content="{escape(t["title"], quote=True)}"><meta property="og:description" content="{escape(t["description"], quote=True)}"><meta property="og:url" content="{escape(url, quote=True)}"><meta property="og:image" content="{escape(image_url, quote=True)}"><meta property="og:image:alt" content="{escape(t["alt"], quote=True)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{escape(image_url, quote=True)}">
-<style>body{{margin:0;background:#f4f7fb;color:#172033;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.85}}header{{background:#13264b;padding:18px}}header a{{color:#fff}}main{{max-width:850px;margin:28px auto;padding:0 16px}}article{{background:#fff;border:1px solid #dce2eb;border-radius:16px;padding:clamp(18px,4vw,36px)}}h1{{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4}}h2{{margin-top:32px;padding-bottom:8px;border-bottom:1px solid #dce2eb;font-size:1.3rem}}.hero{{margin:24px 0}}.hero img{{display:block;width:100%;max-height:430px;object-fit:cover;border-radius:12px}}figcaption,.muted{{color:#657084;font-size:.9rem}}a{{color:#1559d6}}.cta{{display:inline-block;background:#1559d6;color:#fff;text-decoration:none;border-radius:9px;padding:10px 15px;font-weight:700}}footer{{max-width:850px;margin:auto;padding:18px;color:#657084;font-size:.85rem}}</style></head>
+<style>body{{margin:0;background:#f4f7fb;color:#172033;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.85}}header{{background:#13264b;padding:18px}}header a{{color:#fff}}main{{max-width:850px;margin:28px auto;padding:0 16px}}article{{background:#fff;border:1px solid #dce2eb;border-radius:16px;padding:clamp(18px,4vw,36px)}}h1{{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.4}}h2{{margin-top:32px;padding-bottom:8px;border-bottom:1px solid #dce2eb;font-size:1.3rem}}.hero{{margin:24px 0}}.hero img{{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:12px;border:1px solid #dce2eb;background:#f8fafc}}figcaption,.muted{{color:#657084;font-size:.9rem}}a{{color:#1559d6}}.cta{{display:inline-block;background:#1559d6;color:#fff;text-decoration:none;border-radius:9px;padding:10px 15px;font-weight:700}}footer{{max-width:850px;margin:auto;padding:18px;color:#657084;font-size:.85rem}}</style></head>
 <body><header><a href="/">← 3Dプリンター原価・販売価格計算ツールへ戻る</a></header><main><article><p class="muted">3Dプリンター 原価計算ガイド</p><h1>{escape(t["title"])}</h1><p>{escape(t["intro"])}</p>
 <figure class="hero"><img src="{escape(t["image"])}" alt="{escape(t["alt"], quote=True)}" width="1200" height="800" fetchpriority="high"><figcaption>{escape(t["caption"])}</figcaption></figure>
 {sections}<section><h2>計算ツールで試算する</h2><p>入力条件に基づく概算を確認するには、原価・販売価格計算ツールをご利用ください。実際の費用や販売条件に応じて前提を確認してください。</p><p><a class="cta" href="/">無料の計算ツールを使う</a></p></section><section><h2>関連記事</h2><ul>{related}</ul></section><p class="muted">公開日：{datetime.now(timezone.utc).strftime('%Y年%m月%d日')}（UTC基準）</p></article></main><footer>本ページは一般的な費用見積もりの解説です。実際の条件・料金を確認してください。</footer></body></html>'''
@@ -86,16 +136,20 @@ def main():
         return
     dest = ROOT / "guide" / topic["slug"] / "index.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
+    selected_image = select_article_image(topic, published)
+    image_path = ROOT / selected_image.lstrip("/")
+    if not image_path.is_file():
+        raise FileNotFoundError(f"Selected article image does not exist: {selected_image}")
     html = render_article(topic)
     assert html.lower().startswith("<!doctype html>") and html.count("<h1>") == 1
     assert 'name="description"' in html and 'property="og:image"' in html and 'name="twitter:card"' in html
     assert topic["image"] in html and "alt=" in html
     dest.write_text(html, encoding="utf-8")
-    published.append({"slug": topic["slug"], "published_at": datetime.now(timezone.utc).isoformat()})
+    published.append({"slug": topic["slug"], "image": selected_image, "published_at": datetime.now(timezone.utc).isoformat()})
     STATE_PATH.write_text(json.dumps({"published": published}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     update_homepage(published)
     update_sitemap(published)
-    REPORT_PATH.write_text("# 自動記事公開レポート\n\n- 今回の記事: `" + topic["slug"] + "`\n- タイトル: " + topic["title"] + "\n- 画像: `" + topic["image"] + "`\n- 記事HTML、ホームの新着リンク、サイトマップを更新しました。\n- 公開キューは固定テンプレート方式です。AIによる新規文章生成や外部調査は行っていません。\n- GitHub Actionsが変更をコミット・プッシュし、Cloudflare PagesがGit連携でデプロイする設定が必要です。\n", encoding="utf-8")
+    REPORT_PATH.write_text("# 自動記事公開レポート\n\n- 今回の記事: `" + topic["slug"] + "`\n- タイトル: " + topic["title"] + "\n- 画像: `" + topic["image"] + "`（10種類の画像ライブラリから選択。直近3記事との重複を回避）\n- 画像ファイルの存在を確認しました。\n- 記事HTML、ホームの新着リンク、サイトマップを更新しました。\n- 公開キューは固定テンプレート方式です。AIによる新規文章生成や外部調査は行っていません。\n- GitHub Actionsが変更をコミット・プッシュし、Cloudflare PagesがGit連携でデプロイする設定が必要です。\n", encoding="utf-8")
     print(f"Prepared article: {topic['slug']}")
 
 if __name__ == "__main__": main()
