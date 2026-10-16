@@ -157,6 +157,17 @@ test.describe("Toolia / 3D print calculator preview", () => {
     expect(await page.evaluate(() => localStorage.getItem("formcost_pro_license"))).toBe("playwright-test-token");
   });
 
+  test("temporary verification HTTP errors preserve the saved Pro token", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("formcost_pro_license", "playwright-test-token"));
+    await page.route("**/api/verify-pro", route =>
+      route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ active: false, error: "設定未完了です。" }) })
+    );
+    await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole("status")).toContainText("会員資格を確認できません。通信環境を確認してください。");
+    expect(await page.evaluate(() => localStorage.getItem("formcost_pro_license"))).toBe("playwright-test-token");
+  });
+
   test("clearing browser storage fails closed and does not grant Pro access", async ({ page }) => {
     await page.addInitScript(() => {
       if (!sessionStorage.getItem("seeded-pro-token")) {
