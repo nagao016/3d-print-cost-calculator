@@ -369,7 +369,7 @@ function App() {
 
         <section className="method" id="method"><div className="method-head"><span className="micro-label">THE LOGIC BEHIND THE NUMBER</span><h2>計算の仕組み</h2><p>透明な計算式で、価格設定の根拠を確認できます。</p></div><div className="logic-steps"><article><span>01</span><div><h3>製造ベース原価</h3><p>フィラメント代・電気代・プリンター償却費・その他消耗品を合算。</p><code>材料 + 電気 + 償却 + 消耗品</code></div></article><article><span>02</span><div><h3>失敗率・販売関連費用</h3><p>印刷失敗を見込み、梱包費と送料を加算します。</p><code>製造ベース原価 ÷ (1 − 失敗率)</code></div></article><article><span>03</span><div><h3>目標利益率から逆算</h3><p>販売手数料と目標利益率を差し引いた割合で原価を割ります。</p><code>原価 ÷ (1 − 手数料率 − 目標利益率)</code></div></article></div><div className="method-foot"><span>FORM / COST — PRICING TOOL</span><span>人件費・税金・固定出品料・返品費などは含まれません。</span></div></section>
       </main>
-      <footer><a className="wordmark" href="#top"><span className="mark-cube"><i /></span><span>FORM / COST<small>3D PRINT PRICING LAB</small></span></a><span>つくることに、価格の根拠を。</span><a href="/guide/">記事一覧 ↗</a><a href="#calculator">上へ戻る ↑</a></footer>
+      <footer><a className="wordmark" href="#top"><span className="mark-cube"><i /></span><span>FORM / COST<small>3D PRINT PRICING LAB</small></span></a><span>つくることに、価格の根拠を。</span><a href="/guide/">記事一覧 ↗</a><a href="/legal/">利用規約・プライバシー等</a><a href="/legal/tokushoho.html">特定商取引法に基づく表記</a><a href="/legal/cancellation.html">サブスクの解約方法</a><a href="#calculator">上へ戻る ↑</a></footer>
       {copied && <motion.div className="toast" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>{copied}</motion.div>}
     </div>
   </MotionConfig>;
