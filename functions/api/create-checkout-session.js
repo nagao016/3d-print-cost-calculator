@@ -22,10 +22,8 @@ export async function onRequestPost({ request, env }) {
   const token = randomToken();
   const form = new URLSearchParams({
     mode: "subscription",
-    // Keep the first release on card payments. This avoids enabling delayed
-    // payment methods that the current completion flow (payment_status=paid)
-    // does not handle asynchronously.
-    "payment_method_types[0]": "card",
+    // Payment methods are configured in Stripe Dashboard; avoid the deprecated
+    // payment_method_types parameter rejected by the current Checkout API.
     "line_items[0][price]": env.STRIPE_PRICE_ID,
     "line_items[0][quantity]": "1",
     client_reference_id: token,
