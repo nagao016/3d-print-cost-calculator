@@ -16,7 +16,12 @@ export async function onRequestPost({ request, env }) {
   }
 
   const origin = request.headers.get("Origin");
-  const site = new URL(env.SITE_URL).origin;
+  const requestUrl = new URL(request.url);
+  const configuredSite = new URL(env.SITE_URL).origin;
+  // Permit the exact same-origin Cloudflare Pages preview host for branch testing.
+  // Production custom-domain requests must continue to match SITE_URL exactly.
+  const isPagesDevHost = requestUrl.hostname.endsWith(".pages.dev");
+  const site = isPagesDevHost ? requestUrl.origin : configuredSite;
   if (origin && origin !== site) return json({ error: "許可されていないアクセスです。" }, 403);
 
   const token = randomToken();
