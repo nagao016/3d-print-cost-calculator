@@ -2,11 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://3dprint.calquro.online/</loc></url>
   <url><loc>https://3dprint.calquro.online/guide/</loc></url>
-  <url><loc>https://3dprint.calquro.online/guide/3d-printing-electricity-cost/</loc></url>
   <url><loc>https://3dprint.calquro.online/guide/3d-printer-failure-rate-cost/</loc></url>
+  <url><loc>https://3dprint.calquro.online/guide/3d-printing-electricity-cost/</loc></url>
   <url><loc>https://3dprint.calquro.online/guide/3d-printing-machine-depreciation/</loc></url>
+  <url><loc>https://3dprint.calquro.online/guide/3d-printing-packaging-shipping-cost/</loc></url>
+  <url><loc>https://3dprint.calquro.online/guide/3d-printing-post-processing-cost/</loc></url>
   <url><loc>https://3dprint.calquro.online/guide/cost-calculation/</loc></url>
   <url><loc>https://3dprint.calquro.online/guide/filament-cost/</loc></url>
-  <url><loc>https://3dprint.calquro.online/guide/selling-price/</loc></url>
   <url><loc>https://3dprint.calquro.online/guide/keychain-cost/</loc></url>
+  <url><loc>https://3dprint.calquro.online/guide/selling-price/</loc></url>
 </urlset>
