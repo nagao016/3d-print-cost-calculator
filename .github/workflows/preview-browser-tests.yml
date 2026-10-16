@@ -48,12 +48,15 @@ jobs:
       - name: Run preview browser tests (Chromium)
         env:
           PREVIEW_URL: https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev/
-        run: npx playwright test tests/preview --reporter=list --browser=chromium
+        if: always()
+        run: npx playwright test tests/preview --reporter=list --browser=chromium --workers=1
       - name: Run preview browser tests (Firefox)
         env:
           PREVIEW_URL: https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev/
-        run: npx playwright test tests/preview --reporter=list --browser=firefox
+        if: always()
+        run: npx playwright test tests/preview --reporter=list --browser=firefox --workers=1
       - name: Run preview browser tests (WebKit)
         env:
           PREVIEW_URL: https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev/
-        run: npx playwright test tests/preview --reporter=list --browser=webkit
+        if: always()
+        run: npx playwright test tests/preview --reporter=list --browser=webkit --workers=1
