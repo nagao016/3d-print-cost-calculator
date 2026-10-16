@@ -27,6 +27,33 @@ jobs:
         run: python scripts/publish_seo_guides.py
       - name: Run scheduled article publisher
         run: python scripts/auto_publish_article.py
+      - name: Test ten-image rotation and recent-repeat avoidance
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+
+          script = Path("scripts/auto_publish_article.py")
+          spec = importlib.util.spec_from_file_location("auto_publish_article", script)
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+
+          history = []
+          selected = []
+          for i in range(10):
+              topic = {"slug": f"rotation-test-{i}"}
+              image = module.select_article_image(topic, history)
+              assert (Path(".") / image.lstrip("/")).is_file(), f"Missing asset: {image}"
+              assert image == topic["image"]
+              assert topic["alt"] and topic["caption"]
+              if len(history) >= 3:
+                  assert image not in {item["image"] for item in history[-3:]}, "Recent image repeated"
+              selected.append(image)
+              history.append({"slug": topic["slug"], "image": image})
+
+          assert len(set(selected)) == 10, f"Expected 10 unique images, got {len(set(selected))}"
+          print("Image rotation passed: 10 assets selected, all unique, recent repeats avoided.")
+          PY
       - name: Validate article hub and sitemap
         run: |
           python - <<'PY'
