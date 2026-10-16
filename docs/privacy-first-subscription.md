@@ -29,17 +29,17 @@
 Preview URLや設定値は、Cloudflareの現在のPreview deployment画面で実際の値を確認してから使用する。ブランチ名が同じでも、デプロイURLが変わる可能性がある。
 
 ## テスト状況（2026-10-16 Preview検証）
-- GitHub Actions Run #23（commit `c4d817106ffcf2280290aa89f95da09479daef56`）: API回帰テスト21件成功、Playwrightブラウザテスト5件成功。現在のPR head `8850207eb0b0a08f7b801b24be4855ad9066e4e8` はこのテスト済みコミットのドキュメントのみの変更。
+- GitHub Actions Run #25（commit `ad0e85a19b44cb96c9242822ebd3d7e1c8faa625`）成功: API回帰テスト21件（21 passed / 0 failed）、Playwrightブラウザテスト9件成功。実行ログ: https://github.com/nagao016/3d-print-cost-calculator/actions/runs/38843183545
+- Run #25のブラウザテストでは、基本計算の再計算、ステップ遷移、Pro機能表示、無料会員ロック、CSVダウンロード、商品行追加、保存条件の保存/呼び出し、フィラメント10種類上限、320/375/390/768pxの水平はみ出し、資格確認APIの一時ネットワーク障害時のトークン保持、localStorage消去後にPro権限を付与しないことを確認。
+- API回帰テスト21件には、署名不正/期限切れ、重複・順不同イベント、解約と支払い失敗による資格失効、active状態維持、Stripe API一時障害時の再試行、Checkoutトークン照合、Origin検証、Billing Portal入力検証が含まれる。
 - Cloudflare Pages Preview: `PRO_ACCESS` が `pro-access-preview` namespaceに接続されていること、Previewの `SITE_URL` とテストPrice IDが設定されていることを読み取り確認。Secret値はCloudflare APIから読み戻せないため、値そのものは検証していない。
-- Stripe Test mode: アプリ経由のCheckout購入成功、購入完了画面への復帰、KVライセンスの `active` 状態、Billing Portalの表示を確認。
+- Stripe Test mode: アプリ経由のCheckout購入成功、購入完了画面への復帰、KVライセンス `active`、Billing Portal表示を確認。
 - 解約E2E: 専用のテスト契約の解約後に対応するKVライセンスが `inactive` になることを確認。
 - 更新失敗E2E: 専用契約で500円の更新請求を失敗させ、`invoice.payment_failed`、Webhook HTTP 200 / `received: true`、KVのイベント処理済みキー、およびアプリ発行ライセンスの `active` から `inactive` への変更を確認。
 - Webhook購読設定: `checkout.session.completed`、`customer.subscription.created`、`customer.subscription.updated`、`customer.subscription.deleted`、`invoice.payment_failed` の5イベントを確認。
-- Playwrightブラウザ回帰テストは計5件（計算値の再計算、ステップ遷移、Pro機能表示、無料会員ロック、390px幅の水平はみ出し）を通過。これはエミュレートされたモバイル幅であり、実機iOS/Androidの検証を意味しない。
-- API回帰テスト21件には署名不正/期限切れ、重複・順不同イベント、解約と支払い失敗による資格失効、active状態維持、Stripe API一時障害時の再試行、Checkoutトークン照合、Origin検証、Billing Portal入力検証が含まれる。
-- 未実施/未確認: 実機iOS/Androidでの操作、端末変更・ブラウザデータ消去後の復旧UX、Stripe/Cloudflare障害時の実際のネットワーク挙動、全てのCSV/一括見積もり機能の手動回帰テスト。これらは本番公開前の残作業。
+- 実機iOS/Android、Safari/Firefoxはこの環境から実機確認していない。Playwrightの320/375/390/768pxテストはChromiumでのレスポンシブ表示確認であり、実機・別ブラウザの完全な互換性保証ではない。
+- 本番公開前の残作業: 実機iOS/AndroidとSafari/Firefoxの確認、購入復元UXの最終確認、Production適用前の最終レビュー。
 - この作業でPRをマージしたり、Productionを変更したり、Stripe Live課金を有効化したりしていない。
-
 ## 運用上の注意
 - Stripe側の購入者情報処理と、自社側で情報を保存しないことは別の問題である。プライバシー告知にはStripeで処理される情報と、自社KVに保存するライセンス状態・Stripe IDを明記する。
 - ブラウザ内の状態だけを信頼せず、Pro権限確認APIと連携させる。
