@@ -47,13 +47,13 @@ jobs:
         run: node --test tests/preview/backend-api.test.js
       - name: Run preview browser tests (Chromium)
         env:
-          PREVIEW_URL: https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev/
+          PREVIEW_URL: https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev/
         run: npx playwright test tests/preview --reporter=list --browser=chromium
       - name: Run preview browser tests (Firefox)
         env:
-          PREVIEW_URL: https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev/
+          PREVIEW_URL: https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev/
         run: npx playwright test tests/preview --reporter=list --browser=firefox
       - name: Run preview browser tests (WebKit)
         env:
-          PREVIEW_URL: https://feat-privacy-first-subscript.3d-print-cost-calculator-7ce.pages.dev/
+          PREVIEW_URL: https://fix-stripe-checkout-payment.3d-print-cost-calculator-7ce.pages.dev/
         run: npx playwright test tests/preview --reporter=list --browser=webkit
