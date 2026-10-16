@@ -6,7 +6,13 @@ on:
     branches:
       - feat/privacy-first-subscription-foundation
     paths:
+      - "functions/**"
       - "tests/preview/**"
+      - "uiux-prototype/src/**"
+      - "index.html"
+      - "robots.txt"
+      - "sitemap.xml"
+      - "guide/**"
       - ".github/workflows/preview-browser-tests.yml"
 
 permissions:
