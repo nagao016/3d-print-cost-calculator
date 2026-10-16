@@ -91,4 +91,60 @@ test.describe("Toolia / 3D print calculator preview", () => {
     }));
     expect(widths.document).toBeLessThanOrEqual(widths.viewport + 2);
   });
+
+  test("Pro tools support batch rows, CSV export, filament limit, and saved-condition restore", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("formcost_pro_license", "playwright-test-token"));
+    await page.route("**/api/verify-pro", route =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ active: true }) })
+    );
+    await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /複数商品の一括見積もり/ })).toBeVisible({ timeout: 30000 });
+
+    const batchRows = page.locator(".batch-estimate-table tbody tr");
+    const initialRows = await batchRows.count();
+    await page.getByRole("button", { name: /商品を追加/ }).click();
+    await expect(batchRows).toHaveCount(initialRows + 1);
+
+    const saveName = page.getByLabel("保存名");
+    await saveName.fill("回帰テスト条件");
+    await page.getByRole("button", { name: "保存", exact: true }).click();
+    await expect(page.getByText("計算条件をこのブラウザに保存しました。")).toBeVisible();
+
+    await page.evaluate(() => {
+      const input = document.querySelector("#usedGrams");
+      if (!(input instanceof HTMLInputElement)) throw new Error("#usedGrams input is missing");
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+      setter.call(input, "100");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await expect(page.locator("#usedGrams")).toHaveValue("100");
+    await page.getByLabel("保存条件").selectOption({ label: "回帰テスト条件" });
+    await page.getByRole("button", { name: "呼び出す", exact: true }).click();
+    await expect(page.locator("#usedGrams")).toHaveValue("80");
+
+    const addFilament = page.getByRole("button", { name: /フィラメントを追加/ });
+    for (let i = 0; i < 10 && await addFilament.isEnabled(); i++) await addFilament.click();
+    await expect(addFilament).toContainText("10/10");
+    await expect(addFilament).toBeDisabled();
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("button", { name: /CSVをダウンロード/ }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe("3d-print-batch-estimates.csv");
+  });
+
+  test("mobile viewport remains within the screen at narrow and tablet widths", async ({ page }) => {
+    for (const width of [320, 375, 390, 768]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(previewUrl, { waitUntil: "domcontentloaded" });
+      await expect(page.getByRole("heading", { name: /その造形に/ })).toBeVisible({ timeout: 30000 });
+      const dimensions = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        document: document.documentElement.scrollWidth
+      }));
+      expect(dimensions.document, `horizontal overflow at viewport width ${width}px`).toBeLessThanOrEqual(dimensions.viewport + 2);
+    }
+  });
+
 });
