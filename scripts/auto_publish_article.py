@@ -5,7 +5,7 @@ import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE = "https://3d-print-cost-calculator-7ce.pages.dev"
+SITE = "https://3dprint.calquro.online"
 QUEUE_PATH = ROOT / "content-queue" / "articles.json"
 STATE_PATH = ROOT / "content-queue" / "published.json"
 INDEX_PATH = ROOT / "index.html"
@@ -69,6 +69,7 @@ def update_homepage(published):
 
 def update_sitemap(published):
     old = re.findall(r"<loc>\s*(.*?)\s*</loc>", SITEMAP_PATH.read_text(encoding="utf-8")) if SITEMAP_PATH.exists() else []
+    old = [url for url in old if url.startswith(SITE + "/")]
     urls = [SITE + "/"] + [SITE + "/guide/" + x["slug"] + "/" for x in published]
     urls += [x for x in old if x not in urls]
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join("  <url><loc>" + escape(u) + "</loc></url>\n" for u in urls) + "</urlset>\n"
