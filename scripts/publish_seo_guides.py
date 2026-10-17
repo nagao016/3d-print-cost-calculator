@@ -187,35 +187,7 @@ def update_homepage():
     start = "<!-- AUTO-SEO-GUIDES-START -->"
     end = "<!-- AUTO-SEO-GUIDES-END -->"
     section = """<!-- AUTO-SEO-GUIDES-START -->
-<section class="guide" id="seo-guides" aria-labelledby="seo-guides-title">
-<style>
-#seo-guides{max-width:1180px;margin:72px auto;padding:0 24px;color:#252722;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.7}
-#seo-guides *{box-sizing:border-box}
-#seo-guides .section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}
-#seo-guides .section-kicker{font-size:11px;letter-spacing:.12em;color:#72736a}
-#seo-guides h2{font-size:clamp(22px,2.5vw,30px);line-height:1.35;margin:8px 0}
-#seo-guides .section-heading p{font-size:14px;color:#72736a;margin:0}
-#seo-guides .all-articles{font-size:13px;font-weight:700;white-space:nowrap;border-bottom:1px solid #f05a35;padding-bottom:5px}
-#seo-guides .article-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-#seo-guides .article-card{display:flex;flex-direction:column;overflow:hidden;background:#faf9f5;border:1px solid #d7d7ce;border-radius:12px;color:#252722;text-decoration:none;min-width:0;transition:transform .18s,box-shadow .18s}
-#seo-guides .article-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px #25272212}
-#seo-guides .article-card img{display:block;width:100%;height:180px;object-fit:cover}
-#seo-guides .article-card-body{display:flex;flex:1;flex-direction:column;align-items:flex-start;padding:17px}
-#seo-guides .article-tag{display:inline-block;border-radius:99px;padding:3px 9px;font-size:11px;font-weight:700;background:#e9e8df;color:#4f5148}
-#seo-guides .tag-blue{background:#e5edf8;color:#315a8a}#seo-guides .tag-green{background:#e3efe5;color:#356b48}#seo-guides .tag-orange{background:#fae7de;color:#9c4b31}
-#seo-guides h3{font-size:17px;line-height:1.5;margin:12px 0 8px}
-#seo-guides .article-card p{font-size:13px;line-height:1.7;color:#72736a;margin:0 0 16px}
-#seo-guides .read-more{margin-top:auto;font-size:12px;font-weight:700;color:#b84b2e}
-@media(max-width:760px){#seo-guides{margin:46px auto;padding:0 18px}#seo-guides .article-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#seo-guides .article-card img{height:140px}#seo-guides .article-card-body{padding:13px}#seo-guides h3{font-size:15px}}
-@media(max-width:520px){#seo-guides .section-heading{align-items:flex-start;flex-direction:column;gap:12px}#seo-guides .article-cards{grid-template-columns:1fr}#seo-guides .article-card{display:grid;grid-template-columns:112px minmax(0,1fr)}#seo-guides .article-card img{height:100%;min-height:150px}#seo-guides .article-card-body{padding:12px}}
-</style>
-  <div class="section-heading"><div><span class="section-kicker">LEARN MORE</span><h2 id="seo-guides-title">3Dプリンターの価格設定に役立つ記事</h2><p>原価や販売価格の考え方を、テーマごとにわかりやすく解説します。</p></div><a class="all-articles" href="/guide/">記事一覧を見る →</a></div>
-  <div class="article-cards">
-    <a class="article-card" href="/guide/cost-calculation/"><img src="/assets/article-cost.png" alt="電卓と3Dプリント作品" width="177" height="122" loading="lazy"><div class="article-card-body"><span class="article-tag tag-blue">基礎知識</span><h3>3Dプリンターの原価計算ガイド</h3><p>原価の内訳や計算方法、価格設定の基本をわかりやすく解説します。</p><span class="read-more">この記事を読む →</span></div></a>
-    <a class="article-card" href="/guide/filament-cost/"><img src="/assets/article-filament.png" alt="フィラメントと造形サンプル" width="175" height="122" loading="lazy"><div class="article-card-body"><span class="article-tag tag-green">材料費</span><h3>フィラメント材料費の計算方法</h3><p>購入価格と使用量から、材料費を正確に計算する方法を解説します。</p><span class="read-more">この記事を読む →</span></div></a>
-    <a class="article-card" href="/guide/selling-price/"><img src="/assets/article-selling-price.png" alt="色と形の異なる3Dプリント作品" width="185" height="122" loading="lazy"><div class="article-card-body"><span class="article-tag tag-orange">販売価格</span><h3>3Dプリント作品の販売価格の決め方</h3><p>手数料・送料・利益率を考慮した、販売価格の設定方法を解説します。</p><span class="read-more">この記事を読む →</span></div></a>
-  </div>
-</section>
+<!-- Curated guide cards removed from homepage; all articles are linked below. -->
 <!-- AUTO-SEO-GUIDES-END -->
 """
     if start in source and end in source:
