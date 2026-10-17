@@ -72,11 +72,32 @@ jobs:
           assert "https://3dprint.calquro.online/" in urls, "Live sitemap is missing the production homepage"
           print(f"Live sitemap OK: {len(urls)} production URLs; no legacy pages.dev URLs.")
           PY
-      - name: Upload report
+      - name: Submit sitemap and inspect URLs in Search Console when credentials are configured
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: https://3dprint.calquro.online/
+        run: |
+          if [ -z "$GSC_SERVICE_ACCOUNT_JSON" ]; then
+            cat > SEARCH-CONSOLE-REPORT.md <<'EOF'
+          # Google Search Console 自動確認レポート
+
+          - 状態: 未実行
+          - 理由: GitHub Actions の `GSC_SERVICE_ACCOUNT_JSON` シークレットが未設定です。
+          - 次の作業: Google Cloud で Search Console API を有効化し、サービスアカウントにプロパティへのアクセス権を付与してから、サービスアカウント JSON を GitHub Actions secret として登録してください。
+          - 注意: サイトマップの公開・取得確認と、Google側のインデックス登録は別の処理です。
+          EOF
+            echo "Search Console API check skipped: GSC_SERVICE_ACCOUNT_JSON is not configured."
+          else
+            python -m pip install --disable-pip-version-check google-api-python-client google-auth
+            python scripts/search_console_sync.py
+          fi
+      - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: auto-publish-article-report
-          path: AUTO-PUBLISH-REPORT.md
+          path: |
+            AUTO-PUBLISH-REPORT.md
+            SEARCH-CONSOLE-REPORT.md
           if-no-files-found: ignore
           retention-days: 30
