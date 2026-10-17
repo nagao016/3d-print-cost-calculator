@@ -25,17 +25,53 @@ jobs:
           python-version: "3.12"
       - name: Generate one queued article with image and update links
         run: python scripts/auto_publish_article.py
+      - name: Validate generated sitemap uses production URLs only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          sitemap_path = Path("sitemap.xml")
+          assert sitemap_path.exists(), "sitemap.xml is missing"
+          root = ET.parse(sitemap_path).getroot()
+          ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          urls = [node.text.strip() for node in root.findall("sm:url/sm:loc", ns) if node.text]
+          assert urls, "sitemap.xml contains no URLs"
+          assert all(url.startswith("https://3dprint.calquro.online/") for url in urls), "Non-production URL found in sitemap"
+          assert not any("pages.dev" in url for url in urls), "Legacy pages.dev URL found in sitemap"
+          assert "https://3dprint.calquro.online/" in urls, "Production homepage is missing from sitemap"
+          print(f"Validated {len(urls)} production sitemap URLs.")
+          PY
       - name: Commit and push published article
         run: |
           if git diff --quiet -- index.html sitemap.xml guide content-queue AUTO-PUBLISH-REPORT.md; then
             echo "No new article changes."
-            exit 0
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html sitemap.xml guide content-queue/articles.json content-queue/published.json AUTO-PUBLISH-REPORT.md
+            git commit -m "content: auto-publish scheduled SEO article"
+            git push
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html sitemap.xml guide content-queue/articles.json content-queue/published.json AUTO-PUBLISH-REPORT.md
-          git commit -m "content: auto-publish scheduled SEO article"
-          git push
+      - name: Verify live production sitemap after Cloudflare deployment
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            --retry 12 --retry-all-errors --retry-delay 10 --max-time 20 \
+            https://3dprint.calquro.online/sitemap.xml -o /tmp/live-sitemap.xml
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse(Path("/tmp/live-sitemap.xml")).getroot()
+          ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          urls = [node.text.strip() for node in root.findall("sm:url/sm:loc", ns) if node.text]
+          assert urls, "Live sitemap contains no URLs"
+          assert all(url.startswith("https://3dprint.calquro.online/") for url in urls), "Live sitemap contains a non-production URL"
+          assert not any("pages.dev" in url for url in urls), "Live sitemap still contains a legacy pages.dev URL"
+          assert "https://3dprint.calquro.online/" in urls, "Live sitemap is missing the production homepage"
+          print(f"Live sitemap OK: {len(urls)} production URLs; no legacy pages.dev URLs.")
+          PY
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
