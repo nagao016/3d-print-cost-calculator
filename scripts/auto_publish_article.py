@@ -53,12 +53,21 @@ def render_article(t):
 def update_homepage(published):
     source = INDEX_PATH.read_text(encoding="utf-8")
     start, end = "<!-- AUTO-SEO-AUTOPOST-START -->", "<!-- AUTO-SEO-AUTOPOST-END -->"
-    entries = []
-    for item in reversed(published[-6:]):
-        t = next((x for x in TOPICS if x["slug"] == item["slug"]), None)
-        if not t: continue
-        entries.append(f'<a class="autopost-card" href="/guide/{escape(t["slug"])}/"><img src="{escape(t["image"])}" alt="{escape(t["alt"], quote=True)}" loading="lazy" width="150" height="100"><span><strong>{escape(t["title"])}</strong><small>{escape(t["description"])}</small><em>記事を読む →</em></span></a>')
-    block = start + '''\n<section id="new-auto-articles" aria-labelledby="new-auto-articles-title" style="max-width:1440px;margin:32px auto;padding:0 22px"><style>#new-auto-articles .autopost-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}#new-auto-articles .autopost-card{display:flex;gap:14px;align-items:center;padding:14px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 5px 18px #163b6810;text-decoration:none;color:#172033}#new-auto-articles .autopost-card img{width:130px;height:95px;object-fit:cover;border-radius:9px}#new-auto-articles .autopost-card span{display:grid;gap:5px}#new-auto-articles .autopost-card small{color:#5b6577;line-height:1.5}#new-auto-articles .autopost-card em{font-style:normal;color:#1559d6;font-weight:700}@media(max-width:520px){#new-auto-articles .autopost-card img{width:95px;height:85px}}</style>\n<h2 id="new-auto-articles-title">新着ガイド記事</h2><p>原価計算や価格設定に役立つ記事を順次公開しています。</p><div class="autopost-grid">''' + "\n".join(entries) + "</div></section>\n" + end
+    block = start + '''\n<section id="new-auto-articles" aria-labelledby="new-auto-articles-title">
+  <style>
+  #new-auto-articles{max-width:1180px;margin:34px auto 64px;padding:0 24px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#252722}
+  #new-auto-articles .article-index-link{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 28px;background:#faf9f5;border:1px solid #d7d7ce;border-radius:12px;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s}
+  #new-auto-articles .article-index-link:hover{transform:translateY(-2px);box-shadow:0 8px 22px #25272212}
+  #new-auto-articles h2{font-size:clamp(20px,2.3vw,26px);margin:0 0 7px}
+  #new-auto-articles p{font-size:13px;color:#72736a;margin:0}
+  #new-auto-articles .index-cta{font-size:13px;font-weight:700;color:#b84b2e;white-space:nowrap}
+  @media(max-width:520px){#new-auto-articles{padding:0 18px}#new-auto-articles .article-index-link{padding:19px;align-items:flex-start;flex-direction:column;gap:12px}}
+  </style>
+  <a class="article-index-link" href="/guide/">
+    <span><h2 id="new-auto-articles-title">ガイド記事一覧</h2><p>原価計算・材料費・電気代・販売価格など、すべての記事を一覧で確認できます。</p></span>
+    <span class="index-cta">記事一覧を見る →</span>
+  </a>
+</section>\n''' + end
     if start in source and end in source:
         source = re.sub(re.escape(start) + r".*?" + re.escape(end), lambda _: block, source, flags=re.S)
     else:
